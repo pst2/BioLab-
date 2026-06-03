@@ -1,0 +1,25 @@
+services:
+  backend:
+    build:
+      context: ./backend_scaffold
+    container_name: biolab-backend
+    ports:
+      - "8000:8000"
+    environment:
+      DEBUG: "true"
+      API_KEY: "dev-key-1"
+      RATE_LIMIT_ENABLED: "false"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./bio_frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+        NEXT_PUBLIC_API_KEY: dev-key-1
+    container_name: biolab-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
