@@ -6,7 +6,7 @@
 
 <p>
   <a href="https://github.com/pst2/bio-lab-workspace/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/pst2/bio-lab-workspace/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI&color=22c55e" />
+    <img src="https://img.shields.io/github/actions/workflow/status/pst2/BioLab-/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI&color=22c55e" />
   </a>
   <a href="https://www.python.org/downloads/">
     <img src="https://img.shields.io/badge/Python-3.10%2B-3776ab?style=for-the-badge&logo=python&logoColor=white" />
