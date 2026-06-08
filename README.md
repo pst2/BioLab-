@@ -203,7 +203,7 @@ bio_project/
 
 ```bash
 # Clone the repository
-git clone https://github.com/pst2/BioLab.git
+git clone https://github.com/pst2/BioLab-.git
 cd BioLab-
 
 # Launch all services
@@ -428,7 +428,7 @@ Contributions are welcome! Here's how to get started:
 
 ```bash
 # 1. Fork and clone
-git clone https://github.com/pst2/BioLab.git
+git clone https://github.com/pst2/BioLab-.git
 
 # 2. Create a feature branch
 git checkout -b feature/your-feature-name
