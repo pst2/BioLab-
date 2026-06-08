@@ -5,7 +5,7 @@
 <br/>
 
 <p>
-  <a href="https://github.com/pst2/bio-lab-workspace/actions">
+  <a href="https://github.com/pst2/BioLab-/actions/actions">
     <img src="https://img.shields.io/github/actions/workflow/status/pst2/BioLab-/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI&color=22c55e" />
   </a>
   <a href="https://www.python.org/downloads/">
@@ -203,8 +203,8 @@ bio_project/
 
 ```bash
 # Clone the repository
-git clone https://github.com/pst2/bio-lab-workspace.git
-cd bio-lab-workspace
+git clone https://github.com/pst2/BioLab.git
+cd BioLab-
 
 # Launch all services
 docker compose up --build
@@ -428,7 +428,7 @@ Contributions are welcome! Here's how to get started:
 
 ```bash
 # 1. Fork and clone
-git clone https://github.com/pst2/bio-lab-workspace.git
+git clone https://github.com/pst2/BioLab.git
 
 # 2. Create a feature branch
 git checkout -b feature/your-feature-name
