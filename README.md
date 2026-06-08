@@ -5,8 +5,8 @@
 <br/>
 
 <p>
-  <a href="https://github.com/YOUR_USERNAME/bio-lab-workspace/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/YOUR_USERNAME/bio-lab-workspace/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI&color=22c55e" />
+  <a href="https://github.com/pst2/bio-lab-workspace/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/pst2/bio-lab-workspace/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI&color=22c55e" />
   </a>
   <a href="https://www.python.org/downloads/">
     <img src="https://img.shields.io/badge/Python-3.10%2B-3776ab?style=for-the-badge&logo=python&logoColor=white" />
@@ -203,7 +203,7 @@ bio_project/
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/bio-lab-workspace.git
+git clone https://github.com/pst2/bio-lab-workspace.git
 cd bio-lab-workspace
 
 # Launch all services
@@ -428,7 +428,7 @@ Contributions are welcome! Here's how to get started:
 
 ```bash
 # 1. Fork and clone
-git clone https://github.com/YOUR_USERNAME/bio-lab-workspace.git
+git clone https://github.com/pst2/bio-lab-workspace.git
 
 # 2. Create a feature branch
 git checkout -b feature/your-feature-name
