@@ -3,58 +3,40 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
-.Python
 
 # Virtual environments
 .venv/
 venv/
 env/
 
-# Test & coverage
+# Secrets — KHÔNG bao giờ đưa vào image
+.env
+.env.local
+.env.*.local
+
+# SQLite database (DB tạo mới khi container chạy)
+*.db
+*.sqlite
+*.sqlite3
+
+# Test
 .pytest_cache/
 .coverage
 htmlcov/
-
-# Git
-.git/
-.gitignore
+tests/
 
 # IDE
 .vscode/
 .idea/
 
-# Environment files (secrets — never ship into image)
-.env
-.env.local
-.env.*.local
-
-# Alembic migration auto-gen (keep alembic/ itself — migrations needed)
-# alembic/versions/ is intentionally NOT excluded — needed for `alembic upgrade head`
-
-# SQLite database file (DB is created fresh at container start)
-*.db
-*.sqlite
-*.sqlite3
-
 # Logs
 *.log
-logs/
-
-# Node leftovers (these don't belong here but just in case)
-node_modules/
-.next/
-package*.json
-tsconfig*.json
-postcss.config.*
-tailwind.config.*
-public/
-src/
 
 # Build artifacts
 dist/
 build/
 *.egg-info/
 
-# Docker files themselves
+# File Docker (không cần copy vào image)
 Dockerfile
 .dockerignore

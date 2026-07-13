@@ -1,0 +1,24 @@
+services:
+  # ─── FastAPI Backend ──────────────────────────────────────────
+  - type: web
+    name: biolab-backend
+    runtime: python
+    rootDir: backend_scaffold
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1"
+    plan: free
+    envVars:
+      - key: DEBUG
+        value: "false"
+      - key: NCBI_TIMEOUT
+        value: "8"
+      - key: NCBI_RETRY_COUNT
+        value: "1"
+      - key: RATE_LIMIT_ENABLED
+        value: "true"
+      - key: DATABASE_URL
+        value: "sqlite:///./bio_backend.db"
+      - key: ALLOWED_ORIGINS
+        value: "https://biolab-frontend.onrender.com"
+      - key: API_KEYS
+        generateValue: true
