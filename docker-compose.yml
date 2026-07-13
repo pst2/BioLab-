@@ -6,20 +6,41 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DEBUG: "true"
-      API_KEY: "dev-key-1"
-      RATE_LIMIT_ENABLED: "false"
+      DEBUG: "false"
+      # ⚠️  Đổi thành key ngẫu nhiên trước khi share!
+      API_KEYS: "dev-key-1"
+      RATE_LIMIT_ENABLED: "true"
+      NCBI_TIMEOUT: "8"
+      NCBI_RETRY_COUNT: "1"
+      # Cho phép frontend container gọi backend
+      ALLOWED_ORIGINS: "http://localhost:3000"
+      DATABASE_URL: "sqlite:////data/bio_backend.db"
+    volumes:
+      # Mount thư mục ngoài để SQLite database không mất khi redeploy
+      - biolab_data:/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/')\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
 
   frontend:
     build:
       context: ./bio_frontend
       args:
+        # Khi chạy docker compose, frontend gọi backend qua tên service (không phải localhost)
         NEXT_PUBLIC_API_URL: http://localhost:8000
         NEXT_PUBLIC_API_KEY: dev-key-1
     container_name: biolab-frontend
     ports:
       - "3000:3000"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     restart: unless-stopped
+
+volumes:
+  biolab_data:
+    driver: local

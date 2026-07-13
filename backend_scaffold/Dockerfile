@@ -1,39 +1,44 @@
-FROM node:20-alpine AS deps
+# ─────────────────────────────────────────────
+# Stage 1: Build / install dependencies
+# ─────────────────────────────────────────────
+FROM python:3.10-slim AS builder
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci
+# Install build tools needed for some Python packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        gcc \
+        libffi-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy and install Python deps into a separate prefix
+# so the final image doesn't need apt/gcc at all
+COPY requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 
-FROM node:20-alpine AS builder
+# ─────────────────────────────────────────────
+# Stage 2: Production image
+# ─────────────────────────────────────────────
+FROM python:3.10-slim AS runner
 
 WORKDIR /app
 
-ARG NEXT_PUBLIC_API_URL
-ARG NEXT_PUBLIC_API_KEY
+# Copy installed packages from builder
+COPY --from=builder /install /usr/local
 
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_KEY=$NEXT_PUBLIC_API_KEY
-
-COPY --from=deps /app/node_modules ./node_modules
+# Copy application source
 COPY . .
 
-RUN npm run build
+# Create a non-root user for security
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser \
+    && chown -R appuser:appgroup /app
 
+USER appuser
 
-FROM node:20-alpine AS runner
+# Expose FastAPI port
+EXPOSE 8000
 
-WORKDIR /app
-
-ENV NODE_ENV=production
-ENV PORT=3000
-ENV HOSTNAME=0.0.0.0
-
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-
-EXPOSE 3000
-
-CMD ["node", "server.js"]
+# Run Alembic migrations then start uvicorn
+# --workers 1 is safe for SQLite (no shared connection pool issues)
+CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 1"]

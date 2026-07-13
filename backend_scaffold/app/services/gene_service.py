@@ -186,7 +186,10 @@ class GeneService(BaseSearchService):
                 external_used=True,
             )
 
-        # 3. Import from NCBI exactly once, persist, then serve from local DB.
+        # 3. Import from NCBI Gene DB. If the ID is a numeric UID that belongs to
+        #    a nucleotide or protein record (not a gene record), gene lookup returns
+        #    None. In that case fall through to step 3b.
+        external_gene: dict | None = None
         try:
             external_gene = await self.ncbi_client.get_gene_by_id(gene_id)
             if external_gene:
@@ -207,6 +210,29 @@ class GeneService(BaseSearchService):
         except Exception:
             # Keep the detail page usable even when NCBI is unavailable.
             pass
+
+        # 3b. The numeric UID may belong to a nuccore or protein record rather than
+        #     the gene database. Try those databases as a fallback before giving up.
+        if gene_id.isdigit() or not any(ch.isalpha() for ch in gene_id):
+            try:
+                bio_record = await self.ncbi_client.get_bio_record_by_id(gene_id)
+                if bio_record:
+                    bio_record = enrich_with_sequence_fields(bio_record)
+                    self.gene_repo.upsert(bio_record, source="ncbi")
+                    self.db.commit()
+                    saved = self.gene_repo.get_by_gene_id(gene_id) or bio_record
+                    return self._response(
+                        message="Record detail imported from NCBI nucleotide/protein database",
+                        data=saved,
+                        source="ncbi",
+                        cached=False,
+                        stale=False,
+                        keyword=gene_id,
+                        mode="local_first",
+                        external_used=True,
+                    )
+            except Exception:
+                pass
 
         # 4. Nothing found anywhere — return a minimal placeholder so the UI
         #    does not crash; include a hint so the developer knows what to do.
@@ -253,8 +279,11 @@ class GeneService(BaseSearchService):
         if not record_id:
             return enrich_with_sequence_fields(record)
 
-        # Avoid repeated network calls if the saved payload already has rich detail.
-        if record.get("fasta") or record.get("sequence") or record.get("visualization"):
+        # A record already has rich data if it has a real sequence or FASTA string.
+        # NOTE: visualization alone is NOT sufficient — enrich_with_sequence_fields()
+        # always creates a visualization block even for empty placeholder records.
+        has_real_data = bool(record.get("fasta") or record.get("sequence"))
+        if has_real_data:
             return enrich_with_sequence_fields(record)
 
         try:
@@ -262,6 +291,12 @@ class GeneService(BaseSearchService):
                 return await self.ensembl_provider.get_detail(record_id, organism=record.get("organism")) or enrich_with_sequence_fields(record)
             if source == "uniprot" or record.get("database") == "uniprotkb":
                 return await self.uniprot_provider.get_detail(record_id) or enrich_with_sequence_fields(record)
+            # For NCBI records without sequence, try to re-fetch from nuccore/protein
+            # in case this was saved as a placeholder when those databases weren't tried.
+            if source == "ncbi" and record_id.isdigit():
+                bio = await self.ncbi_client.get_bio_record_by_id(record_id)
+                if bio and (bio.get("fasta") or bio.get("sequence")):
+                    return enrich_with_sequence_fields(bio)
         except Exception:
             return enrich_with_sequence_fields(record)
         return enrich_with_sequence_fields(record)
@@ -271,7 +306,8 @@ class GeneService(BaseSearchService):
             if gene_id.startswith("ENS"):
                 return await self.ensembl_provider.get_detail(gene_id)
             # UniProt accessions are usually short alphanumeric IDs such as P38398.
-            if 5 <= len(gene_id) <= 12 and any(char.isalpha() for char in gene_id):
+            # Numeric-only IDs are NCBI UIDs (Gene/nuccore/protein), not UniProt.
+            if 5 <= len(gene_id) <= 12 and any(char.isalpha() for char in gene_id) and not gene_id.isdigit():
                 return await self.uniprot_provider.get_detail(gene_id)
         except Exception:
             return None

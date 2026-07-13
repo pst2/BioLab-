@@ -177,12 +177,14 @@ export interface SystemStatus {
 export class ApiError extends Error {
   status: number;
   code?: string;
+  retryAfter?: number;
 
-  constructor(message: string, status: number, code?: string) {
+  constructor(message: string, status: number, code?: string, retryAfter?: number) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.code = code;
+    this.retryAfter = retryAfter;
   }
 }
 
@@ -251,7 +253,12 @@ async function apiFetch<T>(
   if (!res.ok) {
     const payload = await res.json().catch(() => ({ message: res.statusText }));
     const { code, message } = humanizeApiError(payload, res.status);
-    throw new ApiError(message, res.status, code);
+    let retryAfter: number | undefined;
+    if (res.status === 429) {
+      const ra = res.headers.get("Retry-After");
+      if (ra) retryAfter = parseInt(ra, 10) || undefined;
+    }
+    throw new ApiError(message, res.status, code, retryAfter);
   }
 
   return res.json();

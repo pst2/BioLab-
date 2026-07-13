@@ -105,7 +105,9 @@ class NCBIClient:
         }
         summary_data = await self._get_json("esummary.fcgi", summary_params)
         item = summary_data.get("result", {}).get(gene_id, {})
-        if not item:
+        # NCBI returns {"error": "cannot get document summary"} when the UID does not
+        # exist in the gene database (e.g. it is a nuccore/protein UID instead).
+        if not item or "error" in item:
             return None
 
         organism = self._extract_gene_organism(item)
@@ -122,8 +124,81 @@ class NCBIClient:
             "chromosome": item.get("chromosome") or item.get("maplocation") or "Unknown",
             "aliases": aliases[:30],
             "ncbi_url": f"https://www.ncbi.nlm.nih.gov/gene/{gene_id}",
+            "source": "ncbi",
+            "data_type": "gene",
             "raw": item,
         }
+
+    async def get_bio_record_by_id(
+        self,
+        record_id: str,
+        *,
+        try_databases: list[str] | None = None,
+    ) -> dict[str, Any] | None:
+        """Attempt to fetch an NCBI record from nuccore or protein databases.
+
+        This is a fallback for when get_gene_by_id returns None because the
+        numeric UID belongs to a nucleotide/protein record, not a gene record.
+        Tries each database in order and returns the first successful hit.
+        """
+        record_id = str(record_id).strip()
+        if not record_id:
+            return None
+
+        databases = try_databases or ["nuccore", "protein"]
+        for db in databases:
+            try:
+                params: dict[str, Any] = {
+                    "db": db,
+                    "id": record_id,
+                    "retmode": "json",
+                }
+                data = await self._get_json("esummary.fcgi", params)
+                item = data.get("result", {}).get(record_id, {})
+                if not item or "error" in item:
+                    continue
+
+                # Determine data_type from db
+                ncbi_type = "nucleotide" if db == "nuccore" else "protein"
+                external_id = str(item.get("uid", record_id))
+                caption = item.get("caption") or item.get("accessionversion") or external_id
+                title = item.get("title") or item.get("extra") or ""
+                organism = item.get("organism") or item.get("taxname") or "Unknown"
+                if isinstance(organism, dict):
+                    organism = organism.get("scientificname") or organism.get("commonname") or "Unknown"
+                slen = item.get("slen")
+
+                record: dict[str, Any] = {
+                    "gene_id": external_id,
+                    "external_id": external_id,
+                    "symbol": caption,
+                    "name": title,
+                    "description": title,
+                    "summary": title,
+                    "organism": organism,
+                    "data_type": ncbi_type,
+                    "database": db,
+                    "source": "ncbi",
+                    "ncbi_url": f"https://www.ncbi.nlm.nih.gov/{db}/{external_id}",
+                    "raw": item,
+                }
+                if slen:
+                    record["sequence_length"] = int(slen)
+                # Attempt to fetch FASTA for short sequences (< 50 kbp / 50 kaa)
+                if slen and int(slen) <= 50_000:
+                    try:
+                        fasta_text = await self.fetch_sequence_fasta(external_id, db=db)
+                        if fasta_text and fasta_text.startswith(">"):
+                            record["fasta"] = fasta_text
+                            # Extract bare sequence for stats
+                            seq_lines = [ln for ln in fasta_text.splitlines() if ln and not ln.startswith(">")]
+                            record["sequence"] = "".join(seq_lines)
+                    except Exception:
+                        pass
+                return record
+            except Exception:
+                continue
+        return None
 
     async def search_bio_records(
         self,

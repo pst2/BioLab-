@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Moon, Sun } from "lucide-react";
 
 export type Language = "vi" | "en";
+export type Theme = "light" | "dark" | "system";
 export type Translate = (key: string) => string;
 
 const STORAGE_KEY = "biolab:language";
+const THEME_STORAGE_KEY = "biolab:theme";
 
 const dictionary: Record<Language, Record<string, string>> = {
   vi: {
@@ -28,6 +31,10 @@ const dictionary: Record<Language, Record<string, string>> = {
     "dashboard.badge": "Không gian bioinformatics",
     "dashboard.title": "Tìm kiếm gene, xem FASTA và trực quan hóa dữ liệu sinh học.",
     "dashboard.desc": "UI tối giản nhưng vẫn giữ FastAPI backend, Next proxy, multi-provider fallback, sequence analysis và trang chi tiết gene.",
+    "metric.genesIndexed": "Gene đã chỉ mục",
+    "metric.providers": "Nhà cung cấp",
+    "metric.successRate": "Tỷ lệ thành công",
+    "metric.queriesToday": "Truy vấn hôm nay",
     "dashboard.startSearch": "Bắt đầu tìm gene",
     "dashboard.analyzeSequence": "Phân tích sequence",
     "dashboard.quickTargets": "Gene gợi ý",
@@ -89,10 +96,14 @@ const dictionary: Record<Language, Record<string, string>> = {
     "api.loading": "Đang tải...",
     "api.empty": "Chạy một endpoint để xem JSON tại đây.",
     "settings.runtime": "Runtime Safety",
+    "settings.runtimeDesc": "Toàn bộ lỗi API được bắt và hiển thị thân thiện. Nếu backend trả về 403 (NCBI rate-limit) hoặc timeout, frontend sẽ fallback sang cache local.",
     "settings.data": "Chiến lược dữ liệu",
+    "settings.dataDesc": "Hệ thống ưu tiên cache local trước, sau đó gọi NCBI → Ensembl → UniProt → BV-BRC → Phytozome theo thứ tự. Dữ liệu bundled đảm bảo fallback offline.",
     "settings.ux": "Bioinformatics UX",
+    "settings.uxDesc": "Line-numbered FASTA viewer, GC donut SVG, nucleotide composition bars, tag hệ thống theo loại gene và organism, skeleton loading placeholder.",
     "settings.snapshot": "Backend snapshot",
     "settings.snapshotEmpty": "Bấm system status ở header để lấy health data.",
+    "detail.geneOverview": "Tổng quan gene",
     "common.unknown": "Không rõ",
     "common.notAvailable": "Không có dữ liệu",
     "detail.back": "Quay lại",
@@ -183,6 +194,27 @@ const dictionary: Record<Language, Record<string, string>> = {
     "detail.uniprotAnnotation": "Chú thích UniProt",
     "detail.proteinFasta": "FASTA protein",
     "detail.nucleotideFasta": "FASTA nucleotide",
+    "theme.light": "Sáng",
+    "theme.dark": "Tối",
+    "theme.system": "Hệ thống",
+    "theme.toggle": "Chuyển giao diện",
+    "toast.copied": "Đã sao chép!",
+    "toast.copyFasta": "Đã sao chép FASTA",
+    "toast.copySequence": "Đã sao chép trình tự",
+    "toast.searchSuccess": "Tìm thấy kết quả",
+    "toast.searchEmpty": "Không tìm thấy kết quả nào",
+    "toast.analysisComplete": "Phân tích hoàn tất",
+    "toast.serverOnline": "Server đang hoạt động",
+    "toast.serverOffline": "Không thể kết nối server",
+    "toast.rateLimited": "Quá nhiều yêu cầu. Vui lòng chờ.",
+    "toast.usingCache": "Đang dùng dữ liệu đã lưu",
+    "toast.showAll": "Hiện tất cả",
+    "toast.showLess": "Thu gọn",
+    "detail.aaPropertyBasic": "Bazơ",
+    "detail.aaPropertyAcidic": "Axit",
+    "detail.aaPropertyPolar": "Phân cực",
+    "detail.aaPropertyHydrophobic": "Kỵ nước",
+    "detail.aaDistribution": "Phân bố theo tính chất",
   },
   en: {
     "language.vi": "Tiếng Việt",
@@ -204,6 +236,10 @@ const dictionary: Record<Language, Record<string, string>> = {
     "dashboard.badge": "Bioinformatics workspace",
     "dashboard.title": "Search genes, inspect FASTA and visualize biological data.",
     "dashboard.desc": "A minimal UI that keeps your FastAPI backend, Next proxy, multi-provider fallback, sequence analysis and gene detail page.",
+    "metric.genesIndexed": "Genes Indexed",
+    "metric.providers": "Providers",
+    "metric.successRate": "Success Rate",
+    "metric.queriesToday": "Queries Today",
     "dashboard.startSearch": "Start gene search",
     "dashboard.analyzeSequence": "Analyze sequence",
     "dashboard.quickTargets": "Quick targets",
@@ -265,10 +301,14 @@ const dictionary: Record<Language, Record<string, string>> = {
     "api.loading": "Loading...",
     "api.empty": "Run an endpoint to inspect JSON here.",
     "settings.runtime": "Runtime Safety",
+    "settings.runtimeDesc": "All API errors are caught and displayed in a human-readable format. 403 (NCBI rate-limit) and timeout errors gracefully fall back to local cache.",
     "settings.data": "Data Strategy",
+    "settings.dataDesc": "The system prioritizes local cache, then cascades through NCBI → Ensembl → UniProt → BV-BRC → Phytozome. Bundled reference data guarantees offline fallback.",
     "settings.ux": "Bioinformatics UX",
+    "settings.uxDesc": "Line-numbered FASTA viewer, GC donut SVG, nucleotide composition bars, type-aware gene tags, organism tagging, and skeleton loading placeholders.",
     "settings.snapshot": "Backend snapshot",
     "settings.snapshotEmpty": "Click system status in the header to fetch health data.",
+    "detail.geneOverview": "Gene Overview",
     "common.unknown": "Unknown",
     "common.notAvailable": "Not available",
     "detail.back": "Back",
@@ -359,6 +399,27 @@ const dictionary: Record<Language, Record<string, string>> = {
     "detail.uniprotAnnotation": "UniProt Annotation",
     "detail.proteinFasta": "Protein FASTA",
     "detail.nucleotideFasta": "Nucleotide FASTA",
+    "theme.light": "Light",
+    "theme.dark": "Dark",
+    "theme.system": "System",
+    "theme.toggle": "Toggle theme",
+    "toast.copied": "Copied!",
+    "toast.copyFasta": "FASTA copied",
+    "toast.copySequence": "Sequence copied",
+    "toast.searchSuccess": "Results found",
+    "toast.searchEmpty": "No results found",
+    "toast.analysisComplete": "Analysis complete",
+    "toast.serverOnline": "Server is online",
+    "toast.serverOffline": "Cannot connect to server",
+    "toast.rateLimited": "Too many requests. Please wait.",
+    "toast.usingCache": "Using cached data",
+    "toast.showAll": "Show all",
+    "toast.showLess": "Show less",
+    "detail.aaPropertyBasic": "Basic",
+    "detail.aaPropertyAcidic": "Acidic",
+    "detail.aaPropertyPolar": "Polar",
+    "detail.aaPropertyHydrophobic": "Hydrophobic",
+    "detail.aaDistribution": "Distribution by property",
   }
 };
 
@@ -406,13 +467,92 @@ export function LanguageToggle({ compact = false }: { compact?: boolean }) {
     <button
       type="button"
       onClick={() => setLang(next)}
-      className={`inline-flex items-center justify-center rounded-full border border-slate-200 bg-white text-xs font-black uppercase tracking-wider text-slate-700 shadow-sm transition hover:border-cyan-300 hover:text-cyan-700 ${compact ? "h-9 px-3" : "h-10 gap-2 px-4"}`}
+      className={`inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 shadow-sm transition hover:border-cyan-300 hover:text-cyan-700 dark:hover:border-cyan-500 dark:hover:text-cyan-400 ${compact ? "h-9 px-3" : "h-10 gap-2 px-4"}`}
       title={t("language.toggle")}
       aria-label={t("language.toggle")}
     >
       <span>{lang === "vi" ? "VI" : "EN"}</span>
-      {!compact && <span className="text-slate-300">/</span>}
-      {!compact && <span className="text-slate-400">{next.toUpperCase()}</span>}
+      {!compact && <span className="text-slate-300 dark:text-slate-600">/</span>}
+      {!compact && <span className="text-slate-400 dark:text-slate-500">{next.toUpperCase()}</span>}
+    </button>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   THEME SYSTEM
+═══════════════════════════════════════════ */
+function getSystemTheme(): "light" | "dark" {
+  if (typeof window === "undefined") return "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function getInitialTheme(): Theme {
+  if (typeof window === "undefined") return "system";
+  const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
+  if (saved === "light" || saved === "dark" || saved === "system") return saved;
+  return "system";
+}
+
+function applyTheme(theme: Theme) {
+  if (typeof document === "undefined") return;
+  const resolved = theme === "system" ? getSystemTheme() : theme;
+  document.documentElement.classList.toggle("dark", resolved === "dark");
+}
+
+export function useTheme() {
+  const [theme, setThemeState] = useState<Theme>("system");
+
+  useEffect(() => {
+    const initial = getInitialTheme();
+    setThemeState(initial);
+    applyTheme(initial);
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const onSystemChange = () => {
+      const current = getInitialTheme();
+      if (current === "system") applyTheme("system");
+    };
+    mediaQuery.addEventListener("change", onSystemChange);
+    return () => mediaQuery.removeEventListener("change", onSystemChange);
+  }, []);
+
+  const setTheme = useCallback((value: Theme) => {
+    setThemeState(value);
+    applyTheme(value);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(THEME_STORAGE_KEY, value);
+    }
+  }, []);
+
+  const toggle = useCallback(() => {
+    setThemeState((prev) => {
+      const resolved = prev === "system" ? getSystemTheme() : prev;
+      const next = resolved === "dark" ? "light" : "dark";
+      applyTheme(next);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(THEME_STORAGE_KEY, next);
+      }
+      return next;
+    });
+  }, []);
+
+  return { theme, setTheme, toggle };
+}
+
+export function ThemeToggle() {
+  const { theme, toggle } = useTheme();
+  const { t } = useLanguage();
+  const resolved = theme === "system" ? (typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : theme;
+
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      className="theme-toggle"
+      title={t("theme.toggle")}
+      aria-label={t("theme.toggle")}
+    >
+      {resolved === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
     </button>
   );
 }

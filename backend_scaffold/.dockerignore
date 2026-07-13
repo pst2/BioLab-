@@ -1,9 +1,60 @@
-node_modules
-.next
-out
-dist
-.git
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Test & coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Environment files (secrets — never ship into image)
+.env
 .env.local
-npm-debug.log
+.env.*.local
+
+# Alembic migration auto-gen (keep alembic/ itself — migrations needed)
+# alembic/versions/ is intentionally NOT excluded — needed for `alembic upgrade head`
+
+# SQLite database file (DB is created fresh at container start)
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Node leftovers (these don't belong here but just in case)
+node_modules/
+.next/
+package*.json
+tsconfig*.json
+postcss.config.*
+tailwind.config.*
+public/
+src/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Docker files themselves
 Dockerfile
 .dockerignore
