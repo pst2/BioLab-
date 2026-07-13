@@ -3,8 +3,8 @@ services:
     name: biolab-backend
     runtime: python
     rootDir: backend_scaffold
-    buildCommand: "pip install -r requirements-prod.txt"
-    startCommand: "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    buildCommand: "chmod +x build.sh && ./build.sh"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     plan: free
     envVars:
       - key: PYTHON_VERSION
@@ -22,4 +22,4 @@ services:
       - key: ALLOWED_ORIGINS
         value: "*"
       - key: API_KEYS
-        generateValue: true
+        value: "biolab2024"
