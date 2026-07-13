@@ -8,7 +8,7 @@ services:
     plan: free
     envVars:
       - key: PYTHON_VERSION
-        value: "3.10.14"
+        value: "3.12.5"
       - key: DEBUG
         value: "false"
       - key: NCBI_TIMEOUT
