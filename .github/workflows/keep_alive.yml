@@ -1,0 +1,20 @@
+name: Keep Backend Awake
+
+on:
+  schedule:
+    # Run every 10 minutes (cron syntax in UTC)
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render Backend
+        run: |
+          if [ -z "${{ secrets.BACKEND_HEALTH_URL }}" ]; then
+            echo "Warning: BACKEND_HEALTH_URL secret is not set. Please add it to your GitHub repository settings."
+            exit 1
+          fi
+          echo "Pinging backend health endpoint..."
+          curl -f -s "${{ secrets.BACKEND_HEALTH_URL }}" || echo "Ping failed, but workflow completed."
