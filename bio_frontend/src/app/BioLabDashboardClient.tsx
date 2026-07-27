@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   Activity,
   AlertCircle,
@@ -31,7 +31,7 @@ import {
   Zap,
   type LucideIcon,
 } from "lucide-react";
-import { api, GeneDataType, GeneProvider, GeneResult, GeneSearchBy, HealthData, PubMedResult, SequenceAnalysis, SystemStatus, ApiError } from "@/lib/api";
+import { api, BlastHit, GeneDataType, GeneProvider, GeneResult, GeneSearchBy, HealthData, PubMedResult, SequenceAnalysis, SystemStatus, ApiError } from "@/lib/api";
 import { LanguageToggle, ThemeToggle, Translate, useLanguage } from "@/lib/i18n";
 import { useToast } from "@/lib/Toast";
 
@@ -116,6 +116,19 @@ export default function BioLabDashboard() {
   const [sequenceLoading, setSequenceLoading] = useState(false);
   const [sequenceError, setSequenceError] = useState("");
   const [sequenceResult, setSequenceResult] = useState<SequenceAnalysis | null>(null);
+  const [seqSubTab, setSeqSubTab] = useState<"analyze" | "blast">("analyze");
+
+  // BLAST similarity search state
+  const [blastSeq, setBlastSeq] = useState("");
+  const [blastProvider, setBlastProvider] = useState<"auto" | "ebi" | "uniprot">("auto");
+  const [blastSeqType, setBlastSeqType] = useState<"auto" | "dna" | "protein">("auto");
+  const [blastDatabase, setBlastDatabase] = useState("");
+  const [blastLoading, setBlastLoading] = useState(false);
+  const [blastJobId, setBlastJobId] = useState<string | null>(null);
+  const [blastStatus, setBlastStatus] = useState<string>("idle");
+  const [blastHits, setBlastHits] = useState<BlastHit[]>([]);
+  const [blastError, setBlastError] = useState("");
+  const blastPollCount = useRef(0);
 
   const [pubmedQuery, setPubmedQuery] = useState("BRCA1 cancer");
   const [articles, setArticles] = useState<PubMedResult[]>([]);
@@ -169,6 +182,37 @@ export default function BioLabDashboard() {
       );
     } catch {}
   }, [query, dataType, searchBy, organism, mode, provider, fallbackEnabled, genes, geneMessage, activeTab]);
+
+  // BLAST polling effect — polls every 5 s until FINISHED or ERROR
+  useEffect(() => {
+    if (!blastJobId || blastStatus === "FINISHED" || blastStatus === "ERROR" || blastStatus === "NOT_FOUND" || blastStatus === "idle") return;
+    blastPollCount.current = 0;
+    const MAX_POLLS = 120; // 10 minutes max
+    const intervalId = setInterval(async () => {
+      blastPollCount.current += 1;
+      if (blastPollCount.current > MAX_POLLS) {
+        setBlastStatus("ERROR");
+        setBlastError("Search timed out after 10 minutes. Please try again.");
+        clearInterval(intervalId);
+        return;
+      }
+      try {
+        const res = await api.checkSequenceSearchStatus(blastJobId);
+        const job = res.data;
+        setBlastStatus(job.status);
+        if (job.status === "FINISHED") {
+          setBlastHits(job.hits || []);
+          setBlastLoading(false);
+          toast.success(`BLAST complete — ${job.hits?.length ?? 0} hits found`);
+        } else if (job.status === "ERROR" || job.status === "NOT_FOUND") {
+          setBlastError(res.message || "BLAST search failed.");
+          setBlastLoading(false);
+        }
+      } catch { /* keep polling on transient error */ }
+    }, 5000);
+    return () => clearInterval(intervalId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blastJobId]);
 
   const sequenceCounts = useMemo<CountMap>(() => {
     if (!sequenceResult?.base_counts) return {};
@@ -237,6 +281,34 @@ export default function BioLabDashboard() {
       toast.error(errMsg);
     } finally {
       setSequenceLoading(false);
+    }
+  }
+
+  async function submitBlastSearch() {
+    const seq = blastSeq.trim();
+    if (!seq) { toast.error("Please enter a FASTA or raw sequence."); return; }
+    setBlastLoading(true);
+    setBlastError("");
+    setBlastHits([]);
+    setBlastJobId(null);
+    setBlastStatus("idle");
+    try {
+      const payload: { sequence: string; sequence_type: "auto" | "dna" | "protein"; provider: "auto" | "ebi" | "uniprot"; database?: string } = {
+        sequence: seq,
+        sequence_type: blastSeqType,
+        provider: blastProvider,
+      };
+      if (blastDatabase) payload.database = blastDatabase;
+      const res = await api.submitSequenceSearch(payload);
+      if (!res.success) throw new Error(res.message);
+      setBlastJobId(res.data.job_id);
+      setBlastStatus("RUNNING");
+      toast.info(`BLAST job submitted — polling for results...`);
+    } catch (error) {
+      const errMsg = error instanceof Error ? error.message : "BLAST submission failed.";
+      setBlastError(errMsg);
+      setBlastLoading(false);
+      toast.error(errMsg);
     }
   }
 
@@ -353,16 +425,51 @@ export default function BioLabDashboard() {
 
             {activeTab === "sequence" && (
               <div className="page-enter">
-                <SequenceWorkspace
-                  sequence={sequence}
-                  setSequence={setSequence}
-                  loading={sequenceLoading}
-                  error={sequenceError}
-                  result={sequenceResult}
-                  counts={sequenceCounts}
-                  onSubmit={runSequenceAnalysis}
-                  t={t}
-                />
+                {/* Sub-tab switcher */}
+                <div className="mb-5 flex gap-1 rounded-xl bg-slate-100 dark:bg-slate-800/60 p-1 w-fit">
+                  {(["analyze", "blast"] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setSeqSubTab(tab)}
+                      className={`rounded-lg px-4 py-1.5 text-xs font-semibold transition-all duration-150 ${
+                        seqSubTab === tab
+                          ? "bg-white dark:bg-slate-700 text-cyan-600 dark:text-cyan-300 shadow-sm"
+                          : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                      }`}
+                    >
+                      {tab === "analyze" ? "🔬 Analyze" : "🔍 BLAST Search"}
+                    </button>
+                  ))}
+                </div>
+                {seqSubTab === "analyze" && (
+                  <SequenceWorkspace
+                    sequence={sequence}
+                    setSequence={setSequence}
+                    loading={sequenceLoading}
+                    error={sequenceError}
+                    result={sequenceResult}
+                    counts={sequenceCounts}
+                    onSubmit={runSequenceAnalysis}
+                    t={t}
+                  />
+                )}
+                {seqSubTab === "blast" && (
+                  <SequenceBlastWorkspace
+                    blastSeq={blastSeq}
+                    setBlastSeq={setBlastSeq}
+                    blastProvider={blastProvider}
+                    setBlastProvider={setBlastProvider}
+                    blastSeqType={blastSeqType}
+                    setBlastSeqType={setBlastSeqType}
+                    blastDatabase={blastDatabase}
+                    setBlastDatabase={setBlastDatabase}
+                    loading={blastLoading}
+                    status={blastStatus}
+                    hits={blastHits}
+                    error={blastError}
+                    onSubmit={submitBlastSearch}
+                  />
+                )}
               </div>
             )}
 
@@ -1054,6 +1161,197 @@ function ApiWorkspace({ pubmedQuery, setPubmedQuery, runApiPlayground, loading, 
             </div>
           ))}
         </div>
+      )}
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   BLAST SEQUENCE SEARCH WORKSPACE
+═══════════════════════════════════════════ */
+function SequenceBlastWorkspace({
+  blastSeq, setBlastSeq,
+  blastProvider, setBlastProvider,
+  blastSeqType, setBlastSeqType,
+  blastDatabase, setBlastDatabase,
+  loading, status, hits, error,
+  onSubmit,
+}: {
+  blastSeq: string;
+  setBlastSeq: (v: string) => void;
+  blastProvider: "auto" | "ebi" | "uniprot";
+  setBlastProvider: (v: "auto" | "ebi" | "uniprot") => void;
+  blastSeqType: "auto" | "dna" | "protein";
+  setBlastSeqType: (v: "auto" | "dna" | "protein") => void;
+  blastDatabase: string;
+  setBlastDatabase: (v: string) => void;
+  loading: boolean;
+  status: string;
+  hits: BlastHit[];
+  error: string;
+  onSubmit: () => void;
+}) {
+  const isRunning = loading || status === "RUNNING" || status === "PENDING";
+  const isFinished = status === "FINISHED";
+
+  const providerDatabases: Record<string, [string, string][]> = {
+    auto:    [["" , "Auto (default)"], ["uniprotkb_swissprot", "UniProtKB/Swiss-Prot (protein)"], ["uniprotkb", "UniProtKB (protein)"], ["pdb", "PDB (protein)"], ["emrel", "EMBL-EBI (DNA)"]],
+    ebi:     [["" , "Auto"], ["uniprotkb_swissprot", "UniProtKB/Swiss-Prot"], ["uniprotkb", "UniProtKB"], ["pdb", "PDB structures"], ["emrel", "EMBL-EBI nucleotide"]],
+    uniprot: [["" , "UniProtKB (default)"]],
+  };
+
+  const statusDot = isRunning ? "animate-pulse bg-cyan-400" : isFinished ? "bg-emerald-400" : error ? "bg-red-400" : "bg-slate-400";
+  const statusMsg = isRunning ? `⏳ Searching… (${status})` : isFinished ? `✅ ${hits.length} hits found` : error ? `❌ ${error}` : "Idle";
+
+  function formatEValue(v: number) {
+    if (v === 0) return "0";
+    if (v < 0.001) return v.toExponential(1);
+    return v.toFixed(3);
+  }
+
+  return (
+    <section className="space-y-6 animate-fadeIn">
+      {/* Header */}
+      <div className="rounded-2xl border border-cyan-200/60 dark:border-cyan-800/40 bg-gradient-to-br from-cyan-50/60 to-blue-50/40 dark:from-cyan-950/30 dark:to-blue-950/20 p-6 shadow-sm">
+        <h2 className="flex items-center gap-2 text-base font-black text-slate-900 dark:text-slate-100">
+          <Search className="h-5 w-5 text-cyan-500" />
+          BLAST Similarity Search
+          <span className="ml-2 rounded-full bg-cyan-100 dark:bg-cyan-900/50 px-2 py-0.5 text-[10px] font-semibold text-cyan-700 dark:text-cyan-300 ring-1 ring-cyan-200/60 dark:ring-cyan-800/60">Multi-Provider</span>
+        </h2>
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          Search gene databases using a FASTA or raw sequence. Powered by EBI NCBI BLAST and UniProt BLAST with automatic fallback.
+        </p>
+      </div>
+
+      {/* Input panel */}
+      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-5">
+        {/* Sequence textarea */}
+        <label className="block space-y-1.5">
+          <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">Sequence (FASTA or raw)</span>
+          <textarea
+            id="blast-sequence-input"
+            rows={6}
+            value={blastSeq}
+            onChange={(e) => setBlastSeq(e.target.value)}
+            placeholder=">MyGene\nMETHIONINE...
+or paste raw DNA/protein sequence"
+            className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-4 py-3 font-mono text-xs text-slate-800 dark:text-slate-200 resize-none outline-none focus:border-cyan-400 dark:focus:border-cyan-600 focus:ring-2 focus:ring-cyan-200/40 dark:focus:ring-cyan-900/40 transition custom-scrollbar"
+          />
+        </label>
+
+        {/* Provider + Type + Database row */}
+        <div className="grid gap-4 sm:grid-cols-3">
+          <FilterSelect
+            label="Provider"
+            value={blastProvider}
+            onChange={(v) => { setBlastProvider(v as "auto" | "ebi" | "uniprot"); setBlastDatabase(""); }}
+            options={[["auto", "Auto (EBI → UniProt)"], ["ebi", "EBI NCBI BLAST"], ["uniprot", "UniProt BLAST (protein)"]]}
+          />
+          <FilterSelect
+            label="Sequence Type"
+            value={blastSeqType}
+            onChange={(v) => setBlastSeqType(v as "auto" | "dna" | "protein")}
+            options={[["auto", "Auto-detect"], ["protein", "Protein"], ["dna", "DNA / Nucleotide"]]}
+          />
+          <FilterSelect
+            label="Database"
+            value={blastDatabase}
+            onChange={setBlastDatabase}
+            options={providerDatabases[blastProvider] || providerDatabases.auto}
+          />
+        </div>
+
+        {/* Submit */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className={`h-2 w-2 rounded-full ${statusDot}`} />
+            <span className="text-xs text-slate-500 dark:text-slate-400">{statusMsg}</span>
+          </div>
+          <button
+            id="blast-submit-btn"
+            onClick={onSubmit}
+            disabled={isRunning}
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 disabled:opacity-60 disabled:cursor-not-allowed px-5 py-2.5 text-xs font-bold text-white shadow-md hover:shadow-cyan-200 dark:hover:shadow-cyan-900 transition-all"
+          >
+            {isRunning ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+            {isRunning ? "Searching…" : "Run BLAST"}
+          </button>
+        </div>
+      </div>
+
+      {/* Error */}
+      {error && !isRunning && (
+        <Notice tone="red" title="BLAST Error" message={error} />
+      )}
+
+      {/* Running animation */}
+      {isRunning && (
+        <div className="rounded-2xl border border-cyan-200/50 dark:border-cyan-900/50 bg-cyan-50/50 dark:bg-cyan-950/20 p-6 text-center">
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-cyan-500" />
+          <p className="mt-3 text-sm font-semibold text-cyan-700 dark:text-cyan-300">BLAST search in progress…</p>
+          <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">This typically takes 30–120 seconds. Polling every 5 s.</p>
+        </div>
+      )}
+
+      {/* Results table */}
+      {isFinished && hits.length > 0 && (
+        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-6 py-4">
+            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100">Results — {hits.length} hits</h3>
+            <span className="rounded-full bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-200 dark:ring-emerald-900">FINISHED</span>
+          </div>
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40">
+                  {["Accession", "Description", "E-Value", "Identity %", "Q-Cov %", "Aln Len", "Source", ""].map((h) => (
+                    <th key={h} className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {hits.map((hit, i) => (
+                  <tr key={`${hit.accession}-${i}`} className="border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td className="px-4 py-3">
+                      <span className="font-mono font-semibold text-cyan-600 dark:text-cyan-400">{hit.accession}</span>
+                    </td>
+                    <td className="px-4 py-3 max-w-xs">
+                      <p className="truncate text-slate-700 dark:text-slate-300" title={hit.description}>{hit.description || "—"}</p>
+                    </td>
+                    <td className="px-4 py-3 font-mono text-slate-600 dark:text-slate-400">{formatEValue(hit.e_value)}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="h-1.5 w-14 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                          <div className="h-full rounded-full bg-emerald-400" style={{ width: `${Math.min(hit.identity_percent, 100)}%` }} />
+                        </div>
+                        <span className="text-slate-700 dark:text-slate-300">{hit.identity_percent.toFixed(1)}%</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{hit.query_coverage_percent.toFixed(1)}%</td>
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{hit.alignment_length}</td>
+                    <td className="px-4 py-3">
+                      <span className={`rounded-full px-2 py-0.5 text-[9px] font-semibold ${hit.source === "uniprot" ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300" : "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300"}`}>
+                        {hit.source.toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/genes/${encodeURIComponent(hit.accession)}`}
+                        className="inline-flex items-center gap-1 rounded-lg bg-cyan-50 dark:bg-cyan-950/40 px-2.5 py-1 text-[10px] font-semibold text-cyan-700 dark:text-cyan-300 ring-1 ring-cyan-200/60 dark:ring-cyan-900/60 hover:bg-cyan-100 dark:hover:bg-cyan-900/60 transition"
+                      >
+                        Details <ArrowRight className="h-3 w-3" />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {isFinished && hits.length === 0 && (
+        <EmptyState title="No hits found" message="No similar sequences found in the selected database. Try a different database, provider, or sequence." />
       )}
     </section>
   );

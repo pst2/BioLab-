@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     NCBI_RETRY_COUNT: int = 3
     NCBI_RETMAX: int = 10
 
+    BLAST_CONTACT_EMAIL: str = "pst2102@gmail.com"
+    BLAST_CACHE_TTL_SECONDS: int = 7200
+
     CACHE_TTL_GENE_SECONDS: int = 3600
     CACHE_TTL_PUBMED_SECONDS: int = 3600
     CACHE_TTL_SEQUENCE_SECONDS: int = 86400

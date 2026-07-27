@@ -160,6 +160,28 @@ export interface GenBankResult {
   raw: string;
 }
 
+// ── BLAST Similarity Search ────────────────────────────────────────────────────
+
+export interface BlastHit {
+  accession: string;
+  description: string;
+  e_value: number;
+  identity_percent: number;
+  query_coverage_percent: number;
+  alignment_length: number;
+  source: "ebi" | "uniprot" | string;
+}
+
+export interface SequenceSearchJob {
+  job_id: string;
+  status: "PENDING" | "RUNNING" | "FINISHED" | "ERROR" | "NOT_FOUND" | string;
+  provider: string;
+  sequence_type: string;
+  database: string;
+  hits?: BlastHit[];
+  error?: string;
+}
+
 export interface HealthData {
   status: string;
   db: string;
@@ -317,6 +339,27 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ accession, db }),
     }),
+
+  submitSequenceSearch: (
+    payload: {
+      sequence: string;
+      sequence_type?: "auto" | "dna" | "protein";
+      provider?: "auto" | "ebi" | "uniprot";
+      database?: string;
+    },
+    options?: RequestInit
+  ) =>
+    apiFetch<SequenceSearchJob>("/api/v1/sequence/search/submit", {
+      ...options,
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  checkSequenceSearchStatus: (jobId: string, options?: RequestInit) =>
+    apiFetch<SequenceSearchJob>(
+      `/api/v1/sequence/search/status/${encodeURIComponent(jobId)}`,
+      options
+    ),
 };
 
 export async function getGeneDetail(geneId: string): Promise<GeneDetail> {
