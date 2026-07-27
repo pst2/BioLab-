@@ -1227,17 +1227,20 @@ function SequenceBlastWorkspace({
       <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-5">
         {/* Sequence textarea */}
         <label className="block space-y-1.5">
-          <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">Sequence (FASTA or raw)</span>
+          <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">Sequence (FASTA or raw) — min. 20 residues</span>
           <textarea
             id="blast-sequence-input"
             rows={6}
             value={blastSeq}
             onChange={(e) => setBlastSeq(e.target.value)}
-            placeholder=">MyGene\nMETHIONINE...
-or paste raw DNA/protein sequence"
+            placeholder={`>MyProtein (human insulin – example)\nMALWMRLLPLLALLALWGPDPAAAFVNQHLCGSHLVEALYLVCGERGFFYTPKT\n\nor paste raw DNA (min 20 nt) or protein (min 20 aa)`}
             className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-4 py-3 font-mono text-xs text-slate-800 dark:text-slate-200 resize-none outline-none focus:border-cyan-400 dark:focus:border-cyan-600 focus:ring-2 focus:ring-cyan-200/40 dark:focus:ring-cyan-900/40 transition custom-scrollbar"
           />
+          {blastSeq.length > 0 && blastSeq.replace(/^>.*(\n|$)/m, "").replace(/\s/g, "").length < 20 && (
+            <p className="text-[10px] text-amber-600 dark:text-amber-400">⚠ Sequence too short — EBI BLAST requires at least 20 residues.</p>
+          )}
         </label>
+
 
         {/* Provider + Type + Database row */}
         <div className="grid gap-4 sm:grid-cols-3">

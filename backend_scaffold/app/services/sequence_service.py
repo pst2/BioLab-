@@ -282,6 +282,15 @@ class SequenceService:
         if not raw_seq:
             return ApiResponse(success=False, message="Sequence cannot be empty", data={})
 
+        # Strip FASTA header for length check
+        clean_for_len = self.blast_client.strip_header(raw_seq)
+        if len(clean_for_len) < 20:
+            return ApiResponse(
+                success=False,
+                message=f"Sequence too short ({len(clean_for_len)} residues). EBI BLAST requires at least 20 residues.",
+                data={},
+            )
+
         # Auto-detect sequence type when requested
         seq_type = payload.sequence_type
         if seq_type == "auto":
@@ -323,9 +332,36 @@ class SequenceService:
                 job_id = await self.blast_client.ebi_submit(raw_seq, seq_type, database)
             else:  # uniprot
                 job_id = await self.blast_client.uniprot_submit(raw_seq)
+        except httpx.HTTPStatusError as exc:
+            # EBI returns 400 for malformed sequences (too short, invalid chars, etc.)
+            if exc.response.status_code == 400:
+                submit_err = (
+                    "EBI BLAST rejected the sequence (HTTP 400). "
+                    "Please ensure the sequence is at least 20 residues and contains only valid amino acid or nucleotide characters."
+                )
+            else:
+                submit_err = f"Provider error (HTTP {exc.response.status_code}): {exc.response.text[:200]}"
+            # Auto-fallback: EBI failed → try UniProt (protein only)
+            if requested_provider == "auto" and seq_type == "protein":
+                try:
+                    job_id = await self.blast_client.uniprot_submit(raw_seq)
+                    actual_provider = "uniprot"
+                    database = "UniProtKB"
+                    submit_err = ""
+                except httpx.HTTPError as exc2:
+                    return ApiResponse(
+                        success=False,
+                        message=f"All BLAST providers failed. EBI: {submit_err}. UniProt: {exc2}",
+                        data={},
+                    )
+            else:
+                return ApiResponse(
+                    success=False,
+                    message=f"BLAST submission failed: {submit_err}",
+                    data={},
+                )
         except httpx.HTTPError as exc:
             submit_err = str(exc)
-            # Auto-fallback: EBI failed → try UniProt (protein only)
             if requested_provider == "auto" and seq_type == "protein":
                 try:
                     job_id = await self.blast_client.uniprot_submit(raw_seq)
