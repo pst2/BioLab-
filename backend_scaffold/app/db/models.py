@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from sqlalchemy import JSON, DateTime, Float, Integer, String, Text, UniqueConstraint
+from sqlalchemy import JSON, DateTime, Float, Index, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -47,7 +47,10 @@ class SystemLog(Base):
 
 class GeneRecord(Base):
     __tablename__ = "genes"
-    __table_args__ = (UniqueConstraint("symbol", "organism", name="uq_gene_symbol_organism"),)
+    __table_args__ = (
+        UniqueConstraint("symbol", "organism", name="uq_gene_symbol_organism"),
+        Index("ix_genes_symbol_organism", "symbol", "organism"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     symbol: Mapped[str] = mapped_column(String(100), index=True, nullable=False)
@@ -90,3 +93,16 @@ class SequenceRecord(Base):
     analysis: Mapped[dict] = mapped_column(JSON, default=dict)
     source: Mapped[str] = mapped_column(String(50), default="user_input", index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+
+class RequestMetric(Base):
+    __tablename__ = "request_metrics"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    endpoint: Mapped[str] = mapped_column(String(255), index=True)
+    method: Mapped[str] = mapped_column(String(20), default="GET")
+    status_code: Mapped[int] = mapped_column(Integer, index=True)
+    response_time_ms: Mapped[float] = mapped_column(Float, default=0.0)
+    provider: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, index=True)
+

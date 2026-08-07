@@ -157,15 +157,28 @@ class SequenceService:
                 meta=MetaInfo(source="ncbi", cached=False, stale=False),
             )
 
+    # Threshold for skipping expensive string outputs
+    _LARGE_SEQ_THRESHOLD = 50_000
+    _COMPLEMENT_MAP = str.maketrans({"A": "T", "T": "A", "G": "C", "C": "G", "N": "N"})
+
     def reverse_complement(self, sequence: str) -> str:
         sequence = self._normalize_sequence(sequence)
         validate_dna_sequence(sequence)
-        complement_map = str.maketrans({"A": "T", "T": "A", "G": "C", "C": "G", "N": "N"})
-        return sequence.translate(complement_map)[::-1]
+        return sequence.translate(self._COMPLEMENT_MAP)[::-1]
 
     def transcribe(self, sequence: str) -> str:
         sequence = self._normalize_sequence(sequence)
         validate_dna_sequence(sequence)
+        return sequence.replace("T", "U")
+
+    # ── Fast-path versions (skip redundant normalize + validate) ───────── #
+
+    def _reverse_complement_fast(self, sequence: str) -> str:
+        """Reverse complement without re-normalising (caller guarantees clean input)."""
+        return sequence.translate(self._COMPLEMENT_MAP)[::-1]
+
+    def _transcribe_fast(self, sequence: str) -> str:
+        """Transcribe without re-normalising (caller guarantees clean input)."""
         return sequence.replace("T", "U")
 
     def _normalize_sequence(self, sequence: str) -> str:
@@ -178,18 +191,28 @@ class SequenceService:
         at_count = counts.get("A", 0) + counts.get("T", 0)
         gc_content = round((gc_count / length) * 100, 2) if length else 0.0
         at_content = round((at_count / length) * 100, 2) if length else 0.0
+        is_large = length > self._LARGE_SEQ_THRESHOLD
+
+        # Use fast-path (sequence already normalised + validated by caller)
+        if is_large:
+            rev_comp = f"[Truncated — sequence is {length:,} bp]"
+            rna_seq = f"[Truncated — sequence is {length:,} bp]"
+        else:
+            rev_comp = self._reverse_complement_fast(sequence) if sequence else ""
+            rna_seq = self._transcribe_fast(sequence) if sequence else ""
+
         result: dict[str, Any] = {
             "sequence_length": length,
             "gc_content_percent": gc_content,
             "at_content_percent": at_content,
             "base_counts": {base: counts.get(base, 0) for base in ["A", "T", "G", "C", "N"]},
             "base_composition": self._base_composition(counts, length),
-            "reverse_complement": self.reverse_complement(sequence) if sequence else "",
-            "rna_sequence": self.transcribe(sequence) if sequence else "",
-            "motifs": self._find_motifs(sequence, motifs or ["ATG", "TATA", "AATAAA"]),
-            "orfs": self._find_orfs(sequence),
-            "codon_frequency": self._codon_frequency(sequence),
-            "gc_windows": self._gc_windows(sequence),
+            "reverse_complement": rev_comp,
+            "rna_sequence": rna_seq,
+            "motifs": self._find_motifs(sequence, motifs or ["ATG", "TATA", "AATAAA"], length),
+            "orfs": self._find_orfs(sequence, length),
+            "codon_frequency": self._codon_frequency(sequence, length),
+            "gc_windows": self._gc_windows(sequence, length),
             "dependency_policy": {
                 "internal_percent": 100,
                 "ncbi_percent": 0,
@@ -208,7 +231,9 @@ class SequenceService:
             for base in ["A", "T", "G", "C", "N"]
         ]
 
-    def _find_motifs(self, sequence: str, motifs: list[str]) -> list[dict[str, Any]]:
+    def _find_motifs(self, sequence: str, motifs: list[str], seq_length: int = 0) -> list[dict[str, Any]]:
+        # For very large sequences, only search the first 50k bases
+        search_seq = sequence[:50_000] if seq_length > 100_000 else sequence
         results = []
         for motif in motifs:
             motif = self._normalize_sequence(motif)
@@ -218,7 +243,7 @@ class SequenceService:
             positions = []
             start = 0
             while True:
-                idx = sequence.find(motif, start)
+                idx = search_seq.find(motif, start)
                 if idx == -1:
                     break
                 positions.append(idx)
@@ -226,8 +251,11 @@ class SequenceService:
             results.append({"motif": motif, "count": len(positions), "positions": positions})
         return results
 
-    def _find_orfs(self, sequence: str) -> list[dict[str, Any]]:
+    def _find_orfs(self, sequence: str, seq_length: int = 0) -> list[dict[str, Any]]:
         stop_codons = {"TAA", "TAG", "TGA"}
+        # For large sequences, only look for ORFs with minimum length
+        min_orf_length = 300 if seq_length > 10_000 else 0
+        max_orfs = 30 if seq_length > 10_000 else 50
         orfs = []
         for frame in range(3):
             i = frame
@@ -238,26 +266,40 @@ class SequenceService:
                     while j <= len(sequence) - 3:
                         stop = sequence[j : j + 3]
                         if stop in stop_codons:
-                            orfs.append({"frame": frame + 1, "start": i, "end": j + 3, "length": j + 3 - i, "stop_codon": stop})
+                            orf_len = j + 3 - i
+                            if orf_len >= min_orf_length:
+                                orfs.append({"frame": frame + 1, "start": i, "end": j + 3, "length": orf_len, "stop_codon": stop})
                             break
                         j += 3
                     i = j
                 i += 3
-        return orfs[:50]
+                if len(orfs) >= max_orfs:
+                    break
+            if len(orfs) >= max_orfs:
+                break
+        return orfs[:max_orfs]
 
-    def _codon_frequency(self, sequence: str) -> list[dict[str, Any]]:
-        codons = [sequence[i : i + 3] for i in range(0, len(sequence) - 2, 3)]
-        counts = Counter(codons)
+    def _codon_frequency(self, sequence: str, seq_length: int = 0) -> list[dict[str, Any]]:
+        # For very large sequences, sample the first 30k bases
+        sample = sequence[:30_000] if seq_length > 100_000 else sequence
+        counts: Counter = Counter()
+        for i in range(0, len(sample) - 2, 3):
+            counts[sample[i : i + 3]] += 1
         return [
             {"codon": codon, "count": count}
             for codon, count in sorted(counts.items(), key=lambda item: (-item[1], item[0]))[:30]
         ]
 
-    def _gc_windows(self, sequence: str, window_size: int = 20) -> list[dict[str, Any]]:
-        if len(sequence) > 500:
+    def _gc_windows(self, sequence: str, seq_length: int = 0) -> list[dict[str, Any]]:
+        length = seq_length or len(sequence)
+        if length > 50_000:
+            window_size = 5_000
+        elif length > 5_000:
+            window_size = 1_000
+        elif length > 500:
             window_size = 100
-        if len(sequence) > 5000:
-            window_size = 1000
+        else:
+            window_size = 20
         windows = []
         for start in range(0, len(sequence), window_size):
             window = sequence[start : start + window_size]

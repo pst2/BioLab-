@@ -39,11 +39,14 @@ class BaseSearchService:
         search_fn: SearchFunction,
         *,
         mode: str = "local_first",
+        force_refresh: bool = False,
         local_search_fn: Callable[[str], list[dict[str, Any]]] | None = None,
         local_save_fn: Callable[[list[dict[str, Any]], str], None] | None = None,
     ):
         keyword = keyword.strip()
         mode = self._normalize_mode(mode)
+        if force_refresh:
+            mode = "external_refresh"
         cache_key = f"{self.search_type}:{self.cache_version}:{keyword.lower()}"
 
         if mode == "local_only":
@@ -83,14 +86,18 @@ class BaseSearchService:
             )
 
         if mode != "external_refresh":
-            valid_cache = self.cache_repo.get_valid(cache_key)
-            if valid_cache:
+            valid_cache_entry = self.cache_repo.get_valid_entry(cache_key)
+            if valid_cache_entry:
+                cached_at_str = valid_cache_entry.created_at.isoformat() if valid_cache_entry.created_at else None
+                expires_at_str = valid_cache_entry.expires_at.isoformat() if valid_cache_entry.expires_at else None
                 return self._final_response(
                     message=self.cache_message,
-                    data=valid_cache,
+                    data=valid_cache_entry.payload,
                     source="cache",
                     cached=True,
                     stale=False,
+                    cached_at=cached_at_str,
+                    expires_at=expires_at_str,
                     keyword=keyword,
                     mode=mode,
                     external_used=False,
@@ -113,15 +120,19 @@ class BaseSearchService:
             result = await search_fn(keyword)
             if result:
                 result_source = self._infer_external_source(result, default="ncbi")
-                self.cache_repo.set(cache_key, result, ttl_seconds=self.cache_ttl_seconds)
+                cache_entry = self.cache_repo.set(cache_key, result, ttl_seconds=self.cache_ttl_seconds)
                 if local_save_fn:
                     local_save_fn(result, result_source)
+                cached_at_str = cache_entry.created_at.isoformat() if cache_entry and cache_entry.created_at else None
+                expires_at_str = cache_entry.expires_at.isoformat() if cache_entry and cache_entry.expires_at else None
                 return self._final_response(
                     message=self._success_message_for_source(result_source),
                     data=result,
                     source=result_source,
                     cached=False,
                     stale=False,
+                    cached_at=cached_at_str,
+                    expires_at=expires_at_str,
                     keyword=keyword,
                     mode=mode,
                     external_used=True,
@@ -129,14 +140,18 @@ class BaseSearchService:
         except Exception as exc:
             logger.exception("External %s failed for keyword=%s: %s", self.search_type, keyword, exc)
 
-        stale_cache = self.cache_repo.get_any(cache_key)
-        if stale_cache:
+        stale_cache_entry = self.cache_repo.get_entry(cache_key)
+        if stale_cache_entry:
+            cached_at_str = stale_cache_entry.created_at.isoformat() if stale_cache_entry.created_at else None
+            expires_at_str = stale_cache_entry.expires_at.isoformat() if stale_cache_entry.expires_at else None
             return self._final_response(
                 message="External providers unavailable, showing stale local cache data",
-                data=stale_cache,
+                data=stale_cache_entry.payload,
                 source="cache",
                 cached=True,
                 stale=True,
+                cached_at=cached_at_str,
+                expires_at=expires_at_str,
                 keyword=keyword,
                 mode=mode,
                 external_used=False,
@@ -226,6 +241,8 @@ class BaseSearchService:
         source: str,
         cached: bool,
         stale: bool,
+        cached_at: str | None = None,
+        expires_at: str | None = None,
         keyword: str,
         mode: str,
         external_used: bool,
@@ -247,6 +264,8 @@ class BaseSearchService:
             source=source,
             cached=cached,
             stale=stale,
+            cached_at=cached_at,
+            expires_at=expires_at,
             keyword=keyword,
             mode=mode,
             external_used=external_used,
@@ -260,6 +279,8 @@ class BaseSearchService:
         source: str,
         cached: bool,
         stale: bool,
+        cached_at: str | None = None,
+        expires_at: str | None = None,
         keyword: str,
         mode: str = "local_first",
         external_used: bool = False,
@@ -278,6 +299,8 @@ class BaseSearchService:
                 "source": source,
                 "cached": cached,
                 "stale": stale,
+                "cached_at": cached_at,
+                "expires_at": expires_at,
                 "keyword": keyword,
                 "count": count,
                 "mode": mode,

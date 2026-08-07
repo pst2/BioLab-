@@ -40,3 +40,21 @@ async def test_system_status_reports_services(db_session, monkeypatch):
     monkeypatch.setattr(service.ncbi_client, "ping", fake_ping)
     result = await service.system_status()
     assert result.data["services"]["database"] == "up"
+
+
+@pytest.mark.asyncio
+async def test_get_system_stats_returns_valid_structure(db_session, monkeypatch):
+    service = SystemService(db_session)
+
+    async def fake_ping():
+        return True
+
+    monkeypatch.setattr(service.ncbi_client, "ping", fake_ping)
+    result = await service.get_system_stats()
+    assert result.success is True
+    assert "genes_indexed" in result.data
+    assert "providers_active" in result.data
+    assert "success_rate" in result.data
+    assert "queries_today" in result.data
+    assert "computed_at" in result.data
+

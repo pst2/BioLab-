@@ -28,16 +28,20 @@ const dictionary: Record<Language, Record<string, string>> = {
     "sidebar.subtitle": "Nghiên cứu hệ gene",
     "sidebar.newAnalysis": "Phân tích mới",
     "sidebar.autoFallback": "Tự động fallback",
-    "dashboard.badge": "Không gian bioinformatics",
+    "dashboard.badge": "Không gian làm việc Tin sinh học",
     "dashboard.title": "Tìm kiếm gene, xem FASTA và trực quan hóa dữ liệu sinh học.",
     "dashboard.desc": "UI tối giản nhưng vẫn giữ FastAPI backend, Next proxy, multi-provider fallback, sequence analysis và trang chi tiết gene.",
-    "metric.genesIndexed": "Gene đã chỉ mục",
-    "metric.providers": "Nhà cung cấp",
+    "metric.genesIndexed": "Số gen đã lập chỉ mục",
+    "metric.providers": "Nhà cung cấp hoạt động",
     "metric.successRate": "Tỷ lệ thành công",
     "metric.queriesToday": "Truy vấn hôm nay",
-    "dashboard.startSearch": "Bắt đầu tìm gene",
-    "dashboard.analyzeSequence": "Phân tích sequence",
-    "dashboard.quickTargets": "Gene gợi ý",
+    "metric.monthGrowth": "+{percent}% tháng này",
+    "dashboard.sub.localFirst": "Ưu tiên cục bộ trước",
+    "dashboard.sub.realtime": "Truy vấn thời gian thực",
+    "dashboard.startSearch": "Bắt đầu tìm gen",
+    "dashboard.analyzeSequence": "Phân tích trình tự",
+    "dashboard.quickTargets": "Mục tiêu nhanh",
+    "dashboard.quickTargetsSub": "Các mục tiêu gen ung thư thường tra cứu",
     "dashboard.searchViaBackend": "Tìm qua backend",
     "feature.search.title": "Tìm kiếm gene",
     "feature.search.text": "Tìm theo symbol, accession, ID, organism và provider.",
@@ -91,6 +95,41 @@ const dictionary: Record<Language, Record<string, string>> = {
     "sequence.emptyMessage": "Dán chuỗi DNA vào khung bên trái để xem GC content và nucleotide composition.",
     "sequence.length": "Độ dài",
     "sequence.validBases": "Base hợp lệ",
+    "blast.subtabAnalyze": "Thành phần & Chỉ số",
+    "blast.subtabBlast": "Tìm kiếm tương đồng BLAST",
+    "blast.badge": "NCBI / EBI / UniProt Alignment",
+    "blast.title": "Tìm kiếm tương đồng BLAST",
+    "blast.desc": "Gửi trình tự tới máy chủ BLAST từ xa với cơ chế tự động chuyển đổi nguồn (failover).",
+    "blast.seqType": "Loại trình tự",
+    "blast.seqTypeAuto": "Tự động phát hiện",
+    "blast.seqTypeDna": "DNA / Nucleotide",
+    "blast.seqTypeProtein": "Protein / Axit amin",
+    "blast.provider": "Nguồn thực thi",
+    "blast.providerAuto": "Tự động chọn",
+    "blast.providerEbi": "EBI NCBI-BLAST",
+    "blast.providerUniprot": "UniProt BLAST",
+    "blast.databaseFilter": "Bộ lọc CSDL",
+    "blast.databasePlaceholder": "VD: em_std, uniprotkb_swissprot",
+    "blast.placeholder": "Dán trình tự FASTA hoặc DNA/Protein thô...",
+    "blast.submit": "Gửi yêu cầu tìm kiếm BLAST",
+    "blast.submitting": "Đang gửi...",
+    "blast.reset": "Đặt lại mẫu",
+    "blast.inProgress": "Đang thực thi tìm kiếm BLAST...",
+    "blast.jobId": "Mã công việc",
+    "blast.status": "Trạng thái",
+    "blast.polling": "Đang truy vấn...",
+    "blast.failed": "Tìm kiếm BLAST thất bại",
+    "blast.retry": "Thử lại công việc BLAST",
+    "blast.emptyTitle": "Không tìm thấy căn gióng phù hợp",
+    "blast.emptyDesc": "Không có trình tự nào vượt qua ngưỡng ý nghĩa cho truy vấn này. Hãy thử chọn cơ sở dữ liệu rộng hơn.",
+    "blast.alignmentsFound": "Căn gióng tìm thấy",
+    "blast.identity": "Tương đồng",
+    "blast.eValue": "Chỉ số E-value",
+    "blast.coverage": "Độ phủ",
+    "blast.details": "Chi tiết",
+    "blast.sampleDna": "Tải mẫu DNA",
+    "blast.sampleProtein": "Tải mẫu Protein",
+    "blast.elapsed": "Thời gian chạy",
     "api.title": "API Explorer",
     "api.desc": "Khu vực kiểm thử nhanh các endpoint đang dùng trong frontend cũ.",
     "api.loading": "Đang tải...",
@@ -237,12 +276,16 @@ const dictionary: Record<Language, Record<string, string>> = {
     "dashboard.title": "Search genes, inspect FASTA and visualize biological data.",
     "dashboard.desc": "A minimal UI that keeps your FastAPI backend, Next proxy, multi-provider fallback, sequence analysis and gene detail page.",
     "metric.genesIndexed": "Genes Indexed",
-    "metric.providers": "Providers",
+    "metric.providers": "Providers Active",
     "metric.successRate": "Success Rate",
     "metric.queriesToday": "Queries Today",
+    "metric.monthGrowth": "+{percent}% this month",
+    "dashboard.sub.localFirst": "Local-first fallback",
+    "dashboard.sub.realtime": "Real-time queries",
     "dashboard.startSearch": "Start gene search",
     "dashboard.analyzeSequence": "Analyze sequence",
-    "dashboard.quickTargets": "Quick targets",
+    "dashboard.quickTargets": "Quick Targets",
+    "dashboard.quickTargetsSub": "Frequently searched cancer and oncogene targets",
     "dashboard.searchViaBackend": "Search via backend",
     "feature.search.title": "Gene search",
     "feature.search.text": "Search by symbol, accession, ID, organism and provider.",
@@ -296,6 +339,41 @@ const dictionary: Record<Language, Record<string, string>> = {
     "sequence.emptyMessage": "Paste a DNA sequence on the left to view GC content and nucleotide composition.",
     "sequence.length": "Length",
     "sequence.validBases": "Valid bases",
+    "blast.subtabAnalyze": "Composition & Metrics",
+    "blast.subtabBlast": "BLAST Similarity Search",
+    "blast.badge": "NCBI / EBI / UniProt Alignment",
+    "blast.title": "BLAST Similarity Search",
+    "blast.desc": "Submit sequence to remote BLAST server with automatic provider failover.",
+    "blast.seqType": "Sequence Type",
+    "blast.seqTypeAuto": "Auto-detect",
+    "blast.seqTypeDna": "DNA / Nucleotide",
+    "blast.seqTypeProtein": "Protein / Amino Acid",
+    "blast.provider": "Provider",
+    "blast.providerAuto": "Auto-select",
+    "blast.providerEbi": "EBI NCBI-BLAST",
+    "blast.providerUniprot": "UniProt BLAST",
+    "blast.databaseFilter": "Database Filter",
+    "blast.databasePlaceholder": "e.g. em_std, uniprotkb_swissprot",
+    "blast.placeholder": "Paste FASTA or raw DNA/Protein sequence...",
+    "blast.submit": "Submit BLAST Search",
+    "blast.submitting": "Submitting...",
+    "blast.reset": "Reset Form",
+    "blast.inProgress": "BLAST Search in Progress...",
+    "blast.jobId": "Job ID",
+    "blast.status": "Status",
+    "blast.polling": "Polling...",
+    "blast.failed": "BLAST Search Failed",
+    "blast.retry": "Retry BLAST Job",
+    "blast.emptyTitle": "No Alignments Found",
+    "blast.emptyDesc": "No matching sequences exceeded the significance threshold for this query. Try choosing a broader database or selecting auto-detect sequence type.",
+    "blast.alignmentsFound": "Alignments Found",
+    "blast.identity": "Identity",
+    "blast.eValue": "E-value",
+    "blast.coverage": "Coverage",
+    "blast.details": "Details",
+    "blast.sampleDna": "Load Sample DNA",
+    "blast.sampleProtein": "Load Sample Protein",
+    "blast.elapsed": "Elapsed time",
     "api.title": "API Explorer",
     "api.desc": "Quick playground for endpoints used by the previous frontend.",
     "api.loading": "Loading...",
@@ -462,6 +540,23 @@ export function useLanguage() {
 
 export function LanguageToggle({ compact = false }: { compact?: boolean }) {
   const { lang, setLang, t } = useLanguage();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <button
+        type="button"
+        className={`inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 shadow-sm ${compact ? "h-9 px-3" : "h-10 gap-2 px-4"}`}
+      >
+        <span>VI</span>
+      </button>
+    );
+  }
+
   const next = lang === "vi" ? "en" : "vi";
   return (
     <button
@@ -542,6 +637,20 @@ export function useTheme() {
 export function ThemeToggle() {
   const { theme, toggle } = useTheme();
   const { t } = useLanguage();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <button type="button" className="theme-toggle" aria-label="Toggle theme">
+        <Sun className="h-4 w-4" />
+      </button>
+    );
+  }
+
   const resolved = theme === "system" ? (typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : theme;
 
   return (

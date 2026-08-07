@@ -10,14 +10,14 @@ class Settings(BaseSettings):
     DEBUG: bool = False
 
     DATABASE_URL: str = "sqlite:///./bio_backend.db"
-    ALLOWED_ORIGINS: str = "*"
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
 
     API_KEYS: str = ""
 
     NCBI_BASE_URL: str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
     NCBI_API_KEY: str | None = None
-    NCBI_TIMEOUT: float = 15.0
-    NCBI_RETRY_COUNT: int = 3
+    NCBI_TIMEOUT: float = 10.0
+    NCBI_RETRY_COUNT: int = 2
     NCBI_RETMAX: int = 10
 
     BLAST_CONTACT_EMAIL: str = "pst2102@gmail.com"
@@ -41,7 +41,10 @@ class Settings(BaseSettings):
 
     @property
     def allowed_origins_list(self) -> list[str]:
-        return [item.strip() for item in self.ALLOWED_ORIGINS.split(",") if item.strip()] or ["*"]
+        origins = [item.strip() for item in self.ALLOWED_ORIGINS.split(",") if item.strip()]
+        if not origins or origins == ["*"]:
+            return ["http://localhost:3000", "http://127.0.0.1:3000"]
+        return origins
 
     @property
     def api_keys_list(self) -> list[str]:

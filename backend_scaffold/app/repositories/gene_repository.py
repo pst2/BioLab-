@@ -32,9 +32,14 @@ class GeneRepository:
         return [self.to_dict(row) for row in rows]
 
     def get_by_gene_id(self, gene_id: str) -> dict[str, Any] | None:
+        gid = str(gene_id).strip()
         row = (
             self.db.query(GeneRecord)
-            .filter((GeneRecord.ncbi_gene_id == str(gene_id)) | (GeneRecord.id == self._safe_int(gene_id)))
+            .filter(
+                (GeneRecord.ncbi_gene_id == gid)
+                | (GeneRecord.id == self._safe_int(gid))
+                | (GeneRecord.symbol.ilike(gid))
+            )
             .first()
         )
         return self.to_dict(row) if row else None

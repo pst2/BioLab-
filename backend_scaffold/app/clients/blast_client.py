@@ -34,7 +34,7 @@ _DNA_CHARS: frozenset[str] = frozenset("ATGCNRYWSMKHBVD")
 DEFAULT_DATABASES: dict[str, dict[str, str]] = {
     "ebi": {
         "protein": "uniprotkb_swissprot",
-        "dna": "emrel",
+        "dna": "em_std_hum",
     },
     "uniprot": {
         "protein": "UniProtKB",
@@ -103,6 +103,10 @@ class BlastClient:
         clean = self.strip_header(sequence)
         program = "blastp" if seq_type == "protein" else "blastn"
         stype = "protein" if seq_type == "protein" else "dna"
+
+        # Map legacy or invalid aliases
+        if database in ("emrel", "embl", "em_rel"):
+            database = "em_std"
 
         params = {
             "email": settings.BLAST_CONTACT_EMAIL,

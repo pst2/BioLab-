@@ -234,6 +234,27 @@ class GeneService(BaseSearchService):
             except Exception:
                 pass
 
+        # 3c. Fallback search resolution if lookup by exact ID failed
+        try:
+            search_res = await self.search_genes(keyword=gene_id, mode="local_first")
+            if search_res and isinstance(search_res.get("data"), list) and len(search_res["data"]) > 0:
+                first_match = search_res["data"][0]
+                enriched = await self._enrich_detail_record(first_match)
+                self.gene_repo.upsert(enriched, source=enriched.get("source") or "ncbi")
+                self.db.commit()
+                return self._response(
+                    message="Gene detail resolved via fallback search",
+                    data=enriched,
+                    source=enriched.get("source") or "ncbi",
+                    cached=False,
+                    stale=False,
+                    keyword=gene_id,
+                    mode="local_first",
+                    external_used=True,
+                )
+        except Exception:
+            pass
+
         # 4. Nothing found anywhere — return a minimal placeholder so the UI
         #    does not crash; include a hint so the developer knows what to do.
         placeholder = enrich_with_sequence_fields({

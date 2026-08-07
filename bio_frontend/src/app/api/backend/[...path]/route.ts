@@ -55,6 +55,9 @@ async function proxy(request: NextRequest, context: RouteContext) {
       headers.delete("host");
       headers.delete("connection");
 
+      const apiKey = process.env.API_KEY || "dev-key-1";
+      headers.set("X-API-Key", apiKey);
+
       const response = await fetch(target, {
         method: request.method,
         headers,

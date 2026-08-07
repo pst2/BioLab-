@@ -11,27 +11,26 @@ class CacheRepository:
         self.db = db
 
     def get(self, cache_key: str) -> Any | None:
-        entry = (
-            self.db.query(CacheEntry)
-            .filter(CacheEntry.cache_key == cache_key)
-            .first()
-        )
+        entry = self.get_entry(cache_key)
         return entry.payload if entry else None
 
-    def get_any(self, cache_key: str) -> Any | None:
-        entry = (
+    def get_entry(self, cache_key: str) -> CacheEntry | None:
+        return (
             self.db.query(CacheEntry)
             .filter(CacheEntry.cache_key == cache_key)
             .first()
         )
+
+    def get_any(self, cache_key: str) -> Any | None:
+        entry = self.get_entry(cache_key)
         return entry.payload if entry else None
 
     def get_valid(self, cache_key: str) -> Any | None:
-        entry = (
-            self.db.query(CacheEntry)
-            .filter(CacheEntry.cache_key == cache_key)
-            .first()
-        )
+        entry = self.get_valid_entry(cache_key)
+        return entry.payload if entry else None
+
+    def get_valid_entry(self, cache_key: str) -> CacheEntry | None:
+        entry = self.get_entry(cache_key)
 
         if not entry:
             return None
@@ -46,7 +45,7 @@ class CacheRepository:
             if expires_at < now:
                 return None
 
-        return entry.payload
+        return entry
 
     def set(self, cache_key: str, payload: Any, ttl_seconds: int | None = 3600):
         entry = (

@@ -16,6 +16,26 @@ class AppException(Exception):
         super().__init__(message)
 
 
+class ProviderError(AppException):
+    def __init__(self, message: str = "Provider error occurred", error_code: str = "PROVIDER_ERROR", status_code: int = 502):
+        super().__init__(message=message, error_code=error_code, status_code=status_code)
+
+
+class ProviderTimeoutError(ProviderError):
+    def __init__(self, message: str = "Provider request timed out"):
+        super().__init__(message=message, error_code="PROVIDER_TIMEOUT", status_code=504)
+
+
+class ProviderRateLimitError(ProviderError):
+    def __init__(self, message: str = "Provider rate limit exceeded"):
+        super().__init__(message=message, error_code="PROVIDER_RATE_LIMIT", status_code=429)
+
+
+class ProviderNotFoundError(ProviderError):
+    def __init__(self, message: str = "Resource not found on provider"):
+        super().__init__(message=message, error_code="PROVIDER_NOT_FOUND", status_code=404)
+
+
 class AuthenticationException(AppException):
     def __init__(self, message: str = "Authentication failed", error_code: str = "AUTHENTICATION_FAILED"):
         super().__init__(message=message, error_code=error_code, status_code=401)
@@ -34,6 +54,7 @@ class ExternalServiceError(AppException):
 class ValidationError(AppException):
     def __init__(self, message: str = "Invalid input"):
         super().__init__(message=message, error_code="INVALID_INPUT", status_code=422)
+
 
 
 async def app_exception_handler(_: Request, exc: AppException) -> JSONResponse:

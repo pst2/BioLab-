@@ -1,5 +1,4 @@
 const BASE_URL = "/api/backend";
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY || "dev-key-1";
 
 export interface MetaInfo {
   source: string;
@@ -286,14 +285,19 @@ async function apiFetch<T>(
   return res.json();
 }
 
+export interface SystemStats {
+  genes_indexed: number | null;
+  providers_active: number | null;
+  providers_list?: string[];
+  success_rate: number | null;
+  queries_today: number | null;
+  computed_at: string;
+}
+
 export const api = {
   health: (options?: RequestInit) => apiFetch<HealthData>("/api/v1/health", options),
-
-  systemStatus: (options?: RequestInit) =>
-    apiFetch<SystemStatus>("/api/v1/system/status", {
-      ...options,
-      headers: { "X-API-Key": API_KEY, ...options?.headers },
-    }),
+  systemStatus: (options?: RequestInit) => apiFetch<SystemStatus>("/api/v1/system/status", options),
+  systemStats: (options?: RequestInit) => apiFetch<SystemStats>("/api/v1/system/stats", options),
 
   searchGenes: (params: string | GeneSearchParams, options?: RequestInit) => {
     const normalized: GeneSearchParams =

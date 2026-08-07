@@ -54,7 +54,7 @@ async def fetch_genbank_sequence(
 # ── BLAST Similarity Search ────────────────────────────────────────────────────
 
 @router.post("/search/submit", response_model=ApiResponse)
-@limiter.limit(settings.RATE_LIMIT_SEARCH)
+@limiter.limit("5/minute")
 async def submit_sequence_search(
     request: Request,
     payload: SequenceSearchRequest,
