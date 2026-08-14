@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -83,3 +83,51 @@ async def check_sequence_search_status(
     """
     service = SequenceService(db=db)
     return await service.check_similarity_search_status(job_id)
+
+
+# ── IGV.js Raw FASTA Endpoint ──────────────────────────────────────────────────
+
+@router.get("/igv/fasta")
+@limiter.limit("30/minute")
+async def igv_fasta(
+    request: Request,
+    accession: str = Query(..., min_length=1, description="RefSeq accession, e.g. NC_000005.10"),
+    start: int | None = Query(default=None, ge=1, description="1-based start coordinate (inclusive)"),
+    end: int | None = Query(default=None, ge=1, description="1-based end coordinate (inclusive)"),
+    db: Session = Depends(get_db),
+) -> Response:
+    """Raw FASTA endpoint for IGV.js.
+
+    Returns bare text/plain — NOT wrapped in ApiResponse.
+    IGV.js requires raw FASTA with Content-Type: text/plain.
+
+    Supports optional region slicing (start/end). If omitted the full record
+    is returned — avoid omitting them for chromosome-scale accessions (NC_*).
+    """
+    service = SequenceService(db=db)
+    try:
+        fasta_text = await service.fetch_raw_fasta_for_igv(
+            accession=accession,
+            start=start,
+            end=end,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"NCBI fetch failed: {exc}") from exc
+
+    if not fasta_text or not fasta_text.strip().startswith(">"):
+        raise HTTPException(
+            status_code=404,
+            detail=f"No FASTA sequence found for accession '{accession}'",
+        )
+
+    return Response(
+        content=fasta_text,
+        media_type="text/plain",
+        headers={
+            # Allow IGV.js running on the Next.js dev origin to load this directly
+            "Access-Control-Allow-Origin": "*",
+            "Cache-Control": "public, max-age=300",
+        },
+    )

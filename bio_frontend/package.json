@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "igv": "^3.8.5",
     "lucide-react": "^0.546.0",
     "next": "^15.5.18",
     "react": "^19.0.0",

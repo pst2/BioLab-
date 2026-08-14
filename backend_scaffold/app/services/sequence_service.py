@@ -157,6 +157,51 @@ class SequenceService:
                 meta=MetaInfo(source="ncbi", cached=False, stale=False),
             )
 
+    async def fetch_raw_fasta_for_igv(
+        self,
+        accession: str,
+        start: int | None = None,
+        end: int | None = None,
+    ) -> str:
+        """Fetch raw FASTA text for IGV.js.
+
+        Returns the FASTA sequence as plain text (not wrapped in ApiResponse).
+        Supports optional region slicing via NCBI efetch seq_start/seq_stop params
+        (1-based, both inclusive).  When no start/end are given the full record is
+        returned — be careful with large chromosomes.
+        """
+        accession = accession.strip()
+        if not accession:
+            raise ValueError("accession is required")
+
+        # Build a cache key that encodes the region so different windows are cached separately
+        region_key = f"{start}-{end}" if (start is not None and end is not None) else "full"
+        cache_key = self._build_cache_key("nuccore", accession, f"igv_fasta:{region_key}")
+
+        def normalize_fasta_header(raw_text: str) -> str:
+            if raw_text and raw_text.startswith(">"):
+                lines = raw_text.splitlines()
+                if lines:
+                    lines[0] = f">{accession}"
+                    return "\n".join(lines)
+            return raw_text
+
+        if self.cache_repository:
+            cached = self.cache_repository.get_valid(cache_key)
+            if cached and isinstance(cached, dict) and cached.get("raw"):
+                return normalize_fasta_header(str(cached["raw"]))
+
+        fasta_text = await self.ncbi_client.fetch_sequence_fasta_region(
+            accession,
+            start=start,
+            end=end,
+        )
+        fasta_text = normalize_fasta_header(fasta_text)
+
+        if self.cache_repository and fasta_text:
+            self.cache_repository.set(cache_key, {"raw": fasta_text})
+        return fasta_text
+
     # Threshold for skipping expensive string outputs
     _LARGE_SEQ_THRESHOLD = 50_000
     _COMPLEMENT_MAP = str.maketrans({"A": "T", "T": "A", "G": "C", "C": "G", "N": "N"})

@@ -104,7 +104,12 @@ class NCBIClient:
             "retmode": "json",
         }
         summary_data = await self._get_json("esummary.fcgi", summary_params)
-        item = summary_data.get("result", {}).get(gene_id, {})
+        result_map = summary_data.get("result", {})
+        item = result_map.get(gene_id, {})
+        if not item or "error" in item:
+            uids = result_map.get("uids", [])
+            if uids and isinstance(uids, list):
+                item = result_map.get(str(uids[0]), {})
         # NCBI returns {"error": "cannot get document summary"} when the UID does not
         # exist in the gene database (e.g. it is a nuccore/protein UID instead).
         if not item or "error" in item:
@@ -114,6 +119,43 @@ class NCBIClient:
         other_aliases = item.get("otheraliases") or ""
         aliases = [a.strip() for a in str(other_aliases).split(",") if a.strip()]
 
+        # Parse NC_ chromosome accession and genomic coordinates from genomicinfo for IGV.js
+        # NCBI Gene ESummary returns: {"genomicinfo": [{"chraccver": "NC_000005.10",
+        #                                               "chrstart": 1234567,  ← 0-based
+        #                                               "chrstop":  1245678,  ← 0-based
+        #                                               ...}]}
+        # IMPORTANT: For minus-strand genes, chrstart > chrstop (NCBI quirk).
+        # We always normalise so that gene_start <= gene_end.
+        genomic_accession: str | None = None
+        gene_start: int | None = None
+        gene_end: int | None = None
+        genomic_info = item.get("genomicinfo")
+        if isinstance(genomic_info, list) and genomic_info:
+            first = genomic_info[0]
+            if isinstance(first, dict):
+                genomic_accession = first.get("chraccver") or None
+                raw_start = first.get("chrstart")
+                raw_stop = first.get("chrstop")
+                if raw_start is not None and raw_stop is not None:
+                    try:
+                        s = int(raw_start)
+                        e = int(raw_stop)
+                        # Normalise: always store as min/max so start <= end
+                        gene_start = min(s, e) + 1  # 0-based → 1-based
+                        gene_end = max(s, e) + 1
+                    except (TypeError, ValueError):
+                        pass
+                elif raw_start is not None:
+                    try:
+                        gene_start = int(raw_start) + 1
+                    except (TypeError, ValueError):
+                        pass
+                elif raw_stop is not None:
+                    try:
+                        gene_end = int(raw_stop) + 1
+                    except (TypeError, ValueError):
+                        pass
+
         return {
             "gene_id": str(item.get("uid", gene_id)),
             "symbol": item.get("name") or f"Gene {gene_id}",
@@ -122,6 +164,9 @@ class NCBIClient:
             "summary": item.get("summary") or item.get("description") or "",
             "organism": organism,
             "chromosome": item.get("chromosome") or item.get("maplocation") or "Unknown",
+            "genomic_accession": genomic_accession,
+            "start": gene_start,
+            "end": gene_end,
             "aliases": aliases[:30],
             "ncbi_url": f"https://www.ncbi.nlm.nih.gov/gene/{gene_id}",
             "source": "ncbi",
@@ -138,7 +183,7 @@ class NCBIClient:
         """Attempt to fetch an NCBI record from nuccore or protein databases.
 
         This is a fallback for when get_gene_by_id returns None because the
-        numeric UID belongs to a nucleotide/protein record, not a gene record.
+        numeric UID or accession belongs to a nucleotide/protein record.
         Tries each database in order and returns the first successful hit.
         """
         record_id = str(record_id).strip()
@@ -154,14 +199,21 @@ class NCBIClient:
                     "retmode": "json",
                 }
                 data = await self._get_json("esummary.fcgi", params)
-                item = data.get("result", {}).get(record_id, {})
+                result_map = data.get("result", {})
+                item = result_map.get(record_id, {})
+                if not item or "error" in item:
+                    uids = result_map.get("uids", [])
+                    if uids and isinstance(uids, list):
+                        item = result_map.get(str(uids[0]), {})
+
                 if not item or "error" in item:
                     continue
 
                 # Determine data_type from db
                 ncbi_type = "nucleotide" if db == "nuccore" else "protein"
-                external_id = str(item.get("uid", record_id))
-                caption = item.get("caption") or item.get("accessionversion") or external_id
+                internal_uid = str(item.get("uid", record_id))
+                caption = item.get("caption") or item.get("accessionversion") or record_id
+                acc_ver = item.get("accessionversion") or caption
                 title = item.get("title") or item.get("extra") or ""
                 organism = item.get("organism") or item.get("taxname") or "Unknown"
                 if isinstance(organism, dict):
@@ -169,8 +221,8 @@ class NCBIClient:
                 slen = item.get("slen")
 
                 record: dict[str, Any] = {
-                    "gene_id": external_id,
-                    "external_id": external_id,
+                    "gene_id": caption or record_id,
+                    "external_id": caption,
                     "symbol": caption,
                     "name": title,
                     "description": title,
@@ -179,15 +231,21 @@ class NCBIClient:
                     "data_type": ncbi_type,
                     "database": db,
                     "source": "ncbi",
-                    "ncbi_url": f"https://www.ncbi.nlm.nih.gov/{db}/{external_id}",
+                    "genomic_accession": acc_ver if ncbi_type == "nucleotide" else None,
+                    "ncbi_url": f"https://www.ncbi.nlm.nih.gov/{db}/{caption}",
                     "raw": item,
                 }
                 if slen:
-                    record["sequence_length"] = int(slen)
+                    length_val = int(slen)
+                    record["sequence_length"] = length_val
+                    if ncbi_type == "nucleotide":
+                        record["start"] = 1
+                        record["end"] = length_val
+
                 # Attempt to fetch FASTA for short sequences (< 50 kbp / 50 kaa)
                 if slen and int(slen) <= 50_000:
                     try:
-                        fasta_text = await self.fetch_sequence_fasta(external_id, db=db)
+                        fasta_text = await self.fetch_sequence_fasta(caption, db=db)
                         if fasta_text and fasta_text.startswith(">"):
                             record["fasta"] = fasta_text
                             # Extract bare sequence for stats
@@ -431,6 +489,31 @@ class NCBIClient:
             "rettype": "fasta",
             "retmode": "text",
         }
+        return await self._get_text("efetch.fcgi", params)
+
+    async def fetch_sequence_fasta_region(
+        self,
+        accession: str,
+        *,
+        start: int | None = None,
+        end: int | None = None,
+        db: str = "nuccore",
+    ) -> str:
+        """Fetch a FASTA sequence for a specific genomic region.
+
+        Uses NCBI efetch seq_start / seq_stop parameters (1-based, inclusive).
+        When start/end are None the full record is returned.
+        """
+        params: dict[str, Any] = {
+            "db": db,
+            "id": accession,
+            "rettype": "fasta",
+            "retmode": "text",
+        }
+        if start is not None:
+            params["seq_start"] = max(1, start)
+        if end is not None:
+            params["seq_stop"] = end
         return await self._get_text("efetch.fcgi", params)
 
     async def fetch_sequence_genbank(self, accession: str, db: str = "nuccore") -> str:

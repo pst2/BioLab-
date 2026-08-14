@@ -37,6 +37,8 @@ def build_gene_visualization(record: dict[str, Any]) -> dict[str, Any]:
     stats = sequence_stats(sequence)
     start = _safe_int(record.get("start"))
     end = _safe_int(record.get("end"))
+    if start is not None and end is not None and start > end:
+        start, end = end, start
     chromosome = record.get("chromosome") or record.get("seq_region_name") or "Unknown"
     transcripts = record.get("transcripts") if isinstance(record.get("transcripts"), list) else []
     protein = record.get("protein") if isinstance(record.get("protein"), dict) else None
@@ -48,6 +50,8 @@ def build_gene_visualization(record: dict[str, Any]) -> dict[str, Any]:
             "end": end,
             "strand": record.get("strand"),
             "assembly": record.get("assembly") or record.get("assembly_name") or "Unknown",
+            # NC_/NW_/NZ_ accession for IGV.js — may be None for non-NCBI records
+            "genomic_accession": record.get("genomic_accession") or None,
         },
         "sequence_composition": stats,
         "transcripts": transcripts,
@@ -56,6 +60,12 @@ def build_gene_visualization(record: dict[str, Any]) -> dict[str, Any]:
 
 
 def enrich_with_sequence_fields(record: dict[str, Any], *, sequence_type: str = "genomic") -> dict[str, Any]:
+    # Ensure start <= end on the record itself
+    start = _safe_int(record.get("start"))
+    end = _safe_int(record.get("end"))
+    if start is not None and end is not None and start > end:
+        record["start"], record["end"] = end, start
+
     sequence = clean_sequence(record.get("sequence"))
     if sequence:
         stats = sequence_stats(sequence)

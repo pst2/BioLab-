@@ -35,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="antialiased">
+      <body className="antialiased" suppressHydrationWarning>
         <ClientProviders>{children}</ClientProviders>
       </body>
     </html>

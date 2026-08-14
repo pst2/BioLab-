@@ -64,6 +64,7 @@ export interface GeneVisualization {
     end?: number;
     strand?: number | string;
     assembly?: string;
+    genomic_accession?: string;
   };
   sequence_composition?: {
     sequence_length?: number;
@@ -108,6 +109,9 @@ export interface GeneDetail {
   end?: number;
   strand?: number | string;
   assembly?: string;
+  /** NC_/NW_/NZ_ RefSeq chromosome accession for IGV.js, e.g. "NC_000005.10".
+   *  Populated only for NCBI Gene records. */
+  genomic_accession?: string;
   aliases?: string[];
   sequence?: string;
   sequence_type?: string;

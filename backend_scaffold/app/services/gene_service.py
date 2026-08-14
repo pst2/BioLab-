@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+from typing import Any
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -26,9 +28,6 @@ class GeneService(BaseSearchService):
     unavailable_message = "Gene search is temporarily unavailable"
     cache_ttl_seconds = settings.CACHE_TTL_GENE_SECONDS
 
-    # mock_data is the LAST resort fallback (after cache → local DB → NCBI).
-    # It is intentionally small and labelled so users know it is reference data,
-    # not a real search result.
     mock_data = MOCK_GENES
 
     def __init__(self, db: Session) -> None:
@@ -50,9 +49,6 @@ class GeneService(BaseSearchService):
         search_by = self._normalize_search_by(search_by)
         organism = (organism or "").strip() or None
 
-        # Keep the old local-first/cache flow, but make the external step resilient:
-        # NCBI is tried first; Ensembl/UniProt/BV-BRC are used only if NCBI is down
-        # or returns no result. The frontend response envelope remains unchanged.
         if data_type == "gene" and search_by == "name" and not organism:
             async def external_gene_search(_: str):
                 return await self.provider_orchestrator.search_with_fallbacks(
@@ -72,9 +68,6 @@ class GeneService(BaseSearchService):
                 local_save_fn=self.gene_repo.upsert_many,
             )
 
-        # Extended Bio Search: Gene/Nucleotide/Protein + organism + ID/name.
-        # Local DB currently stores only genes, so nucleotide/protein searches use NCBI
-        # through the same resilient cache/fallback response envelope.
         decorated_keyword = self._build_decorated_keyword(
             keyword=keyword,
             data_type=data_type,
@@ -155,20 +148,31 @@ class GeneService(BaseSearchService):
         # 1. Try local DB first, then enrich the cached provider payload when possible.
         local = self.gene_repo.get_by_gene_id(gene_id)
         if local:
-            enriched = await self._enrich_detail_record(local)
-            if enriched != local:
-                self.gene_repo.upsert(enriched, source=enriched.get("source") or local.get("source") or "local_db")
-                self.db.commit()
-            return self._response(
-                message="Gene detail loaded from local workspace database",
-                data=enriched,
-                source=enriched.get("source") or "local_db",
-                cached=False,
-                stale=False,
-                keyword=gene_id,
-                mode="local_first",
-                external_used=bool(enriched.get("sequence") or enriched.get("fasta") or enriched.get("visualization")),
+            data_type = str(local.get("data_type") or "gene").lower()
+            is_nucleotide_or_protein = data_type in ("nucleotide", "protein")
+            missing_accession = is_nucleotide_or_protein and not local.get("genomic_accession")
+            type_mismatch = gene_id.isdigit() and data_type != "gene"
+            is_placeholder = (
+                local.get("description") in ("No local gene record found.", "", None)
+                and not local.get("sequence")
+                and not local.get("fasta")
             )
+
+            if not missing_accession and not is_placeholder and not type_mismatch:
+                enriched = await self._enrich_detail_record(local)
+                if enriched != local:
+                    self.gene_repo.upsert(enriched, source=enriched.get("source") or local.get("source") or "local_db")
+                    self.db.commit()
+                return self._response(
+                    message="Gene detail loaded from local workspace database",
+                    data=enriched,
+                    source=enriched.get("source") or "local_db",
+                    cached=False,
+                    stale=False,
+                    keyword=gene_id,
+                    mode="local_first",
+                    external_used=bool(enriched.get("sequence") or enriched.get("fasta") or enriched.get("visualization")),
+                )
 
         # 2. If the detail ID is clearly from a fallback provider, query that provider directly.
         provider_detail = await self._fetch_provider_detail(gene_id)
@@ -208,12 +212,16 @@ class GeneService(BaseSearchService):
                     external_used=True,
                 )
         except Exception:
-            # Keep the detail page usable even when NCBI is unavailable.
             pass
 
-        # 3b. The numeric UID may belong to a nuccore or protein record rather than
+        # 3b. The UID/accession may belong to a nuccore or protein record rather than
         #     the gene database. Try those databases as a fallback before giving up.
-        if gene_id.isdigit() or not any(ch.isalpha() for ch in gene_id):
+        looks_like_accession = (
+            gene_id.isdigit()
+            or (any(ch.isdigit() for ch in gene_id) and any(ch.isalpha() for ch in gene_id))
+            or not any(ch.isalpha() for ch in gene_id)
+        )
+        if looks_like_accession:
             try:
                 bio_record = await self.ncbi_client.get_bio_record_by_id(gene_id)
                 if bio_record:
@@ -255,8 +263,7 @@ class GeneService(BaseSearchService):
         except Exception:
             pass
 
-        # 4. Nothing found anywhere — return a minimal placeholder so the UI
-        #    does not crash; include a hint so the developer knows what to do.
+        # 4. Nothing found anywhere — return a minimal placeholder so the UI does not crash.
         placeholder = enrich_with_sequence_fields({
             "id": gene_id,
             "gene_id": gene_id,
@@ -271,28 +278,16 @@ class GeneService(BaseSearchService):
             "aliases": [],
             "ncbi_url": f"https://www.ncbi.nlm.nih.gov/gene/{gene_id}",
         })
-        return {
-            "success": True,
-            "message": (
-                "Gene detail is not available in local workspace "
-                "and could not be imported from external providers."
-            ),
-            "data": placeholder,
-            "meta": {
-                "source": "none",
-                "cached": False,
-                "stale": True,
-                "keyword": gene_id,
-                "mode": "local_first",
-                "external_used": False,
-                "dependency_policy": "local-first; NCBI is primary, Ensembl/UniProt/BV-BRC can be used as fallback providers",
-                "estimated_dependency_ratio": {
-                    "internal_percent": 65,
-                    "ncbi_percent": 35,
-                    "fallback_provider_percent": 0,
-                },
-            },
-        }
+        return self._response(
+            message="Gene detail is not available in local workspace and could not be imported from external providers.",
+            data=placeholder,
+            source="none",
+            cached=False,
+            stale=True,
+            keyword=gene_id,
+            mode="local_first",
+            external_used=False,
+        )
 
     async def _enrich_detail_record(self, record: dict):
         source = str(record.get("source") or record.get("database") or "").lower()
@@ -300,10 +295,38 @@ class GeneService(BaseSearchService):
         if not record_id:
             return enrich_with_sequence_fields(record)
 
-        # A record already has rich data if it has a real sequence or FASTA string.
-        # NOTE: visualization alone is NOT sufficient — enrich_with_sequence_fields()
-        # always creates a visualization block even for empty placeholder records.
         has_real_data = bool(record.get("fasta") or record.get("sequence"))
+
+        missing_igv_data = (
+            source == "ncbi"
+            and record.get("data_type", "gene") == "gene"
+            and record_id.isdigit()
+            and not record.get("genomic_accession")
+        )
+
+        if missing_igv_data:
+            try:
+                fresh = await self.ncbi_client.get_gene_by_id(record_id)
+                if fresh and fresh.get("genomic_accession"):
+                    record = {
+                        **record,
+                        "genomic_accession": fresh["genomic_accession"],
+                        "start": fresh.get("start") or record.get("start"),
+                        "end": fresh.get("end") or record.get("end"),
+                        "chromosome": fresh.get("chromosome") or record.get("chromosome"),
+                    }
+            except Exception:
+                pass
+
+        _s = record.get("start")
+        _e = record.get("end")
+        if _s is not None and _e is not None:
+            try:
+                if int(_s) > int(_e):
+                    record = {**record, "start": int(_e), "end": int(_s)}
+            except (TypeError, ValueError):
+                pass
+
         if has_real_data:
             return enrich_with_sequence_fields(record)
 
@@ -312,9 +335,8 @@ class GeneService(BaseSearchService):
                 return await self.ensembl_provider.get_detail(record_id, organism=record.get("organism")) or enrich_with_sequence_fields(record)
             if source == "uniprot" or record.get("database") == "uniprotkb":
                 return await self.uniprot_provider.get_detail(record_id) or enrich_with_sequence_fields(record)
-            # For NCBI records without sequence, try to re-fetch from nuccore/protein
-            # in case this was saved as a placeholder when those databases weren't tried.
-            if source == "ncbi" and record_id.isdigit():
+            # For NCBI nucleotide/protein records without sequence, try to re-fetch from nuccore/protein
+            if source == "ncbi" and record.get("data_type") in ("nucleotide", "protein") and record_id.isdigit():
                 bio = await self.ncbi_client.get_bio_record_by_id(record_id)
                 if bio and (bio.get("fasta") or bio.get("sequence")):
                     return enrich_with_sequence_fields(bio)
@@ -326,9 +348,11 @@ class GeneService(BaseSearchService):
         try:
             if gene_id.startswith("ENS"):
                 return await self.ensembl_provider.get_detail(gene_id)
-            # UniProt accessions are usually short alphanumeric IDs such as P38398.
-            # Numeric-only IDs are NCBI UIDs (Gene/nuccore/protein), not UniProt.
-            if 5 <= len(gene_id) <= 12 and any(char.isalpha() for char in gene_id) and not gene_id.isdigit():
+            _UNIPROT_RE = re.compile(
+                r"^([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2})$",
+                re.IGNORECASE,
+            )
+            if _UNIPROT_RE.match(gene_id):
                 return await self.uniprot_provider.get_detail(gene_id)
         except Exception:
             return None

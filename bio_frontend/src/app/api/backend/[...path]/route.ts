@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 type RouteContext = {
   params: Promise<{ path?: string[] }>;
@@ -49,6 +51,7 @@ async function proxy(request: NextRequest, context: RouteContext) {
   for (const backend of backendCandidates()) {
     const target = `${backend}/${pathName}${search}`;
     tried.push(target);
+    console.log("[Next.js Proxy] Fetching:", target);
 
     try {
       const headers = new Headers(request.headers);

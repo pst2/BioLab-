@@ -25,6 +25,7 @@ import {
 import { api, GeneDetail, GeneProteinInfo, GeneTranscript, ApiError } from "@/lib/api";
 import { LanguageToggle, ThemeToggle, useLanguage } from "@/lib/i18n";
 import { useToast } from "@/lib/Toast";
+import { GenomeBrowser } from "./GenomeBrowser";
 
 const GENE_CACHE_PREFIX = "biolab:gene:";
 
@@ -49,6 +50,11 @@ function normalizeGene(id: string, gene: Partial<GeneDetail>): GeneDetail {
     end: gene.end ?? location.end,
     strand: gene.strand ?? location.strand,
     assembly: gene.assembly || location.assembly,
+    // genomic_accession may live at top-level (freshly fetched) or inside
+    // visualization.location (older records enriched by build_gene_visualization)
+    genomic_accession:
+      gene.genomic_accession ||
+      (location as Record<string, unknown>).genomic_accession as string | undefined,
     aliases: Array.isArray(gene.aliases) ? gene.aliases : [],
     sequence: gene.sequence,
     sequence_type: gene.sequence_type,
@@ -111,9 +117,16 @@ function formatNumber(value?: number | string | null, fallback = "Unknown") {
   return Number.isFinite(numberValue) ? numberValue.toLocaleString() : String(value);
 }
 
-function percent(value?: number) {
-  if (value === undefined || value === null || Number.isNaN(value)) return "0%";
+function percent(value?: number | null, fallback = "N/A") {
+  if (value === undefined || value === null || Number.isNaN(value)) return fallback;
   return `${Number(value).toFixed(1)}%`;
+}
+
+function hasSequenceStats(gene: GeneDetail): boolean {
+  const counts = gene.base_counts || gene.visualization?.sequence_composition?.base_counts;
+  const hasCounts = counts && Object.values(counts).some((v) => Number(v) > 0);
+  const hasGcAt = Boolean(gene.gc_content || gene.at_content);
+  return Boolean(hasCounts || hasGcAt);
 }
 
 function truncateSequence(sequence?: string, max = 7000, truncatedLabel?: string) {
@@ -392,6 +405,7 @@ export default function GeneDetailClient({ id }: { id: string }) {
                   )}
 
                   <div className="col-span-12"><LocationCard gene={gene} /></div>
+                  <div className="col-span-12"><GenomeBrowser gene={gene} /></div>
                 </div>
               );
             })()}
@@ -839,44 +853,65 @@ function UniProtAnnotationPanel({ gene, external }: { gene: GeneDetail; external
 
 function GcDonut({ gene }: { gene: GeneDetail }) {
   const { t } = useLanguage();
-  const gc = Number(gene.gc_content || 0);
+  const hasStats = hasSequenceStats(gene);
+  const gc = hasStats ? Number(gene.gc_content || 0) : 0;
   const radius = 70;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (Math.min(Math.max(gc, 0), 100) / 100) * circumference;
+  const totalLength = sequenceLength(gene) || geneRangeLength(gene);
+
   return (
     <section className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-6 shadow-sm">
       <h3 className="mb-4 text-sm font-semibold text-slate-900 dark:text-slate-100">{t("detail.gcContent")}</h3>
-      <div className="relative flex items-center justify-center py-4">
-        <svg className="h-44 w-44 -rotate-90" role="img" aria-label={`GC content: ${gc.toFixed(1)}%`}>
-          <defs>
-            <linearGradient id="gcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#22d3ee" />
-              <stop offset="100%" stopColor="#0891b2" />
-            </linearGradient>
-          </defs>
-          <circle cx="88" cy="88" r={radius} fill="transparent" stroke="currentColor" strokeWidth="12" className="text-slate-200 dark:text-slate-700" />
-          <circle
-            cx="88" cy="88" r={radius}
-            fill="transparent"
-            stroke="url(#gcGrad)"
-            strokeDasharray={circumference}
-            strokeDashoffset={offset}
-            strokeLinecap="round"
-            strokeWidth="12"
-            className="gc-donut-circle"
-          />
-        </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-3xl font-bold text-slate-950 dark:text-slate-100">{gc.toFixed(1)}%</span>
-          <span className="text-[10px] font-medium uppercase tracking-[0.07em] text-slate-400 dark:text-slate-500">{t("detail.gcRatio")}</span>
+      {!hasStats && totalLength > 50_000 ? (
+        <div className="flex flex-col items-center justify-center gap-3 py-10 text-center">
+          <svg className="h-20 w-20 text-slate-200 dark:text-slate-700" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="38" stroke="currentColor" strokeWidth="12" fill="none" />
+          </svg>
+          <div>
+            <p className="text-sm font-semibold text-slate-400 dark:text-slate-500">N/A</p>
+            <p className="mt-1 text-[11px] text-slate-400 dark:text-slate-500 max-w-[160px]">
+              Quá lớn để tính GC content tự động ({formatNumber(totalLength)} bp)
+            </p>
+          </div>
         </div>
-      </div>
-      <div className="mt-4 flex justify-center gap-6 text-xs text-slate-500 dark:text-slate-400">
-        <span className="inline-flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full" style={{ background: "linear-gradient(90deg,#22d3ee,#0891b2)" }} />G+C
-        </span>
-        <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-slate-200 dark:bg-slate-700" />A+T</span>
-      </div>
+      ) : (
+        <>
+          <div className="relative flex items-center justify-center py-4">
+            <svg className="h-44 w-44 -rotate-90" role="img" aria-label={`GC content: ${gc.toFixed(1)}%`}>
+              <defs>
+                <linearGradient id="gcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#22d3ee" />
+                  <stop offset="100%" stopColor="#0891b2" />
+                </linearGradient>
+              </defs>
+              <circle cx="88" cy="88" r={radius} fill="transparent" stroke="currentColor" strokeWidth="12" className="text-slate-200 dark:text-slate-700" />
+              <circle
+                cx="88" cy="88" r={radius}
+                fill="transparent"
+                stroke={hasStats ? "url(#gcGrad)" : "currentColor"}
+                strokeDasharray={circumference}
+                strokeDashoffset={hasStats ? offset : circumference}
+                strokeLinecap="round"
+                strokeWidth="12"
+                className={hasStats ? "gc-donut-circle" : "text-slate-300 dark:text-slate-600"}
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-3xl font-bold text-slate-950 dark:text-slate-100">
+                {hasStats ? `${gc.toFixed(1)}%` : "—"}
+              </span>
+              <span className="text-[10px] font-medium uppercase tracking-[0.07em] text-slate-400 dark:text-slate-500">{t("detail.gcRatio")}</span>
+            </div>
+          </div>
+          <div className="mt-4 flex justify-center gap-6 text-xs text-slate-500 dark:text-slate-400">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ background: "linear-gradient(90deg,#22d3ee,#0891b2)" }} />G+C
+            </span>
+            <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-slate-200 dark:bg-slate-700" />A+T</span>
+          </div>
+        </>
+      )}
     </section>
   );
 }
@@ -891,41 +926,56 @@ const NUCLEOTIDE_GRADIENTS: Record<string, string> = {
 function CompositionPanel({ gene }: { gene: GeneDetail }) {
   const { t } = useLanguage();
   const counts = gene.base_counts || gene.visualization?.sequence_composition?.base_counts || {};
+  const totalCounts = Object.values(counts).reduce((sum, v) => sum + Number(v || 0), 0);
+  const totalLength = sequenceLength(gene) || geneRangeLength(gene);
+  const isLargeRecord = totalLength > 50_000 && totalCounts === 0;
+
   return (
-    <section className="h-full rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-6 shadow-sm">
-      <div className="mb-5 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{t("detail.nucleotideComposition")}</h3>
-        <BarChart3 className="h-4 w-4 text-cyan-500" />
-      </div>
-      <div className="space-y-4">
-        {(["A", "T", "G", "C"] as const).map((base) => {
-          const w = countWidth(counts, base);
-          return (
-            <div key={base} className="bar-row">
-              <div className="mb-1.5 flex justify-between gap-3">
-                <span className="text-xs font-medium text-slate-600 dark:text-slate-300">{baseName(base)} <span className="font-mono text-slate-400 dark:text-slate-500">({base})</span></span>
-                <span className="font-mono text-xs text-slate-500 dark:text-slate-400">{basePercent(counts, base)} / {formatNumber(counts[base], "0")} bp</span>
-              </div>
-              <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-                <div
-                  className="h-full rounded-full"
-                  style={{
-                    width: `${w}%`,
-                    background: NUCLEOTIDE_GRADIENTS[base],
-                    animation: "fillBar 700ms cubic-bezier(0.16,1,0.3,1) both",
-                    animationDelay: base === "A" ? "0ms" : base === "T" ? "80ms" : base === "G" ? "160ms" : "240ms",
-                    ["--bar-width" as any]: `${w}%`,
-                  }}
-                />
-              </div>
-            </div>
-          );
-        })}
+    <section className="h-full rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-6 shadow-sm flex flex-col justify-between">
+      <div>
+        <div className="mb-5 flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{t("detail.nucleotideComposition")}</h3>
+          <BarChart3 className="h-4 w-4 text-cyan-500" />
+        </div>
+        {isLargeRecord ? (
+          <div className="my-4 rounded-lg border border-cyan-100 dark:border-cyan-900/40 bg-cyan-50/50 dark:bg-cyan-950/20 p-4 text-xs leading-5 text-cyan-800 dark:text-cyan-300">
+            <p className="font-semibold">Trình tự quy mô lớn ({formatNumber(totalLength)} bp)</p>
+            <p className="mt-1 text-slate-600 dark:text-slate-400">
+              Đếm bazơ chi tiết được bỏ qua cho các bản ghi nhiễm sắc thể/scaffold lớn. Bạn có thể duyệt và xem trực quan toàn bộ trình tự trong <strong>Genome Browser</strong> bên dưới.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {(["A", "T", "G", "C"] as const).map((base) => {
+              const w = countWidth(counts, base);
+              return (
+                <div key={base} className="bar-row">
+                  <div className="mb-1.5 flex justify-between gap-3">
+                    <span className="text-xs font-medium text-slate-600 dark:text-slate-300">{baseName(base)} <span className="font-mono text-slate-400 dark:text-slate-500">({base})</span></span>
+                    <span className="font-mono text-xs text-slate-500 dark:text-slate-400">{basePercent(counts, base)} / {formatNumber(counts[base], "0")} bp</span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${w}%`,
+                        background: NUCLEOTIDE_GRADIENTS[base],
+                        animation: "fillBar 700ms cubic-bezier(0.16,1,0.3,1) both",
+                        animationDelay: base === "A" ? "0ms" : base === "T" ? "80ms" : base === "G" ? "160ms" : "240ms",
+                        ["--bar-width" as any]: `${w}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
       <div className="mt-6 grid gap-4 border-t border-slate-100 dark:border-slate-800 pt-5 sm:grid-cols-3">
-        <MiniStat label={t("detail.length")} value={formatNumber(sequenceLength(gene) || geneRangeLength(gene))} />
-        <MiniStat label={t("detail.gcContent")} value={percent(gene.gc_content)} />
-        <MiniStat label={t("detail.atContent")} value={percent(gene.at_content)} />
+        <MiniStat label={t("detail.length")} value={formatNumber(totalLength)} />
+        <MiniStat label={t("detail.gcContent")} value={isLargeRecord ? "N/A" : percent(gene.gc_content ?? null)} />
+        <MiniStat label={t("detail.atContent")} value={isLargeRecord ? "N/A" : percent(gene.at_content ?? null)} />
       </div>
     </section>
   );
