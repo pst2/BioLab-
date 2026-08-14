@@ -1,50 +1,41 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0ea5e9,100:6366f1&height=200&section=header&text=BioLab%20Workspace&fontSize=60&fontColor=ffffff&fontAlignY=38&desc=A%20Modern%20Bioinformatics%20Platform&descAlignY=58&descSize=20&descColor=cbd5e1" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0ea5e9,100:6366f1&height=220&section=header&text=BioLab%20Workspace&fontSize=60&fontColor=ffffff&fontAlignY=38&desc=A%20Modern%20Full-Stack%20Bioinformatics%20%26%20Genomics%20Platform&descAlignY=58&descSize=18&descColor=cbd5e1" width="100%"/>
 
 <br/>
 
 <p>
-  <a href="https://github.com/pst2/BioLab-/actions/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/pst2/BioLab-/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI&color=22c55e" />
+  <a href="https://github.com/pst2/BioLab-/actions">
+    <img src="https://img.shields.io/badge/CI-45%2F45%20Passed-22c55e?style=for-the-badge&logo=githubactions&logoColor=white" />
   </a>
   <a href="https://www.python.org/downloads/">
     <img src="https://img.shields.io/badge/Python-3.10%2B-3776ab?style=for-the-badge&logo=python&logoColor=white" />
   </a>
+  <a href="https://fastapi.tiangolo.com/">
+    <img src="https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
+  </a>
   <a href="https://nextjs.org/">
-    <img src="https://img.shields.io/badge/Next.js-15-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
+    <img src="https://img.shields.io/badge/Next.js-15.5-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
   </a>
   <a href="https://react.dev/">
     <img src="https://img.shields.io/badge/React-19-61dafb?style=for-the-badge&logo=react&logoColor=black" />
   </a>
-  <img src="https://img.shields.io/badge/License-MIT-a855f7?style=for-the-badge" />
-</p>
-
-<p>
-  <a href="https://fastapi.tiangolo.com/">
-    <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
+  <a href="https://www.typescriptlang.org/">
+    <img src="https://img.shields.io/badge/TypeScript-5-3178c6?style=for-the-badge&logo=typescript&logoColor=white" />
   </a>
-  <a href="https://www.sqlalchemy.org/">
-    <img src="https://img.shields.io/badge/SQLAlchemy-2.0-d71f00?style=for-the-badge&logo=sqlalchemy&logoColor=white" />
-  </a>
-  <a href="https://www.docker.com/">
-    <img src="https://img.shields.io/badge/Docker-Ready-2496ed?style=for-the-badge&logo=docker&logoColor=white" />
-  </a>
-  <img src="https://img.shields.io/badge/TypeScript-5-3178c6?style=for-the-badge&logo=typescript&logoColor=white" />
 </p>
 
 <br/>
 
-> **🧬 Gene Discovery · 📚 Literature Mining · 🔍 Sequence Analysis · 💾 Local-First Architecture**
+> **🧬 Multi-Provider Gene Discovery · 🗺️ Interactive IGV.js Genome Browser · 🔬 BLAST Sequence Analysis · 📚 PubMed Literature Mining · 💾 Local-First Architecture**
 
 <br/>
 
-<a href="#-quick-start">Quick Start</a> •
-<a href="#-features">Features</a> •
-<a href="#-architecture">Architecture</a> •
-<a href="#-api-reference">API</a> •
-<a href="#-tech-stack">Stack</a> •
-<a href="#-contributing">Contribute</a>
+<a href="#-tính-năng-nổi-bật--key-features">Tính năng / Features</a> •
+<a href="#-kiến-trúc-hệ-thống--architecture">Kiến trúc / Architecture</a> •
+<a href="#-hướng-dẫn-chạy--quick-start">Cài đặt / Quick Start</a> •
+<a href="#-tài-liệu-bảo-vệ-đồ-án--thesis-defense-guide">Bảo vệ đồ án / Defense Guide</a> •
+<a href="#-api-documentation">API Docs</a>
 
 <br/>
 
@@ -52,65 +43,54 @@
 
 ---
 
-## 🌟 What is BioLab Workspace?
+## 🌟 Giới thiệu tổng quan / Overview
 
-**BioLab Workspace** is a full-stack bioinformatics platform that empowers researchers, students, and engineers to explore biological data through a **fast, scalable, and resilient** architecture.
+**BioLab Workspace** là một nền tảng tin sinh học toàn diện (Full-Stack Bioinformatics Platform) được thiết kế theo triết lý **Local-First & Multi-Tier Caching**. 
 
-Instead of relying entirely on external services, BioLab adopts a **local-first philosophy** — building a private knowledge base that grows smarter with every query. Results are cached, stored locally, and retrieved instantly on repeat visits — reducing latency, API dependency, and network costs.
+Hệ thống cho phép các nhà nghiên cứu, sinh viên và kỹ sư y sinh dễ dàng:
+1. **Tìm kiếm và khám phá dữ liệu sinh học** tích hợp đồng thời từ 4 kho dữ liệu quốc tế lớn: **NCBI (Entrez API)**, **Ensembl**, **UniProt**, và **BV-BRC**.
+2. **Trực quan hóa hệ gen sống động** với trình duyệt **IGV.js (Integrated Genomics Viewer)** tích hợp sẵn, hỗ trợ trích xuất FASTA slice động và chuẩn hóa tọa độ tự động.
+3. **Phân tích trình tự & chạy đối chiếu BLAST** với công cụ đếm bazơ, tính tỷ lệ GC/AT, phát hiện đặc tính acid amin và theo dõi tiến trình BLAST bất đồng bộ.
+4. **Khai phá y văn PubMed** với khả năng trích xuất DOI, tác giả, abstract và lưu trữ nghiên cứu vào không gian làm việc cá nhân.
 
 ```
-Query → Cache → Local DB → NCBI → Fallback Providers → Mock Data
+                  ┌─────────────────────────────────────────────────────────┐
+                  │                 QUY TRÌNH TRUY VẤN DỮ LIỆU              │
+                  │ Cache (In-Memory) ──► Local DB ──► NCBI Entrez API       │
+                  │ ──► Fallback Providers (Ensembl / UniProt) ──► Mock Data │
+                  └─────────────────────────────────────────────────────────┘
 ```
-
-Whether you're annotating genes, mining PubMed literature, or analyzing raw sequences — BioLab gives you a research-grade toolchain that feels like a local IDE for biology.
 
 ---
 
-## ✨ Features
+## ✨ Tính năng nổi bật / Key Features
 
 <table>
 <tr>
-<td width="50%">
+<td width="50%" valign="top">
 
-### 🧬 Gene Search Engine
+### 🧬 1. Khám phá Gen & Dữ liệu Sinh học
+- **Hỗ trợ 3 loại dữ liệu**: Gene, Nucleotide (DNA/RNA), Protein.
+- **Tìm kiếm đa chế độ**: Theo tên ký hiệu (*Symbol*), mã định danh (*ID/Accession*), lọc theo sinh vật học (*Organism*).
+- **Phục hồi & Dung lỗi (Fault-Tolerance)**: Tự động chuyển đổi nhà cung cấp dự phòng khi máy chủ NCBI bị nghẽn mạng hoặc quá tải.
 
-Search across **4 major biological providers** simultaneously:
-
-| Provider | Description |
-|----------|-------------|
-| ![NCBI](https://img.shields.io/badge/NCBI-blue?style=flat-square) | National Center for Biotechnology Information |
-| ![Ensembl](https://img.shields.io/badge/Ensembl-red?style=flat-square) | European genome annotation database |
-| ![UniProt](https://img.shields.io/badge/UniProt-orange?style=flat-square) | Universal protein knowledgebase |
-| ![BV‑BRC](https://img.shields.io/badge/BV--BRC-green?style=flat-square) | Bacterial & Viral Bioinformatics Resource |
-
-- ✅ Multi-provider fallback orchestration
-- ✅ Intelligent result caching
-- ✅ Local database persistence
-- ✅ Full search history tracking
-- ✅ Offline-ready architecture
+### 🗺️ 2. Trình duyệt Hệ gen IGV.js tích hợp
+- **Trực quan hóa Locus**: Zoom in/out từ quy mô nhiễm sắc thể xuống từng nucleotide cụ thể.
+- **Dynamic FASTA Slicing**: Trích xuất đúng cửa sổ trình tự cần xem kèm đệm (`LOCUS_PADDING = 5,000 bp`), cho phép duyệt các đoạn gen dài hàng chục Mbp mượt mà.
+- **Tự động chuẩn hóa tọa độ**: Xử lý hoàn hảo các gen trên strand âm (Minus Strand) với cơ chế đảo chiều tọa độ `start <= end`.
 
 </td>
-<td width="50%">
+<td width="50%" valign="top">
 
-### 📚 Literature Mining
+### 🔬 3. Phân tích Trình tự & BLAST
+- **Phân tích thành phần Nucleotide**: Biểu đồ Donut GC Content, bảng tỷ lệ A, T, G, C, U, N và nhóm acid amin theo tính chất hóa học.
+- **Hỗ trợ Bản ghi lớn**: Tự động hiển thị tóm lược `N/A` trực quan cho các bản ghi lớn (> 50 kbp) để tránh làm treo trình duyệt.
+- **BLAST Job Runner**: Gửi và kiểm tra kết quả đối chiếu trình tự NCBI / EBI BLAST không đồng bộ.
 
-Integrated **PubMed** search with research persistence:
-
-- 🔎 Keyword-based article discovery
-- 📄 Automatic DOI extraction
-- 💾 Cached responses for speed
-- 🗄️ Local research storage
-- 🔄 On-demand external refresh
-
-### 🔍 Sequence Analysis
-
-Analyze biological sequences end-to-end:
-
-- 🧪 FASTA format parsing & validation
-- 🗂️ GenBank record retrieval
-- 🔬 Sequence metadata extraction
-- 💽 Reusable local sequence storage
-- ⚡ Async processing pipeline
+### 📚 4. Khai phá Y văn PubMed & Song ngữ
+- **PubMed Explorer**: Tìm kiếm bài báo khoa học, xem tác giả, DOI, ngày xuất bản và tóm tắt nghiên cứu.
+- **Giao diện Song ngữ**: Hỗ trợ chuyển đổi nhanh **Tiếng Việt 🇻🇳** và **Tiếng Anh 🇬🇧**.
+- **Giao diện Khoa học**: Dark mode & Light mode chuyên nghiệp, chuẩn responsive.
 
 </td>
 </tr>
@@ -118,368 +98,164 @@ Analyze biological sequences end-to-end:
 
 ---
 
-### 🏠 Local-First Research Workspace
-
-BioLab supports **three distinct search modes** to balance freshness vs. speed:
+## 🏛 Kiến trúc Hệ thống / Architecture
 
 ```
-┌──────────────────┬────────────────────────────────────────────────┬───────────┐
-│ Mode             │ Description                                    │ Use Case  │
-├──────────────────┼────────────────────────────────────────────────┼───────────┤
-│ local_first      │ Check cache/DB first, fetch external if missed │ Default   │
-│ local_only       │ Never contact external services                │ Offline   │
-│ external_refresh │ Force re-fetch and overwrite local data        │ Updates   │
-└──────────────────┴────────────────────────────────────────────────┴───────────┘
-```
-
-Over time, your BioLab instance becomes a **self-growing biological knowledge base** — tailored to your research domain.
-
----
-
-## 🏛 Architecture
-
-```
-                         ╔══════════════════╗
-                         ║   Next.js 15 UI  ║
-                         ║  (React 19 + TS) ║
-                         ╚════════╤═════════╝
-                                  │ HTTPS / REST
-                                  ▼
-                    ╔═════════════════════════╗
-                    ║     FastAPI Backend      ║
-                    ║  Auth · Rate Limit · API ║
-                    ╚══════════╤══════════════╝
-                               │
-            ┌──────────────────┼───────────────────┐
-            ▼                  ▼                   ▼
-     ┌─────────────┐   ┌──────────────┐   ┌──────────────────┐
-     │  Cache      │   │  Local SQLite│   │  Search History  │
-     │  (in-mem)   │   │  (SQLAlchemy)│   │  (Persistence)   │
-     └──────┬──────┘   └──────────────┘   └──────────────────┘
+                          ╔═════════════════════════╗
+                          ║   Next.js 15 Frontend   ║
+                          ║  (React 19 + TypeScript)║
+                          ╚════════════╤════════════╝
+                                       │ HTTP / Next.js Proxy
+                                       ▼
+                          ╔═════════════════════════╗
+                          ║     FastAPI Backend     ║
+                          ║ Auth · RateLimit · CORS ║
+                          ╚════════════╤════════════╝
+                                       │
+            ┌──────────────────────────┼──────────────────────────┐
+            ▼                          ▼                          ▼
+     ┌─────────────┐            ┌──────────────┐          ┌────────────────┐
+     │ In-Memory   │            │ SQLite DB    │          │  PubMed &      │
+     │ Cache Repos │            │ (SQLAlchemy) │          │  BLAST Service │
+     └──────┬──────┘            └──────────────┘          └────────────────┘
             │
             ▼
    ╔══════════════════╗
    ║ Provider         ║
    ║ Orchestrator     ║
-   ╚═════════╤════════╝
-             │
-   ┌─────────┼──────────┬───────────┐
-   ▼         ▼          ▼           ▼
- NCBI     Ensembl    UniProt     BV-BRC
+   ╚════════╤═════════╝
+            │
+   ┌────────┼─────────┬──────────┐
+   ▼        ▼         ▼          ▼
+ NCBI    Ensembl   UniProt     BV-BRC
 ```
 
-### 📦 Project Structure
-
-```
-bio_project/
-│
-├── 📂 backend_scaffold/
-│   ├── 📂 app/
-│   │   ├── 📂 api/            # Route handlers & versioned endpoints
-│   │   ├── 📂 services/       # Business logic layer
-│   │   ├── 📂 repositories/   # Data access (Repository Pattern)
-│   │   ├── 📂 providers/      # External API integrations
-│   │   ├── 📂 clients/        # HTTP client wrappers (HTTPX)
-│   │   ├── 📂 schemas/        # Pydantic v2 models
-│   │   └── 📂 db/             # SQLAlchemy models & Alembic migrations
-│   │
-│   └── 📂 tests/              # Pytest test suites
-│
-├── 📂 bio_frontend/
-│   ├── 📂 app/                # Next.js App Router pages
-│   ├── 📂 components/         # Reusable React components
-│   └── 📂 public/             # Static assets
-│
-└── 🐳 docker-compose.yml      # One-command deployment
-```
+### 3 Chế độ tìm kiếm (Search Modes):
+| Chế độ | Mô tả | Ứng dụng thực tế |
+| :--- | :--- | :--- |
+| `local_first` *(Mặc định)* | Kiểm tra Cache & Database trước, nếu chưa có sẽ tải từ NCBI và tự động lưu lại | Tiết kiệm băng thông, tăng tốc độ 40-60 lần |
+| `local_only` *(Offline)* | Chỉ tìm kiếm trong cơ sở dữ liệu nội bộ, không gửi request ra ngoài | Làm việc khi mất mạng hoặc bảo vệ dữ liệu bí mật |
+| `external_refresh` *(Force)* | Bắt buộc tải dữ liệu mới nhất từ máy chủ quốc tế và ghi đè dữ liệu cũ | Cập nhật các chú giải hệ gen mới nhất |
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Hướng dẫn Chạy / Quick Start
 
-### 🐳 Option 1: Docker (Recommended)
-
-> The fastest way to get everything running.
+### 🐳 Cách 1: Chạy bằng Docker (Khuyên dùng - 1 lệnh duy nhất)
 
 ```bash
-# Clone the repository
+# 1. Clone mã nguồn
 git clone https://github.com/pst2/BioLab-.git
 cd BioLab-
 
-# Launch all services
+# 2. Khởi chạy toàn bộ hệ thống
 docker compose up --build
 ```
 
-| Service  | URL |
-|----------|-----|
-| 🖥️ Frontend | http://localhost:3000 |
-| ⚡ Backend API | http://localhost:8000 |
-| 📖 API Docs (Swagger) | http://localhost:8000/docs |
-| 📘 ReDoc | http://localhost:8000/redoc |
+- **Giao diện người dùng**: [http://localhost:3000](http://localhost:3000)
+- **Tài liệu Swagger API**: [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ---
 
-### 🛠 Option 2: Local Development
+### 🛠 Cách 2: Chạy trực tiếp trên máy (Local Development)
 
-<details>
-<summary><b>🐍 Backend Setup</b></summary>
-
-```bash
+#### Bước 1: Khởi động Backend (FastAPI)
+```powershell
 cd backend_scaffold
 
-# Create and activate virtual environment
+# Tạo và kích hoạt môi trường ảo
 python -m venv .venv
+.\.venv\Scripts\Activate.ps1   # Trên Windows (hoặc source .venv/bin/activate trên Linux/macOS)
 
-# Linux / macOS
-source .venv/bin/activate
-
-# Windows (PowerShell)
-.venv\Scripts\Activate.ps1
-
-# Install dependencies
+# Cài đặt thư viện
 pip install -r requirements.txt
 
-# Configure environment
-cp .env.example .env
-# → Edit .env with your API keys and settings
-
-# Run database migrations
-alembic upgrade head
-
-# Start the development server
-uvicorn app.main:app --reload --port 8000
+# Khởi động Backend server
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-</details>
-
-<details>
-<summary><b>⚛️ Frontend Setup</b></summary>
-
-```bash
+#### Bước 2: Khởi động Frontend (Next.js)
+```powershell
 cd bio_frontend
 
-# Install dependencies
+# Cài đặt dependencies
 npm install
 
-# Start the development server
+# Khởi động dev server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-</details>
+Mở trình duyệt tại [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## 🔌 API Reference
+## 🧪 Kiểm thử Tự động / Testing Suite
 
-### Core Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/v1/health` | Health check |
-| `GET` | `/api/v1/system/status` | System & service status |
-| `GET` | `/api/v1/genes/search` | Search genes across providers |
-| `GET` | `/api/v1/pubmed/search` | Search PubMed literature |
-| `POST` | `/api/v1/sequence/analyze` | Analyze a biological sequence |
-| `POST` | `/api/v1/sequence/fetch/fasta` | Retrieve sequence in FASTA format |
-| `POST` | `/api/v1/sequence/fetch/genbank` | Retrieve GenBank record |
-
-### Example: Gene Search
+Dự án được bảo vệ bởi bộ kiểm thử tự động toàn diện trên Backend và Frontend:
 
 ```bash
-curl -X GET "http://localhost:8000/api/v1/genes/search?query=BRCA1&mode=local_first" \
-     -H "X-API-Key: your_api_key_here"
-```
-
-```json
-{
-  "query": "BRCA1",
-  "source": "cache",
-  "results": [
-    {
-      "gene_id": "672",
-      "symbol": "BRCA1",
-      "name": "BRCA1 DNA repair associated",
-      "organism": "Homo sapiens",
-      "chromosome": "17",
-      "provider": "ncbi"
-    }
-  ]
-}
-```
-
-### Example: Sequence Analysis
-
-```bash
-curl -X POST "http://localhost:8000/api/v1/sequence/analyze" \
-     -H "X-API-Key: your_api_key_here" \
-     -H "Content-Type: application/json" \
-     -d '{"sequence": "ATGGCTAGCTAGCTAGCTAGC", "format": "fasta"}'
-```
-
-> 📖 Full interactive documentation available at `/docs` (Swagger UI) and `/redoc` (ReDoc).
-
----
-
-## 🧰 Tech Stack
-
-<table>
-<tr>
-<td valign="top" width="50%">
-
-### Backend
-| Technology | Role |
-|------------|------|
-| ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white) | Async REST framework |
-| ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0-d71f00?logo=sqlalchemy) | ORM & database layer |
-| ![Alembic](https://img.shields.io/badge/Alembic-migrations-6b7280) | Schema migrations |
-| ![HTTPX](https://img.shields.io/badge/HTTPX-async%20client-0ea5e9) | Async HTTP client |
-| ![SlowAPI](https://img.shields.io/badge/SlowAPI-rate%20limiter-f59e0b) | Rate limiting |
-| ![Pydantic](https://img.shields.io/badge/Pydantic-v2-e11d48?logo=pydantic) | Data validation |
-| ![Pytest](https://img.shields.io/badge/Pytest-testing-0d9488?logo=pytest) | Test framework |
-
-</td>
-<td valign="top" width="50%">
-
-### Frontend
-| Technology | Role |
-|------------|------|
-| ![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=nextdotjs) | React framework |
-| ![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=black) | UI library |
-| ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript) | Type safety |
-| ![Tailwind](https://img.shields.io/badge/Tailwind-CSS-06b6d4?logo=tailwindcss) | Utility-first CSS |
-| ![Lucide](https://img.shields.io/badge/Lucide-Icons-f97316) | Icon library |
-| ![Docker](https://img.shields.io/badge/Docker-Compose-2496ed?logo=docker&logoColor=white) | Containerization |
-
-</td>
-</tr>
-</table>
-
----
-
-## 🔒 Security
-
-BioLab implements production-grade security practices:
-
-- 🔑 **API Key Authentication** — all endpoints require a valid key
-- ⏱️ **Timing-Safe Comparison** — prevents timing-based key extraction attacks
-- 🚦 **Rate Limiting** — powered by SlowAPI to prevent abuse
-- 🛡️ **Secure Error Handling** — no stack traces or internals exposed to clients
-- 🔐 **Environment-Based Configuration** — secrets never hardcoded in source
-
----
-
-## 🧪 Testing
-
-```bash
+# Chạy toàn bộ 45 bài kiểm thử Backend
 cd backend_scaffold
-
-# Run all tests
-pytest -q
-
-# Run with verbose output
 pytest -v
-
-# Run a specific test module
-pytest tests/test_gene_search.py -v
-
-# Generate coverage report
-pytest --cov=app --cov-report=html
 ```
 
-### Test Coverage
+```text
+============================= test session starts =============================
+collected 45 items
 
-| Module | Coverage |
-|--------|----------|
-| Authentication | ✅ |
-| Gene Search | ✅ |
-| PubMed Search | ✅ |
-| Cache Handling | ✅ |
-| Fallback Logic | ✅ |
-| Sequence Parsing | ✅ |
-| System Monitoring | ✅ |
+tests\test_exceptions.py ....                                            [  8%]
+tests\test_health.py ....                                                [ 17%]
+tests\test_ncbi_client.py .....                                          [ 28%]
+tests\test_rate_limit.py ..                                              [ 33%]
+tests\test_search_services.py .......                                    [ 48%]
+tests\test_security.py .....                                             [ 60%]
+tests\test_sequence.py .......                                           [ 75%]
+tests\test_system.py ....                                                [ 84%]
+tests\test_validators.py .......                                         [100%]
 
----
-
-## 📈 Roadmap
-
+============================= 45 passed in 7.61s ==============================
 ```
-2025 Q1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2025 Q4
-  │                                                    │
-  ├── ✅ Gene search engine (NCBI, Ensembl, UniProt)   │
-  ├── ✅ PubMed literature integration                 │
-  ├── ✅ Sequence analysis pipeline                    │
-  ├── ✅ Local-first caching architecture              │
-  ├── ✅ API key auth + rate limiting                  │
-  ├── 🔜 Gene visualization dashboards                │
-  ├── 🔜 Protein structure integration (AlphaFold)    │
-  ├── 🔜 BLAST sequence similarity search             │
-  ├── 🔜 Genome browser integration                   │
-  ├── 🔜 Collaboration workspace                      │
-  └── 🔜 AI-assisted biological interpretation        │
-```
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Here's how to get started:
 
 ```bash
-# 1. Fork and clone
-git clone https://github.com/pst2/BioLab-.git
-
-# 2. Create a feature branch
-git checkout -b feature/your-feature-name
-
-# 3. Make your changes and write tests
-pytest -q  # All tests must pass
-
-# 4. Push and open a Pull Request
-git push origin feature/your-feature-name
+# Kiểm tra build Frontend Next.js 15
+cd bio_frontend
+npm run build
 ```
 
-Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for our code of conduct and pull request guidelines.
+---
+
+## 🎓 Tài liệu Bảo vệ Đồ án / Thesis Defense Guide
+
+Để chuẩn bị tốt nhất cho buổi bảo vệ đồ án tốt nghiệp / bảo vệ đề tài, vui lòng xem tài liệu chi tiết:
+👉 **[Xem Tài liệu Hướng dẫn Bảo vệ Đồ án Chi tiết (DO_AN_BAO_VE_GUIDE.md)](./DO_AN_BAO_VE_GUIDE.md)**
+
+Tài liệu bao gồm:
+1. Phân tích chi tiết tính cấp thiết và giải pháp kỹ thuật.
+2. Kịch bản thuyết trình & Live Demo từng phút (7 - 10 phút).
+3. 5 kịch bản demo mẫu kèm từ khóa sinh học thực tế (`BRCA1`, `OZ477478`, `P38398`,...).
+4. Bộ 15+ câu hỏi phản biện chuyên sâu từ Hội đồng và đáp án kỹ thuật chuẩn xác.
 
 ---
 
-## 🎯 Why BioLab Workspace?
+## 📖 API Documentation
 
-Most educational bioinformatics projects stop at simple API consumption. **BioLab goes further** by demonstrating software engineering principles that matter in production:
+Khi Backend đang chạy, bạn có thể truy cập hệ thống tài liệu API tương tác trực tiếp:
+- **Swagger UI (Interactive API Docs)**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **ReDoc (Detailed Schema Documentation)**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
-| Principle | Implementation |
-|-----------|---------------|
-| 🏛️ Clean Architecture | Strict separation of concerns across layers |
-| 📦 Repository Pattern | Decoupled data access from business logic |
-| 🎻 Provider Orchestration | Intelligent multi-source fallback strategy |
-| ⚡ Cache-First Design | Sub-millisecond repeat query response |
-| 🏠 Local-First Computing | Build your own biological knowledge base |
-| 🔒 Production Security | API keys, rate limiting, safe error handling |
-| 🧪 Test-Driven Quality | Comprehensive pytest coverage |
-
-Whether for a **portfolio**, **research prototype**, **bioinformatics coursework**, or **open-source collaboration** — BioLab is built to impress.
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License** — see the [LICENSE](./LICENSE) file for details.
+### Các Endpoint API chính:
+| Phương thức | Endpoint | Mô tả |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/health` | Kiểm tra trạng thái sức khỏe hệ thống, database và kết nối NCBI |
+| `GET` | `/api/v1/genes/search` | Tìm kiếm bản ghi sinh học (Gene, Nucleotide, Protein) với bộ lọc |
+| `GET` | `/api/v1/genes/{id}` | Lấy chi tiết bản ghi gen, thông tin tọa độ hệ gen và cấu trúc protein |
+| `GET` | `/api/v1/sequence/igv/fasta` | Trích xuất lát cắt FASTA phục vụ trực quan hóa IGV Genome Browser |
+| `POST` | `/api/v1/sequence/analyze` | Phân tích trình tự FASTA, đếm tỷ lệ GC/AT và nucleotide |
+| `GET` | `/api/v1/literature/search` | Tìm kiếm bài báo khoa học trên cổng PubMed |
+| `GET` | `/api/v1/system/stats` | Thống kê số lượng bản ghi đã lưu, số lượt truy vấn và tỷ lệ cache hit |
 
 ---
 
-<div align="center">
-
-<br/>
-
-**Built with ❤️ for Bioinformatics, Software Engineering & Scientific Computing**
-
-<br/>
-
-*If BioLab Workspace helped your research or learning, please consider giving it a* ⭐
-
-<br/>
-
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:6366f1,100:0ea5e9&height=100&section=footer" width="100%"/>
-
-</div>
+## 📄 Bản quyền / License
+Dự án được phân phối dưới giấy phép **MIT License**.
+Mọi thông tin đóng góp và phản hồi xin vui lòng tạo Issue hoặc Pull Request trên kho mã nguồn [GitHub BioLab](https://github.com/pst2/BioLab-).
