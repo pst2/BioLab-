@@ -127,7 +127,8 @@ class GeneService(BaseSearchService):
 
     def _normalize_search_by(self, search_by: str) -> str:
         value = str(search_by or "name").lower().strip()
-        return "id" if value == "id" else "name"
+        # "accession" is an alias for id-based lookup
+        return "id" if value in ("id", "accession") else "name"
 
     def _build_decorated_keyword(
         self,
@@ -335,11 +336,15 @@ class GeneService(BaseSearchService):
                 return await self.ensembl_provider.get_detail(record_id, organism=record.get("organism")) or enrich_with_sequence_fields(record)
             if source == "uniprot" or record.get("database") == "uniprotkb":
                 return await self.uniprot_provider.get_detail(record_id) or enrich_with_sequence_fields(record)
-            # For NCBI nucleotide/protein records without sequence, try to re-fetch from nuccore/protein
-            if source == "ncbi" and record.get("data_type") in ("nucleotide", "protein") and record_id.isdigit():
-                bio = await self.ncbi_client.get_bio_record_by_id(record_id)
-                if bio and (bio.get("fasta") or bio.get("sequence")):
-                    return enrich_with_sequence_fields(bio)
+            # For NCBI nucleotide/protein records without sequence, try to re-fetch from nuccore/protein.
+            # Note: record_id may be a numeric UID or an accession like NM_007294 — both are valid.
+            if source == "ncbi" and record.get("data_type") in ("nucleotide", "protein") and not has_real_data:
+                try:
+                    bio = await self.ncbi_client.get_bio_record_by_id(record_id)
+                    if bio and (bio.get("fasta") or bio.get("sequence")):
+                        return enrich_with_sequence_fields(bio)
+                except Exception:
+                    pass
         except Exception:
             return enrich_with_sequence_fields(record)
         return enrich_with_sequence_fields(record)

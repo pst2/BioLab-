@@ -242,15 +242,28 @@ class NCBIClient:
                         record["start"] = 1
                         record["end"] = length_val
 
-                # Attempt to fetch FASTA for short sequences (< 50 kbp / 50 kaa)
-                if slen and int(slen) <= 50_000:
+                # Attempt to fetch FASTA sequence.
+                # - Full fetch for sequences up to 200 kbp / 200 kaa
+                # - Preview fetch (first 10 kbp) for larger sequences so that
+                #   GC content and base-composition can still be visualised.
+                if slen:
                     try:
-                        fasta_text = await self.fetch_sequence_fasta(caption, db=db)
+                        seq_len_int = int(slen)
+                        if seq_len_int <= 200_000:
+                            fasta_text = await self.fetch_sequence_fasta(caption, db=db)
+                        else:
+                            # Large sequence — fetch first 10_000 bp as preview
+                            fasta_text = await self.fetch_sequence_fasta_region(
+                                caption, start=1, end=10_000, db=db
+                            )
                         if fasta_text and fasta_text.startswith(">"):
                             record["fasta"] = fasta_text
                             # Extract bare sequence for stats
                             seq_lines = [ln for ln in fasta_text.splitlines() if ln and not ln.startswith(">")]
                             record["sequence"] = "".join(seq_lines)
+                            if seq_len_int > 200_000:
+                                # Mark as preview so the UI can inform the user
+                                record["sequence_preview"] = True
                     except Exception:
                         pass
                 return record

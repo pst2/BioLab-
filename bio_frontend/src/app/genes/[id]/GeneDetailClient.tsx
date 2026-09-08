@@ -382,12 +382,11 @@ export default function GeneDetailClient({ id }: { id: string }) {
 
             {activeTab === "visualization" && (() => {
               const hasProteinData = Boolean(gene.protein?.sequence || gene.protein?.fasta || gene.protein?.uniprot_id || (cleanSequence(gene.sequence || gene.fasta) && !/^[ACGTUN]+$/.test(cleanSequence(gene.sequence || gene.fasta))));
-              const hasNucleotideData = Boolean(cleanSequence(gene.sequence || gene.fasta) && /^[ACGTUN]+$/.test(cleanSequence(gene.sequence || gene.fasta))) || Boolean(gene.gc_content || gene.at_content || (gene.base_counts && Object.keys(gene.base_counts).length > 0));
 
               return (
                 <div className="grid grid-cols-12 gap-6">
-                  {/* Nucleotide Visualizations */}
-                  {(recordKind !== "protein" || hasNucleotideData) && (
+                  {/* Nucleotide Visualizations — show for gene and nucleotide records */}
+                  {recordKind !== "protein" && (
                     <>
                       <div className="col-span-12 lg:col-span-4"><GcDonut gene={gene} /></div>
                       <div className="col-span-12 lg:col-span-8"><CompositionPanel gene={gene} /></div>

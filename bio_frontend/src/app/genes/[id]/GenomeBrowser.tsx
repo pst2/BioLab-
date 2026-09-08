@@ -30,8 +30,13 @@ const LOCUS_PADDING = 5_000;
 /** Maximum initial chunk requested for IGV FASTA reference to ensure instant loading. */
 const MAX_INITIAL_CHUNK = 100_000;
 
-/** Regex for valid IGV FASTA reference accessions (RefSeq + INSDC accessions). */
-const VALID_ACCESSION_RE = /^[A-Za-z0-9_.]+/;
+/**
+ * Regex for valid IGV FASTA reference accessions.
+ * Must look like a real RefSeq or INSDC accession (e.g. NC_000005.10, NM_007294, CM000667.2).
+ * A plain numeric gene ID (e.g. "672") is NOT a valid FASTA accession for IGV.
+ * The underscore or dot requirement filters out bare numbers and symbol-only strings.
+ */
+const VALID_ACCESSION_RE = /^[A-Za-z]{1,6}[_\.][A-Za-z0-9_.]+$/;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -200,11 +205,18 @@ export function GenomeBrowser({ gene }: GenomeBrowserProps) {
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [retryKey, setRetryKey] = useState(0);
 
-  // Resolve accession from genomic_accession, symbol, or gene_id
+  // Resolve accession: prefer genomic_accession (NC_/NW_/NZ_ etc.), then
+  // fall back to symbol or gene_id ONLY if they look like real accessions
+  // (contain '_' or '.' e.g. NM_007294, NM_007294.3, CM000667.2).
+  // Plain numeric gene IDs ("672") and short gene symbols ("BRCA1") are NOT
+  // valid FASTA accessions for IGV and will cause a fetch error.
+  const looksLikeAccession = (value?: string | number) =>
+    Boolean(value && /[_.]/.test(String(value)));
+
   const accession =
     gene.genomic_accession ||
-    (gene.symbol && /^[A-Za-z0-9_.]+(\.\d+)?$/.test(gene.symbol) ? gene.symbol : undefined) ||
-    (gene.gene_id && /^[A-Za-z0-9_.]+(\.\d+)?$/.test(String(gene.gene_id)) ? String(gene.gene_id) : undefined);
+    (looksLikeAccession(gene.symbol) ? gene.symbol : undefined) ||
+    (looksLikeAccession(gene.gene_id) ? String(gene.gene_id) : undefined);
 
   const start = gene.start ?? 1;
   const end = gene.end ?? (gene.sequence_length ? gene.sequence_length : 50_000);

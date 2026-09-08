@@ -21,8 +21,8 @@ async def search_genes(
     ),
     search_by: str = Query(
         default="name",
-        pattern="^(name|id)$",
-        description="Search by name/symbol/keyword or by exact NCBI/accession ID.",
+        pattern="^(name|id|accession)$",
+        description="Search by name/symbol/keyword or by exact NCBI/accession ID. 'accession' is an alias for 'id'.",
     ),
     organism: str | None = Query(
         default=None,
