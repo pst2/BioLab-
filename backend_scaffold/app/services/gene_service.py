@@ -149,17 +149,21 @@ class GeneService(BaseSearchService):
         # 1. Try local DB first, then enrich the cached provider payload when possible.
         local = self.gene_repo.get_by_gene_id(gene_id)
         if local:
+            has_data = bool(local.get("sequence") or local.get("fasta"))
             data_type = str(local.get("data_type") or "gene").lower()
-            is_nucleotide_or_protein = data_type in ("nucleotide", "protein")
-            missing_accession = is_nucleotide_or_protein and not local.get("genomic_accession")
-            type_mismatch = gene_id.isdigit() and data_type != "gene"
+
+            # Ensure genomic_accession is populated for nucleotide/protein records if symbol or accession looks valid
+            if not local.get("genomic_accession"):
+                acc_cand = local.get("symbol") or local.get("accession") or local.get("caption")
+                if acc_cand and any(ch.isalpha() for ch in str(acc_cand)):
+                    local["genomic_accession"] = str(acc_cand)
+
             is_placeholder = (
                 local.get("description") in ("No local gene record found.", "", None)
-                and not local.get("sequence")
-                and not local.get("fasta")
+                and not has_data
             )
 
-            if not missing_accession and not is_placeholder and not type_mismatch:
+            if has_data or not is_placeholder:
                 enriched = await self._enrich_detail_record(local)
                 if enriched != local:
                     self.gene_repo.upsert(enriched, source=enriched.get("source") or local.get("source") or "local_db")

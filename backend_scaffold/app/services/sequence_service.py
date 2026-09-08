@@ -5,12 +5,14 @@ from collections import Counter
 from typing import Any
 
 import httpx
+from sqlalchemy import String, cast
 from sqlalchemy.orm import Session
 
 from app.bioinformatics.fasta_parser import FastaParser
 from app.clients.blast_client import DEFAULT_DATABASES, BlastClient
 from app.clients.ncbi_client import NCBIClient
 from app.core.config import settings
+from app.db.models import GeneRecord, SequenceRecord
 from app.repositories.cache_repository import CacheRepository
 from app.repositories.sequence_cache_repository import SequenceCacheRepository
 from app.repositories.sequence_repository import SequenceRepository
@@ -60,6 +62,58 @@ class SequenceService:
             meta=MetaInfo(source="internal", cached=False, stale=False, count=len(items)),
         )
 
+    def _find_local_sequence(self, accession: str) -> str | None:
+        """Find sequence in local DB by accession, symbol, or NCBI ID (local-first policy)."""
+        if not self.db:
+            return None
+        acc = accession.strip()
+        clean_acc = acc.split(".")[0]
+
+        # 1. SequenceRecord lookup
+        if self.sequence_repository:
+            seq_rec = (
+                self.db.query(SequenceRecord)
+                .filter(
+                    (SequenceRecord.name.ilike(acc))
+                    | (SequenceRecord.name.ilike(clean_acc))
+                )
+                .first()
+            )
+            if seq_rec and seq_rec.sequence:
+                return seq_rec.sequence
+
+        # 2. GeneRecord direct fields (symbol, ncbi_gene_id)
+        gene_rec = (
+            self.db.query(GeneRecord)
+            .filter(
+                (GeneRecord.symbol.ilike(acc))
+                | (GeneRecord.symbol.ilike(clean_acc))
+                | (GeneRecord.ncbi_gene_id == acc)
+                | (GeneRecord.ncbi_gene_id == clean_acc)
+            )
+            .first()
+        )
+        if gene_rec and gene_rec.payload and isinstance(gene_rec.payload, dict):
+            seq = gene_rec.payload.get("sequence")
+            if seq and isinstance(seq, str) and len(seq.strip()) > 0:
+                return seq.strip()
+
+        # 3. GeneRecord payload search (genomic_accession, caption, accession inside JSON)
+        try:
+            gene_rec = (
+                self.db.query(GeneRecord)
+                .filter(cast(GeneRecord.payload, String).ilike(f"%{clean_acc}%"))
+                .first()
+            )
+            if gene_rec and gene_rec.payload and isinstance(gene_rec.payload, dict):
+                seq = gene_rec.payload.get("sequence")
+                if seq and isinstance(seq, str) and len(seq.strip()) > 0:
+                    return seq.strip()
+        except Exception:
+            pass
+
+        return None
+
     async def fetch_fasta(self, payload: SequenceFetchRequest) -> ApiResponse:
         cache_key = self._build_cache_key(payload.db, payload.accession, "fasta")
         cached = self.cache_repository.get_valid(cache_key) if self.cache_repository else None
@@ -69,6 +123,28 @@ class SequenceService:
                 message="FASTA sequence loaded from local cache",
                 data=cached,
                 meta=MetaInfo(source="cache", cached=True, stale=False),
+            )
+
+        # Check local database first (local-first policy)
+        local_seq = self._find_local_sequence(payload.accession)
+        if local_seq:
+            raw_text = f">{payload.accession}\n{local_seq}\n"
+            parsed = FastaParser.parse(raw_text)
+            result = {
+                "accession": payload.accession,
+                "db": payload.db,
+                "format": "fasta",
+                "raw": raw_text,
+                "parsed": parsed,
+                "dependency_policy": "Loaded from local database (local-first)",
+            }
+            if self.cache_repository:
+                self.cache_repository.set(cache_key, result)
+            return ApiResponse(
+                success=True,
+                message="FASTA sequence loaded from local workspace database",
+                data=result,
+                meta=MetaInfo(source="local", cached=False, stale=False),
             )
 
         try:
@@ -167,7 +243,7 @@ class SequenceService:
 
         Returns the FASTA sequence as plain text (not wrapped in ApiResponse).
         Supports optional region slicing via NCBI efetch seq_start/seq_stop params
-        (1-based, both inclusive).  When no start/end are given the full record is
+        (1-based, both inclusive). When no start/end are given the full record is
         returned — be careful with large chromosomes.
         """
         accession = accession.strip()
@@ -191,16 +267,40 @@ class SequenceService:
             if cached and isinstance(cached, dict) and cached.get("raw"):
                 return normalize_fasta_header(str(cached["raw"]))
 
-        fasta_text = await self.ncbi_client.fetch_sequence_fasta_region(
-            accession,
-            start=start,
-            end=end,
-        )
-        fasta_text = normalize_fasta_header(fasta_text)
+        # Check local database first (local-first policy)
+        local_seq = self._find_local_sequence(accession)
+        if local_seq:
+            logger.info("Serving IGV FASTA locally for %s (length=%d)", accession, len(local_seq))
+            s_idx = max(0, (start or 1) - 1)
+            if s_idx < len(local_seq):
+                e_idx = end if (end is not None and end > s_idx) else len(local_seq)
+                e_idx = min(e_idx, len(local_seq))
+                sliced = local_seq[s_idx:e_idx]
+            else:
+                sliced = local_seq
+            fasta_text = f">{accession}\n{sliced}\n"
+            if self.cache_repository:
+                self.cache_repository.set(cache_key, {"raw": fasta_text})
+            return fasta_text
 
-        if self.cache_repository and fasta_text:
-            self.cache_repository.set(cache_key, {"raw": fasta_text})
-        return fasta_text
+        try:
+            fasta_text = await self.ncbi_client.fetch_sequence_fasta_region(
+                accession,
+                start=start,
+                end=end,
+            )
+            fasta_text = normalize_fasta_header(fasta_text)
+
+            if self.cache_repository and fasta_text:
+                self.cache_repository.set(cache_key, {"raw": fasta_text})
+            return fasta_text
+        except Exception as exc:
+            if self.cache_repository:
+                stale = self.cache_repository.get_any(cache_key)
+                if stale and isinstance(stale, dict) and stale.get("raw"):
+                    logger.warning("Returning stale cache for %s due to fetch error: %s", accession, exc)
+                    return normalize_fasta_header(str(stale["raw"]))
+            raise
 
     # Threshold for skipping expensive string outputs
     _LARGE_SEQ_THRESHOLD = 50_000

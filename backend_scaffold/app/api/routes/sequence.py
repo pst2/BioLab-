@@ -114,6 +114,17 @@ async def igv_fasta(
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception as exc:
+        err_msg = str(exc)
+        if any(w in err_msg.lower() for w in ("rate-limit", "rate limit", "misuse", "429", "abuse", "blocked")):
+            raise HTTPException(
+                status_code=429,
+                detail=(
+                    "NCBI is temporarily blocking requests from this server due to "
+                    "rate-limiting. Please wait a few minutes and try again, or set "
+                    "an NCBI_API_KEY in the backend .env file."
+                ),
+                headers={"Retry-After": "60"},
+            ) from exc
         raise HTTPException(status_code=502, detail=f"NCBI fetch failed: {exc}") from exc
 
     if not fasta_text or not fasta_text.strip().startswith(">"):

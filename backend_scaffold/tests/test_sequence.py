@@ -89,3 +89,43 @@ async def test_fetch_genbank_returns_failure_without_cache(db_session, monkeypat
     monkeypatch.setattr(service.ncbi_client, "fetch_sequence_genbank", fake_fetch)
     result = await service.fetch_genbank(SequenceFetchRequest(accession="NC_404", db="nuccore"))
     assert result.success is False
+
+
+@pytest.mark.asyncio
+async def test_fetch_raw_fasta_for_igv_local_lookup(db_session):
+    from app.db.models import GeneRecord
+
+    gene = GeneRecord(
+        symbol="XM_020943662",
+        name="Test gene",
+        organism="Test organism",
+        ncbi_gene_id="3371095011",
+        payload={"sequence": "ATGCGATCGATCGATC", "symbol": "XM_020943662"},
+    )
+    db_session.add(gene)
+    db_session.commit()
+
+    service = SequenceService(db_session)
+    fasta = await service.fetch_raw_fasta_for_igv("XM_020943662")
+    assert fasta.startswith(">XM_020943662")
+    assert "ATGCGATCGATCGATC" in fasta
+
+
+@pytest.mark.asyncio
+async def test_fetch_raw_fasta_for_igv_subregion_slicing(db_session):
+    from app.db.models import GeneRecord
+
+    gene = GeneRecord(
+        symbol="TEST_GENE",
+        name="Test subregion",
+        organism="Test organism",
+        ncbi_gene_id="99999",
+        payload={"sequence": "AAGGCCTT", "symbol": "TEST_GENE"},
+    )
+    db_session.add(gene)
+    db_session.commit()
+
+    service = SequenceService(db_session)
+    # 1-based start=2, end=5: "AGGC"
+    fasta = await service.fetch_raw_fasta_for_igv("TEST_GENE", start=2, end=5)
+    assert fasta == ">TEST_GENE\nAGGC\n"

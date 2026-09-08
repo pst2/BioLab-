@@ -132,16 +132,49 @@ function UnsupportedPlaceholder({ gene }: { gene: GeneDetail }) {
   );
 }
 
-function BrowserError({ message, onRetry }: { message: string; onRetry: () => void }) {
+function BrowserError({ message, onRetry, gene }: { message: string; onRetry: () => void; gene?: GeneDetail }) {
+  const isRateLimit = /rate.?limit|429|abuse|misuse|temporarily blocking/i.test(message);
+  const ncbiUrl = gene?.ncbi_url || (gene?.gene_id ? `https://www.ncbi.nlm.nih.gov/gene/${gene.gene_id}` : undefined);
+
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 px-5 py-4 text-red-800 dark:text-red-300">
-      <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
+    <div className={`flex items-start gap-3 rounded-xl border px-5 py-4 ${
+      isRateLimit
+        ? "border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300"
+        : "border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 text-red-800 dark:text-red-300"
+    }`}>
+      <AlertCircle className={`mt-0.5 h-4 w-4 shrink-0 ${isRateLimit ? "text-amber-500" : "text-red-500"}`} />
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold">Genome Browser Error</p>
-        <p className="mt-1 text-xs leading-5 break-words">{message}</p>
+        <p className="text-sm font-semibold">
+          {isRateLimit ? "NCBI Rate Limit Reached" : "Genome Browser Error"}
+        </p>
+        {isRateLimit ? (
+          <>
+            <p className="mt-1 text-xs leading-5">
+              NCBI is temporarily blocking requests from this server. This usually resolves within a few minutes.
+              You can still view the sequence directly on NCBI.
+            </p>
+            {ncbiUrl && (
+              <a
+                href={ncbiUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
+              >
+                <Globe className="h-3 w-3" />
+                View on NCBI
+              </a>
+            )}
+          </>
+        ) : (
+          <p className="mt-1 text-xs leading-5 break-words">{message}</p>
+        )}
         <button
           onClick={onRetry}
-          className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-red-200 dark:border-red-800 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium transition hover:bg-red-50 dark:hover:bg-slate-700"
+          className={`mt-3 inline-flex items-center gap-1.5 rounded-md border bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium transition ${
+            isRateLimit
+              ? "border-amber-200 dark:border-amber-800 hover:bg-amber-50 dark:hover:bg-slate-700"
+              : "border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-slate-700"
+          }`}
         >
           Try again
         </button>
@@ -315,6 +348,7 @@ export function GenomeBrowser({ gene }: GenomeBrowserProps) {
         <div className="mt-4">
           <BrowserError
             message={errorMsg}
+            gene={gene}
             onRetry={() => {
               setStatus("idle");
               setRetryKey((k) => k + 1);

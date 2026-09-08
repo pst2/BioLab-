@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import time
 from typing import Any
 
 import httpx
@@ -31,11 +32,17 @@ class NCBIClient:
     def __init__(self) -> None:
         self._client: httpx.AsyncClient | None = None
 
+    # Minimum seconds between NCBI requests (NCBI allows 3/sec without API key,
+    # 10/sec with one).  Being conservative avoids the abuse-shtml redirect.
+    _MIN_REQUEST_INTERVAL: float = 0.35
+    _last_request_time: float = 0.0
+
     async def _get_client(self) -> httpx.AsyncClient:
         """Return (and lazily create) the shared async client."""
         if self._client is None or self._client.is_closed:
             self._client = httpx.AsyncClient(
                 timeout=settings.NCBI_TIMEOUT,
+                follow_redirects=True,
                 headers={"User-Agent": f"{settings.APP_NAME}/{settings.APP_VERSION}"},
             )
         return self._client
@@ -585,23 +592,54 @@ class NCBIClient:
         response = await self._request(endpoint, params)
         return response.text
 
+    async def _throttle(self) -> None:
+        """Enforce minimum interval between consecutive NCBI requests."""
+        now = time.monotonic()
+        elapsed = now - NCBIClient._last_request_time
+        if elapsed < self._MIN_REQUEST_INTERVAL:
+            await asyncio.sleep(self._MIN_REQUEST_INTERVAL - elapsed)
+        NCBIClient._last_request_time = time.monotonic()
+
     async def _request(self, endpoint: str, params: dict[str, Any]) -> httpx.Response:
         url = f"{self.BASE_URL}/{endpoint}"
         request_params = dict(params)
         if settings.NCBI_API_KEY:
             request_params["api_key"] = settings.NCBI_API_KEY
+        # NCBI best practice: identify the tool and contact email
+        request_params.setdefault("tool", settings.APP_NAME.replace(" ", "_"))
+        request_params.setdefault("email", settings.BLAST_CONTACT_EMAIL)
 
         client = await self._get_client()
         last_error: Exception | None = None
 
         for attempt in range(settings.NCBI_RETRY_COUNT + 1):
             try:
+                await self._throttle()
                 logger.info(
                     "NCBI request attempt=%d endpoint=%s", attempt + 1, endpoint
                 )
                 response = await client.get(url, params=request_params)
+
+                # Detect NCBI abuse/rate-limit redirect
+                final_url = str(response.url)
+                if "misuse.ncbi.nlm.nih.gov" in final_url or "abuse" in final_url:
+                    msg = (
+                        f"NCBI rate-limit detected (redirected to {final_url}). "
+                        "Consider setting NCBI_API_KEY in .env for higher limits."
+                    )
+                    logger.warning(msg)
+                    if attempt < settings.NCBI_RETRY_COUNT:
+                        # Wait longer before retrying — exponential back-off
+                        wait = 2.0 * (2 ** attempt)
+                        logger.info("Waiting %.1fs before NCBI retry…", wait)
+                        await asyncio.sleep(wait)
+                        continue
+                    raise RuntimeError(msg)
+
                 response.raise_for_status()
                 return response
+            except RuntimeError:
+                raise
             except (httpx.TimeoutException, httpx.HTTPStatusError, httpx.NetworkError) as exc:
                 last_error = exc
                 logger.warning(
@@ -612,6 +650,6 @@ class NCBIClient:
                 )
                 if attempt >= settings.NCBI_RETRY_COUNT:
                     raise
-                await asyncio.sleep(0.5 * (2**attempt))
+                await asyncio.sleep(0.5 * (2 ** attempt))
 
         raise RuntimeError(f"NCBI request failed after retries: {last_error!r}")
