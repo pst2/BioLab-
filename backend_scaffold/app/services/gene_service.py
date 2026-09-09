@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import logging
 import re
 from typing import Any
+
+logger = logging.getLogger(__name__)
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -146,6 +149,37 @@ class GeneService(BaseSearchService):
     async def get_gene_detail(self, gene_id: str):
         gene_id = str(gene_id).strip()
 
+        try:
+            return await self._get_gene_detail_inner(gene_id)
+        except Exception:
+            logger.exception("Unhandled error in get_gene_detail for gene_id=%s", gene_id)
+            placeholder = enrich_with_sequence_fields({
+                "id": gene_id,
+                "gene_id": gene_id,
+                "symbol": f"Gene {gene_id}",
+                "description": "An error occurred while fetching gene details.",
+                "organism": "Unknown",
+                "summary": (
+                    "An internal error prevented loading this record. "
+                    "Try searching this gene with mode=external_refresh "
+                    "to import it, then reopen the detail page."
+                ),
+                "chromosome": "Unknown",
+                "aliases": [],
+                "ncbi_url": f"https://www.ncbi.nlm.nih.gov/gene/{gene_id}",
+            })
+            return self._response(
+                message="Gene detail could not be loaded due to an internal error.",
+                data=placeholder,
+                source="none",
+                cached=False,
+                stale=True,
+                keyword=gene_id,
+                mode="local_first",
+                external_used=False,
+            )
+
+    async def _get_gene_detail_inner(self, gene_id: str):
         # 1. Try local DB first, then enrich the cached provider payload when possible.
         local = self.gene_repo.get_by_gene_id(gene_id)
         if local:

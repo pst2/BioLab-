@@ -70,6 +70,10 @@ class GeneRepository:
         row.description = item.get("description") or item.get("summary") or ""
         row.organism = organism
         row.ncbi_gene_id = ncbi_gene_id
+        row.genome_assembly = item.get("genome_assembly") or item.get("assembly")
+        raw_taxid = item.get("taxid") or item.get("taxonomy_id")
+        row.taxid = int(raw_taxid) if raw_taxid and str(raw_taxid).isdigit() else None
+        row.accession_version = item.get("accession_version") or item.get("genomic_accession")
         row.source = source
         row.payload = item
         return row
@@ -83,6 +87,9 @@ class GeneRepository:
             "name": row.name,
             "description": row.description,
             "organism": row.organism,
+            "genome_assembly": row.genome_assembly,
+            "taxid": row.taxid,
+            "accession_version": row.accession_version,
             "source": row.source,
         }
         data.update({key: value for key, value in payload.items() if key not in data or not data[key]})

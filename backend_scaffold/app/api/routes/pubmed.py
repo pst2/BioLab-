@@ -23,3 +23,22 @@ async def search_pubmed(
 ):
     service = PubMedService(db)
     return await service.search_pubmed(q, mode=mode)
+
+
+@router.get("/export")
+async def export_pubmed_citation(
+    pmid: str = Query(..., description="PubMed ID"),
+    format: str = Query("bibtex", pattern="^(bibtex|ris)$", description="Export format: bibtex or ris"),
+    title: str = Query(default="", description="Article title"),
+    authors: str = Query(default="", description="Comma-separated author list"),
+    journal: str = Query(default="", description="Journal name"),
+    year: str = Query(default="", description="Publication year"),
+    doi: str = Query(default="", description="DOI"),
+    abstract: str = Query(default="", description="Article abstract"),
+):
+    """Export PubMed citation as BibTeX or RIS file."""
+    from app.api.routes.export import export_bibtex, export_ris
+    if format == "ris":
+        return export_ris(pmid=pmid, title=title, authors=authors, journal=journal, year=year, doi=doi, abstract=abstract)
+    return export_bibtex(pmid=pmid, title=title, authors=authors, journal=journal, year=year, doi=doi)
+

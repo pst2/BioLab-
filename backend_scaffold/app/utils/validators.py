@@ -1,9 +1,15 @@
 from app.core.exceptions import ValidationError
 
-MAX_SEQUENCE_LENGTH = 50000
+MAX_SEQUENCE_LENGTH = 5_000_000
 
-VALID_DNA_BASES = {"A", "T", "G", "C", "N", "U", "a", "t", "g", "c", "n", "u"}
-VALID_PROTEIN_AMINO_ACIDS = set("ACDEFGHIKLMNPQRSTVWYUBZXO*acdefghiklmnpqrstvwyubzxo*")
+# Full IUPAC nucleotide alphabet (DNA + RNA + degenerate codes + gap)
+# R=A/G, Y=C/T, S=G/C, W=A/T, K=G/T, M=A/C, B=C/G/T, D=A/G/T, H=A/C/T, V=A/C/G
+VALID_DNA_BASES = set("ATGCNURYSWKMBDHVatgcnuryswkmbdhv-")
+
+# Standard IUPAC amino acid single-letter codes including:
+# U=Selenocysteine, O=Pyrrolysine, X=unknown/any, B=Asx (Asp/Asn), Z=Glx (Glu/Gln),
+# J=Leu/Ile, *=stop/termination, -=gap
+VALID_PROTEIN_AMINO_ACIDS = set("ACDEFGHIKLMNPQRSTVWYUBZXOJacdefghiklmnpqrstvwyubzxoj*-")
 
 
 def validate_sequence_length(sequence: str, max_length: int = MAX_SEQUENCE_LENGTH) -> None:
@@ -31,4 +37,3 @@ def validate_protein_sequence(sequence: str) -> None:
     invalid = {char for char in clean_seq if char not in VALID_PROTEIN_AMINO_ACIDS}
     if invalid:
         raise ValidationError(f"Invalid protein sequence. Unsupported characters: {sorted(invalid)}")
-

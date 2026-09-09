@@ -477,6 +477,7 @@ class NCBIClient:
         if not id_list:
             return []
 
+        # ── Step 1: esummary for metadata (title, journal, dates, DOIs) ── #
         summary_params: dict[str, Any] = {
             "db": "pubmed",
             "id": ",".join(id_list),
@@ -484,6 +485,22 @@ class NCBIClient:
         }
         summary_data = await self._get_json("esummary.fcgi", summary_params)
         result_map = summary_data.get("result", {})
+
+        # ── Step 2: efetch XML for abstracts (esummary does not return them) ── #
+        abstract_map: dict[str, str] = {}
+        mesh_map: dict[str, list[str]] = {}
+        keyword_map: dict[str, list[str]] = {}
+        try:
+            fetch_params: dict[str, Any] = {
+                "db": "pubmed",
+                "id": ",".join(id_list),
+                "retmode": "xml",
+                "rettype": "abstract",
+            }
+            xml_text = await self._get_text("efetch.fcgi", fetch_params)
+            abstract_map, mesh_map, keyword_map = self._parse_pubmed_xml(xml_text)
+        except Exception as exc:
+            logger.warning("PubMed efetch XML failed (abstracts unavailable): %s", exc)
 
         results: list[dict[str, Any]] = []
         for pmid in id_list:
@@ -498,9 +515,57 @@ class NCBIClient:
                     "pubdate": item.get("pubdate") or "",
                     "authors": self._extract_pubmed_authors(item),
                     "doi": self._extract_pubmed_doi(item),
+                    "abstract": abstract_map.get(pmid, ""),
+                    "mesh_terms": mesh_map.get(pmid, []),
+                    "keywords": keyword_map.get(pmid, []),
                 }
             )
         return results
+
+    def _parse_pubmed_xml(self, xml_text: str) -> tuple[dict[str, str], dict[str, list[str]], dict[str, list[str]]]:
+        """Parse PubMed efetch XML to extract abstracts, MeSH terms, and keywords."""
+        abstract_map: dict[str, str] = {}
+        mesh_map: dict[str, list[str]] = {}
+        keyword_map: dict[str, list[str]] = {}
+        try:
+            from lxml import etree
+            root = etree.fromstring(xml_text.encode("utf-8"))
+            for article in root.findall(".//PubmedArticle"):
+                pmid_el = article.find(".//PMID")
+                if pmid_el is None or not pmid_el.text:
+                    continue
+                pmid = pmid_el.text.strip()
+
+                # Abstract
+                abstract_parts: list[str] = []
+                for abs_text in article.findall(".//AbstractText"):
+                    label = abs_text.get("Label", "")
+                    text = "".join(abs_text.itertext()).strip()
+                    if label and text:
+                        abstract_parts.append(f"{label}: {text}")
+                    elif text:
+                        abstract_parts.append(text)
+                if abstract_parts:
+                    abstract_map[pmid] = " ".join(abstract_parts)
+
+                # MeSH terms
+                mesh_terms: list[str] = []
+                for mesh in article.findall(".//MeshHeading/DescriptorName"):
+                    if mesh.text:
+                        mesh_terms.append(mesh.text.strip())
+                if mesh_terms:
+                    mesh_map[pmid] = mesh_terms
+
+                # Keywords
+                kw_list: list[str] = []
+                for kw in article.findall(".//Keyword"):
+                    if kw.text:
+                        kw_list.append(kw.text.strip())
+                if kw_list:
+                    keyword_map[pmid] = kw_list
+        except Exception as exc:
+            logger.warning("Failed to parse PubMed XML: %s", exc)
+        return abstract_map, mesh_map, keyword_map
 
     async def fetch_sequence_fasta(self, accession: str, db: str = "nuccore") -> str:
         params: dict[str, Any] = {

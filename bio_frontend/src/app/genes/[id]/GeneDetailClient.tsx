@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   BarChart3,
   CheckCircle2,
+  ChevronDown,
   Copy,
   Database,
   Dna,
@@ -426,6 +427,7 @@ export default function GeneDetailClient({ id }: { id: string }) {
 
 function GeneHero({ gene, geneId, external, loading, usingBrowserCache }: { gene: GeneDetail; geneId: string; external: { provider: string; href: string } | null; loading: boolean; usingBrowserCache: boolean }) {
   const { t } = useLanguage();
+  const [exportOpen, setExportOpen] = useState(false);
   const seqLen = Number(gene.sequence_length || gene.sequence?.length || gene.protein?.length || 0);
   const gcVal = Number(gene.gc_content || 0);
 
@@ -466,13 +468,70 @@ function GeneHero({ gene, geneId, external, loading, usingBrowserCache }: { gene
 
           {/* Action buttons */}
           <div className="mt-5 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => copyToClipboard(JSON.stringify(gene, null, 2))}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/8 px-3.5 py-2 text-xs font-medium text-slate-300 transition hover:bg-white/14 hover:text-white"
-            >
-              <Download className="h-3.5 w-3.5" /> {t("detail.export")}
-            </button>
+            {/* Real Research Export Dropdown */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setExportOpen((prev) => !prev)}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-white/10 px-3.5 py-2 text-xs font-medium text-slate-200 transition hover:bg-white/18 hover:text-white"
+              >
+                <Download className="h-3.5 w-3.5 text-cyan-400" /> {t("detail.export")}
+                <ChevronDown className="h-3 w-3 opacity-70" />
+              </button>
+
+              {exportOpen && (
+                <div
+                  className="absolute left-0 top-full z-50 mt-1.5 w-56 rounded-xl border border-slate-700/80 bg-slate-900/95 p-1.5 shadow-2xl backdrop-blur-md animate-fadeIn"
+                  onMouseLeave={() => setExportOpen(false)}
+                >
+                  <a
+                    href={`/api/v1/export/gene/${geneId}/fasta`}
+                    download
+                    className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-slate-300 hover:bg-cyan-500/20 hover:text-cyan-300 transition"
+                  >
+                    <FileText className="h-3.5 w-3.5 text-cyan-400" />
+                    <span>Download .FASTA</span>
+                  </a>
+                  <a
+                    href={`/api/v1/export/gene/${geneId}/genbank`}
+                    download
+                    className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-slate-300 hover:bg-emerald-500/20 hover:text-emerald-300 transition"
+                  >
+                    <Database className="h-3.5 w-3.5 text-emerald-400" />
+                    <span>Download .GenBank (.gb)</span>
+                  </a>
+                  <a
+                    href={`/api/v1/export/gene/${geneId}/bed`}
+                    download
+                    className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-slate-300 hover:bg-amber-500/20 hover:text-amber-300 transition"
+                  >
+                    <BarChart3 className="h-3.5 w-3.5 text-amber-400" />
+                    <span>Download .BED Exons</span>
+                  </a>
+                  <a
+                    href={`/api/v1/export/gene/${geneId}/json`}
+                    download
+                    className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-slate-300 hover:bg-indigo-500/20 hover:text-indigo-300 transition"
+                  >
+                    <Download className="h-3.5 w-3.5 text-indigo-400" />
+                    <span>Download .JSON Metadata</span>
+                  </a>
+                  <div className="my-1 border-t border-slate-800" />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      copyToClipboard(JSON.stringify(gene, null, 2));
+                      setExportOpen(false);
+                    }}
+                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-slate-400 hover:bg-white/10 hover:text-white transition"
+                  >
+                    <Copy className="h-3.5 w-3.5" />
+                    <span>Copy JSON to Clipboard</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
             {external?.href && (
               <a
                 href={external.href}

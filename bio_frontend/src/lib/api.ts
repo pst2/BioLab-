@@ -109,6 +109,9 @@ export interface GeneDetail {
   end?: number;
   strand?: number | string;
   assembly?: string;
+  genome_assembly?: string;
+  taxid?: number;
+  accession_version?: string;
   /** NC_/NW_/NZ_ RefSeq chromosome accession for IGV.js, e.g. "NC_000005.10".
    *  Populated only for NCBI Gene records. */
   genomic_accession?: string;
@@ -138,6 +141,9 @@ export interface PubMedResult {
   pubdate: string;
   authors: string[];
   doi?: string;
+  abstract?: string;
+  mesh_terms?: string[];
+  keywords?: string[];
 }
 
 export interface SequenceAnalysis {
@@ -173,6 +179,15 @@ export interface BlastHit {
   query_coverage_percent: number;
   alignment_length: number;
   source: "ebi" | "uniprot" | string;
+  bit_score?: number;
+  gaps?: number;
+  query_seq?: string;
+  match_seq?: string;
+  subject_seq?: string;
+  query_from?: number;
+  query_to?: number;
+  hit_from?: number;
+  hit_to?: number;
 }
 
 export interface SequenceSearchJob {
@@ -354,6 +369,10 @@ export const api = {
       sequence_type?: "auto" | "dna" | "protein";
       provider?: "auto" | "ebi" | "uniprot";
       database?: string;
+      evalue_cutoff?: number;
+      matrix?: string;
+      gap_open?: number;
+      gap_extend?: number;
     },
     options?: RequestInit
   ) =>

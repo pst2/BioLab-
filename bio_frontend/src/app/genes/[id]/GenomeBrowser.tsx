@@ -30,6 +30,14 @@ const LOCUS_PADDING = 5_000;
 /** Maximum initial chunk requested for IGV FASTA reference to ensure instant loading. */
 const MAX_INITIAL_CHUNK = 100_000;
 
+/** Common genome assembly versions for display */
+const ASSEMBLY_LABELS: Record<string, string> = {
+  "GRCh38": "GRCh38 / hg38",
+  "GRCh37": "GRCh37 / hg19",
+  "GRCm39": "GRCm39 / mm39",
+  "GRCm38": "GRCm38 / mm10",
+};
+
 /**
  * Regex for valid IGV FASTA reference accessions.
  * Must look like a real RefSeq or INSDC accession (e.g. NC_000005.10, NM_007294, CM000667.2).
@@ -276,8 +284,29 @@ export function GenomeBrowser({ gene }: GenomeBrowserProps) {
         if (cancelled) return;
 
         const seqLen = gene.sequence_length || gene.sequence?.length;
+        const { paddedStart, paddedEnd } = computePaddedRange(start, end, seqLen);
         const fastaURL = buildFastaUrl(accession!, start, end, seqLen);
         const locusStr = buildRelativeLocus(accession!, start, end, seqLen);
+
+        // Build a gene annotation track to highlight the gene region
+        const geneRelStart = Math.max(1, start - paddedStart + 1);
+        const geneRelEnd = Math.min(end - paddedStart + 1, paddedEnd - paddedStart + 1);
+        const annotationTrack = {
+          name: `${gene.symbol || 'Gene'} Region`,
+          type: 'annotation',
+          format: 'bed',
+          features: [{
+            chr: accession!,
+            start: geneRelStart,
+            end: Math.max(geneRelStart + 1, geneRelEnd),
+            name: gene.symbol || accession!,
+            score: 0,
+            strand: gene.strand === '-' || gene.strand === -1 ? '-' : '+',
+          }],
+          displayMode: 'EXPANDED',
+          color: '#06b6d4',
+          height: 40,
+        };
 
         browser = await createBrowserFn(container, {
           reference: {
@@ -292,7 +321,7 @@ export function GenomeBrowser({ gene }: GenomeBrowserProps) {
           showRuler: true,
           showCenterGuide: true,
           showCursorTrackingGuide: true,
-          tracks: [],
+          tracks: [annotationTrack],
         });
 
         if (!cancelled) setStatus("ready");
@@ -340,7 +369,14 @@ export function GenomeBrowser({ gene }: GenomeBrowserProps) {
     <section className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-5 shadow-sm">
       <SectionHeader>
         {status === "ready" && (
-          <LocusBadge chromosome={chromosome} start={start} end={end} accession={accession!} />
+          <div className="flex items-center gap-2">
+            {gene.genome_assembly && (
+              <span className="inline-flex items-center rounded-full bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 px-2.5 py-0.5 text-[10px] font-semibold text-indigo-600 dark:text-indigo-300">
+                {ASSEMBLY_LABELS[gene.genome_assembly] || gene.genome_assembly}
+              </span>
+            )}
+            <LocusBadge chromosome={chromosome} start={start} end={end} accession={accession!} />
+          </div>
         )}
       </SectionHeader>
 

@@ -13,13 +13,28 @@ def test_validate_sequence_length_pass():
 
 def test_validate_sequence_length_fail():
     with pytest.raises(ValidationError) as exc:
-        validate_sequence_length("A" * 50001)
+        validate_sequence_length("A" * 5_000_001)
     assert "exceeds maximum allowed length" in str(exc.value)
+
+
+def test_validate_sequence_length_at_boundary():
+    """5,000,000 should pass; 5,000,001 should fail."""
+    validate_sequence_length("A" * 5_000_000)
+    with pytest.raises(ValidationError):
+        validate_sequence_length("A" * 5_000_001)
 
 
 def test_validate_dna_sequence_valid():
     validate_dna_sequence("ATGCGTANACGU")
     validate_dna_sequence("atgcgtanacgu")
+
+
+def test_validate_dna_sequence_iupac_degenerate_codes():
+    """Full IUPAC degenerate nucleotide codes must be accepted."""
+    validate_dna_sequence("ATGCRYSWKMBDHVN")
+    validate_dna_sequence("atgcryswkmbdhvn")
+    # Gap character
+    validate_dna_sequence("ATG-CGT")
 
 
 def test_validate_dna_sequence_invalid_chars():
@@ -38,7 +53,14 @@ def test_validate_protein_sequence_valid():
     validate_protein_sequence("MKTLLILAVIMACAA")
 
 
+def test_validate_protein_sequence_selenocysteine_and_pyrrolysine():
+    """U (Selenocysteine) and O (Pyrrolysine) are valid IUPAC amino acids."""
+    validate_protein_sequence("MKTU")
+    validate_protein_sequence("MKTO")
+
+
 def test_validate_protein_sequence_invalid_chars():
     with pytest.raises(ValidationError) as exc:
         validate_protein_sequence("MKTL!@#")
     assert "Invalid protein sequence" in str(exc.value)
+

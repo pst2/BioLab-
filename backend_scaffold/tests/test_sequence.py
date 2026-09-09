@@ -23,10 +23,14 @@ def test_fasta_parser_returns_visualization_data():
     assert parsed["visualization"]["base_composition"][0]["base"] == "A"
 
 
-def test_fasta_parser_rejects_non_dna_analysis():
+def test_fasta_parser_protein_analysis():
+    """Protein sequences now receive full biochemistry analysis."""
     parsed = FastaParser.parse(">protein\nMEEPQ")
     assert parsed["is_dna"] is False
-    assert parsed["analysis"] is None
+    assert parsed["is_protein"] is True
+    assert parsed["analysis"] is not None
+    assert parsed["analysis"]["sequence_length"] == 5
+    assert parsed["analysis"]["molecular_weight_da"] > 0
 
 
 @pytest.mark.asyncio

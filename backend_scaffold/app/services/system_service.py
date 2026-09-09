@@ -1,3 +1,4 @@
+import asyncio
 import time
 from datetime import datetime, timedelta, timezone
 from sqlalchemy import func, text
@@ -10,7 +11,7 @@ from app.schemas.common import ApiResponse, MetaInfo
 # In-memory cache for system stats
 _STATS_CACHE: dict = {}
 _STATS_CACHE_EXPIRES: float = 0.0
-_CACHE_TTL_SECONDS: float = 60.0
+_CACHE_TTL_SECONDS: float = 120.0
 
 
 class SystemService:
@@ -77,11 +78,12 @@ class SystemService:
         providers_list = ["NCBI", "Ensembl", "UniProt", "BV-BRC", "Phytozome"]
         active_providers_count: int | None = None
         try:
-            ncbi_ok = await self._check_ncbi()
-            # If NCBI is ok, count 5 active providers
+            # Use a short timeout for stats so the dashboard doesn't hang
+            ncbi_ok = await asyncio.wait_for(self._check_ncbi(), timeout=3.0)
             active_count = len(providers_list) if ncbi_ok else 4
             active_providers_count = active_count
-        except Exception:
+        except (asyncio.TimeoutError, Exception):
+            # Assume all providers active when NCBI is unreachable (avoids slow stats)
             active_providers_count = len(providers_list)
 
         # 3. Success Rate (Rolling 24h)

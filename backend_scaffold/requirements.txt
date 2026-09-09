@@ -6,5 +6,7 @@ pydantic==2.9.2
 pydantic-settings==2.5.2
 httpx==0.27.2
 slowapi==0.1.9
+biopython>=1.83
+lxml>=5.0
 pytest==8.3.3
 pytest-asyncio==0.24.0

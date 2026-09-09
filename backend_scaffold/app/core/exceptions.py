@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -91,6 +95,7 @@ async def validation_exception_handler(_: Request, exc: RequestValidationError) 
 
 
 async def generic_exception_handler(_: Request, exc: Exception) -> JSONResponse:
+    logger.exception("Unhandled exception: %s", exc)
     content = {
         "success": False,
         "message": "Internal server error",

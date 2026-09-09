@@ -97,7 +97,15 @@ class BlastClient:
     # ── EBI BLAST ─────────────────────────────────────────────────────────── #
 
     async def ebi_submit(
-        self, sequence: str, seq_type: str, database: str
+        self,
+        sequence: str,
+        seq_type: str,
+        database: str,
+        *,
+        matrix: str | None = None,
+        exp: float | str | None = None,
+        gapopen: int | None = None,
+        gapextend: int | None = None,
     ) -> str:
         """Submit a job to EBI NCBI BLAST and return the job ID."""
         clean = self.strip_header(sequence)
@@ -116,8 +124,15 @@ class BlastClient:
             "database": database,
             "alignments": "50",
             "scores": "50",
-            "exp": "10",
+            "exp": str(exp if exp is not None else "10"),
         }
+        if seq_type == "protein" and matrix:
+            params["matrix"] = matrix
+        if gapopen is not None:
+            params["gapopen"] = str(gapopen)
+        if gapextend is not None:
+            params["gapextend"] = str(gapextend)
+
         data = urllib.parse.urlencode(params).encode("utf-8")
         client = await self._client()
         resp = await client.post(
@@ -170,6 +185,15 @@ class BlastClient:
                     "identity_percent": float(hsp.get("hsp_identity", 0.0)),
                     "query_coverage_percent": round(q_cov, 1),
                     "alignment_length": int(hsp.get("hsp_align_len", 0)),
+                    "bit_score": float(hsp.get("hsp_bits", hsp.get("hsp_score", 0.0))),
+                    "gaps": int(hsp.get("hsp_gaps", 0)),
+                    "query_seq": hsp.get("hsp_qseq", ""),
+                    "match_seq": hsp.get("hsp_mseq", ""),
+                    "subject_seq": hsp.get("hsp_hseq", ""),
+                    "query_from": q_from,
+                    "query_to": q_to,
+                    "hit_from": int(hsp.get("hsp_hit_from", 0)),
+                    "hit_to": int(hsp.get("hsp_hit_to", 0)),
                     "source": "ebi",
                 }
             )
@@ -256,6 +280,10 @@ class BlastClient:
                     if q_end > q_start and query_len > 0
                     else 0.0
                 )
+                s_start = int(parts[8]) if len(parts) > 8 else 0
+                s_end = int(parts[9]) if len(parts) > 9 else 0
+                bit_score = float(parts[11]) if len(parts) > 11 else 0.0
+                gaps = int(parts[5]) if len(parts) > 5 else 0
                 results.append(
                     {
                         "accession": accession,
@@ -264,6 +292,12 @@ class BlastClient:
                         "identity_percent": identity,
                         "query_coverage_percent": round(q_cov, 1),
                         "alignment_length": aln_len,
+                        "bit_score": bit_score,
+                        "gaps": gaps,
+                        "query_from": q_start,
+                        "query_to": q_end,
+                        "hit_from": s_start,
+                        "hit_to": s_end,
                         "source": "uniprot",
                     }
                 )

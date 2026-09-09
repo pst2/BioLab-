@@ -16,6 +16,11 @@ export function useBlastSearch() {
   const [error, setError] = useState("");
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
+  const [evalueCutoff, setEvalueCutoff] = useState<number>(10.0);
+  const [matrix, setMatrix] = useState<string>("BLOSUM62");
+  const [gapOpen, setGapOpen] = useState<number | undefined>(undefined);
+  const [gapExtend, setGapExtend] = useState<number | undefined>(undefined);
+
   const pollCount = useRef(0);
   const timerRef = useRef<any>(null);
   const toast = useToast();
@@ -87,6 +92,10 @@ export function useBlastSearch() {
         sequence_type: seqType,
         provider,
         database: database.trim() || undefined,
+        evalue_cutoff: evalueCutoff,
+        matrix: matrix || undefined,
+        gap_open: gapOpen,
+        gap_extend: gapExtend,
       });
       const job = response.data;
       setJobId(job.job_id);
@@ -133,6 +142,14 @@ export function useBlastSearch() {
     setSeqType,
     database,
     setDatabase,
+    evalueCutoff,
+    setEvalueCutoff,
+    matrix,
+    setMatrix,
+    gapOpen,
+    setGapOpen,
+    gapExtend,
+    setGapExtend,
     loading,
     jobId,
     status,

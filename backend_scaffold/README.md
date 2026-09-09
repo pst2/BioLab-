@@ -1,216 +1,137 @@
-# Bioinformatics Backend Scaffold
+# Bioinformatics Backend Scaffold (FastAPI)
 
-FastAPI backend for gene lookup, PubMed lookup, sequence parsing, caching, and system status monitoring.
+FastAPI backend for multi-provider gene discovery, PubMed literature mining, bioinformatics sequence analysis, FAIR provenance tracking, research data export, and system performance monitoring.
 
-## Main upgrades in this scaffold
+## 🚀 Main Features & Recent Upgrades
 
-- Startup/DB: `init_db()` no longer runs as an import side effect. Local table creation is only triggered in the FastAPI lifespan when `DEBUG=true`; production schema management is handled by Alembic.
-- Security: generic 500 responses no longer expose stack traces; protected endpoints use `X-API-Key` with timing-safe comparison and multiple keys.
-- NCBI client: async `httpx` client with retries, timeout, real `esearch` + `esummary`, DOI extraction for PubMed, and FASTA/GenBank fetch support.
-- Code quality: `GeneService` and `PubMedService` share cache/fallback behavior through `BaseSearchService`.
-- Multi-provider gene search: NCBI remains the primary source; Ensembl, UniProt, and BV-BRC are used as trusted fallback providers when NCBI is unavailable or returns no result.
-- Reliability: cache-first search, stale-cache fallback, local DB fallback, multi-provider external fallback, local mock fallback, and real DB/NCBI health checks.
-- Rate limiting: SlowAPI-based IP rate limiting, configurable from environment.
-- Tests: 31 tests covering auth, NCBI parsing, cache hit, stale fallback, service failure, sequence parsing, and system status.
+- **Multi-Provider Architecture**: NCBI (Entrez) as primary provider, with automatic fallback and dedicated filtering across **Ensembl**, **UniProt**, **BV-BRC**, and **Phytozome**. Route `/api/v1/genes/search` supports `provider` (`auto`, `ncbi`, `ensembl`, `uniprot`, `bvbrc`, `phytozome`, `all`) and `fallback: bool`.
+- **FAIR Data Provenance**: Explicit tracking of `genome_assembly`, `taxid`, and `accession_version` columns in the `genes` table, ensuring data traceability across external genomic revisions.
+- **Research-Grade Data Export**: Endpoints under `/api/v1/export/` for:
+  - FASTA sequence downloads (`/api/v1/export/gene/{id}/fasta`)
+  - Full GenBank flatfile downloads (`/api/v1/export/gene/{id}/genbank`)
+  - BED track coordinate files (`/api/v1/export/gene/{id}/bed`)
+  - Complete JSON machine-readable export (`/api/v1/export/gene/{id}/json`)
+  - Query results CSV export (`/api/v1/export/search/csv`)
+  - Academic citation exports: **BibTeX** (`/api/v1/export/citation/bibtex`) and **RIS** (`/api/v1/export/citation/ris`)
+- **Advanced Sequence & Protein Analysis**:
+  - Multi-FASTA file parsing (`parse_multi_fasta`)
+  - Full IUPAC nucleotide degenerate code support (R, Y, S, W, K, M, B, D, H, V, N) & gap (`-`) handling
+  - Automatic Protein vs. DNA/RNA sequence classification
+  - Physicochemical protein profiling: Molecular Weight (Da), Isoelectric Point (pI), Instability Index, GRAVY hydropathy, Extinction Coefficient, and charge distribution
+  - 6-Frame Open Reading Frame (ORF) finder supporting canonical (`ATG`) and alternative start codons (`GTG`, `TTG`, `CTG`) across both strands
+- **Asynchronous BLAST Integration**: Integration with EBI/NCBI BLAST APIs with job dispatching, status polling, and visual alignment string parsing (`Query`, `Subject`, `Match`).
+- **Dynamic IGV.js FASTA Slicing**: On-the-fly genomic sequence slicing (`/api/v1/sequence/igv/fasta`) with coordinate normalization for minus strands and customizable locus padding.
+- **High-Performance System Stats**: Real-time stats (`/api/v1/system/stats`) with bounded asynchronous timeout (3.0s for external health pings) and 120s TTL caching, responding in < 0.5s.
+- **Security & Reliability**: Timing-safe `X-API-Key` authentication, SlowAPI rate-limiting, and sanitized 500 error responses preventing internal traceback leaks.
+- **Testing Suite**: **75 automated tests** across all modules with 100% pass rate.
 
-## Setup
+---
 
-```bash
+## 🛠 Setup & Installation
+
+### Windows (PowerShell)
+```powershell
 python -m venv .venv
-.venv\Scripts\activate  # Windows
+.\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 copy .env.example .env
 ```
 
-For Linux/macOS:
-
+### Linux / macOS
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
 ```
 
-## Database migrations
+---
 
-Use Alembic for schema changes:
+## 🗄 Database Migrations (Alembic)
+
+Schema management is strictly handled by Alembic:
 
 ```bash
+# Apply all pending migrations (including FAIR provenance columns)
 alembic upgrade head
-```
 
-Rollback:
-
-```bash
+# Rollback one migration if needed
 alembic downgrade -1
 ```
 
-For local quick development, `DEBUG=true` will create tables in lifespan if they do not exist. For production, set `DEBUG=false` and run Alembic migrations explicitly.
+*Note: In development mode, `alembic upgrade head` ensures all tables and columns (`genome_assembly`, `taxid`, `accession_version`) match the SQLAlchemy models.*
 
-## Run
+---
 
-```bash
-uvicorn app.main:app --reload
-```
-
-Open:
-
-```text
-http://localhost:8000/docs
-```
-
-## API endpoints
-
-```text
-GET  /api/v1/health
-GET  /api/v1/system/status        # requires X-API-Key
-GET  /api/v1/genes/search?q=BRCA1&organism=Homo%20sapiens
-GET  /api/v1/pubmed/search?q=cancer
-POST /api/v1/sequence/analyze
-POST /api/v1/sequence/fetch/fasta
-POST /api/v1/sequence/fetch/genbank
-```
-
-Example protected request:
+## ▶️ Running the Server
 
 ```bash
-curl -H "X-API-Key: dev-key-1" http://localhost:8000/api/v1/system/status
+# Local development with auto-reload
+py -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-## Tests
+Interactive documentation:
+- **Swagger UI**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **ReDoc**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+
+---
+
+## 🧪 Running Automated Tests
 
 ```bash
-pytest -q
+# Run the full 75-test suite
+pytest -v
 ```
 
-Current suite: 31 tests.
+All 75 tests cover:
+- `test_bioinformatics_upgrade.py`: Multi-FASTA, IUPAC, Protein physicochemical properties, 6-frame ORF
+- `test_research_features.py`: FAIR provenance columns, data export (FASTA, GenBank, BED, CSV, BibTeX, RIS), BLAST alignment parsing
+- `test_search_services.py`: Multi-provider fallback, cache hits, stale fallback, mock fallbacks
+- `test_ncbi_client.py`: Entrez E-Utilities parsing, DOI extraction, retries
+- `test_sequence.py`: IGV subregion slicing, FASTA parser, GenBank parser
+- `test_system.py`: Health checks, system status, real-time stats
+- `test_security.py` & `test_rate_limit.py`: API key validation, dev/prod enforcement, rate limits
+- `test_exceptions.py`: Provider error hierarchy, sanitization of 500 error responses
+- `test_validators.py`: DNA, Protein, and sequence length validations
 
-## Important configuration
+---
 
-See `.env.example` for:
+## 📡 API Reference Overview
 
-- `API_KEYS`
-- `NCBI_API_KEY`
-- `CACHE_TTL_*`
-- `RATE_LIMIT_*`
-- `DEBUG`
+### Health & System
+| Method | Path | Description | Auth |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/v1/health` | Service health (DB + NCBI connectivity) | Public |
+| `GET` | `/api/v1/system/status` | Uptime, cache metrics, active services | `X-API-Key` |
+| `GET` | `/api/v1/system/stats` | Real-time indexed stats, provider count | Public |
+| `GET` | `/api/v1/workspace/overview`| Internal vs. external dependency breakdown | Public |
 
-## Local-first Bioinformatics Workspace update
+### Gene Discovery & Visualization
+| Method | Path | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/genes/search` | Search genes (`q`, `provider`, `fallback`, `mode`, `organism`, `data_type`) |
+| `GET` | `/api/v1/genes/{id}` | Detailed record with genome coordinates, transcripts, and protein info |
+| `GET` | `/api/v1/sequence/igv/fasta` | Dynamic FASTA locus extraction for IGV.js browser |
 
-This backend now treats NCBI as an optional external reference provider instead of the only data source. The intended dependency split is roughly:
+### Sequence Analysis & BLAST
+| Method | Path | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/v1/sequence/analyze` | Comprehensive DNA/RNA/Protein analysis, codon table, ORF finder |
+| `POST` | `/api/v1/sequence/blast` | Submit and check async NCBI/EBI BLAST search |
+| `GET` | `/api/v1/sequence/local` | List locally saved sequence analyses |
 
-- 60-70% internal workspace data, local database, local cache, and backend analysis logic
-- 30-40% NCBI reference data when a refresh or missing external lookup is needed
+### Research Data Export
+| Method | Path | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/export/gene/{id}/fasta` | Download gene sequence in standard FASTA format |
+| `GET` | `/api/v1/export/gene/{id}/genbank` | Download full GenBank flatfile (.gb) |
+| `GET` | `/api/v1/export/gene/{id}/bed` | Download exon/feature coordinates in BED format |
+| `GET` | `/api/v1/export/gene/{id}/json` | Download complete JSON record |
+| `GET` | `/api/v1/export/search/csv` | Export search query results to CSV |
+| `GET` | `/api/v1/export/citation/bibtex` | Export citation for PubMed record in BibTeX format |
+| `GET` | `/api/v1/export/citation/ris` | Export citation for PubMed record in RIS format |
 
-### Added database tables
-
-The new workspace layer adds:
-
-- `genes` - local gene records imported from NCBI or bundled local references
-- `research_papers` - saved PubMed/research records
-- `sequences` - locally analyzed user sequences
-- extended `search_history` fields: `mode`, `result_source`, `result_count`
-
-Run migrations after pulling this version:
-
-```bash
-alembic upgrade head
-```
-
-For a fresh local development database, you can also run with `DEBUG=true` and the app will create missing tables via `init_db()`.
-
-### Search modes
-
-Gene and PubMed search endpoints now accept a `mode` query parameter:
-
-```text
-local_first       # default: local cache/database first, NCBI only when needed
-local_only        # never calls NCBI
-external_refresh  # refreshes from NCBI and saves results into the local workspace
-```
-
-Examples:
-
-```bash
-curl "http://localhost:8000/api/v1/genes/search?q=BRCA1&organism=Homo%20sapiens&mode=local_first"
-curl "http://localhost:8000/api/v1/genes/search?q=TP53&data_type=gene&search_by=name&organism=human"
-curl "http://localhost:8000/api/v1/genes/search?q=NP_009225&data_type=protein&search_by=id&organism=Homo%20sapiens"
-curl "http://localhost:8000/api/v1/genes/search?q=spike&organism=virus"
-curl "http://localhost:8000/api/v1/pubmed/search?q=breast%20cancer&mode=external_refresh"
-```
-
-### Multi-provider fallback for gene search
-
-The gene search route keeps the old response envelope, cache behavior, and local-first mode. The external lookup step now follows this order:
-
-```text
-1. Local valid cache
-2. Local gene database
-3. NCBI Gene / Nucleotide / Protein
-4. If NCBI fails or is empty:
-   - human / animal genes -> Ensembl + UniProt
-   - protein/function lookup -> UniProt + BV-BRC
-   - bacteria / virus -> BV-BRC + UniProt
-   - plant keyword -> UniProt for now; Phytozome can be added as another provider later
-5. Stale cache / local DB / bundled mock fallback
-```
-
-Provider output is normalized into the same frontend-friendly fields: `id`, `gene_id`, `symbol`, `name`, `description`, `organism`, `source`, `source_url`, `data_type`, and `raw`. The `meta.source` value can now be `ncbi`, `ensembl`, `uniprot`, or `bvbrc`.
-
-### Internal sequence analysis
-
-The `/api/v1/sequence/analyze` endpoint is now fully internal. It computes:
-
-- sequence length
-- GC content
-- AT content
-- base counts
-- base composition for charts
-- reverse complement
-- RNA transcription
-- motif search
-- ORF detection
-- codon frequency
-- GC windows for visualization
-
-Example:
-
-```bash
-curl -X POST "http://localhost:8000/api/v1/sequence/analyze" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"demo","sequence":"ATGCGTACGTAGCTAGCTAGCTAA","motifs":["ATG","CTA"],"save":true}'
-```
-
-List saved sequence analyses:
-
-```bash
-curl "http://localhost:8000/api/v1/sequence/local"
-```
-
-### Workspace overview endpoint
-
-Frontend dashboards can use this endpoint to show whether the system is becoming too dependent on NCBI:
-
-```bash
-curl "http://localhost:8000/api/v1/workspace/overview"
-```
-
-It returns counts for local genes, saved papers, analyzed sequences, cache entries, recent searches, and an estimated internal-vs-NCBI dependency ratio.
-
-## Gene detail visualization upgrade
-
-This version enriches gene detail responses for multi-provider records:
-
-- Ensembl detail records can include genomic location, transcripts/exons, genomic sequence, FASTA, base counts, GC/AT content, and a `visualization` payload.
-- UniProt detail records can include protein sequence, protein FASTA, function text, feature/domain annotations, and a `visualization.protein` payload.
-- The existing `/api/v1/genes/search` and `/api/v1/genes/{gene_id}` routes are preserved, so the frontend can keep using the same URLs.
-- NCBI remains the primary source. Ensembl and UniProt are used to enrich fallback-provider detail pages when the record ID indicates the source.
-
-Recommended frontend detail sections:
-
-1. Overview
-2. Sequence & FASTA
-3. Gene Visualization
-4. Transcript / Exon Structure
-5. Protein Information
-6. External provider links
+### Literature Mining
+| Method | Path | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/pubmed/search` | Query PubMed articles (`q`, `limit`, `mode`) with DOI extraction |

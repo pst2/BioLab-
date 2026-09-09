@@ -8,7 +8,7 @@ import httpx
 from sqlalchemy import String, cast
 from sqlalchemy.orm import Session
 
-from app.bioinformatics.fasta_parser import FastaParser
+from app.bioinformatics.fasta_parser import FastaParser, _IUPAC_COMPLEMENT
 from app.clients.blast_client import DEFAULT_DATABASES, BlastClient
 from app.clients.ncbi_client import NCBIClient
 from app.core.config import settings
@@ -18,7 +18,7 @@ from app.repositories.sequence_cache_repository import SequenceCacheRepository
 from app.repositories.sequence_repository import SequenceRepository
 from app.schemas.common import ApiResponse, MetaInfo
 from app.schemas.sequence import SequenceAnalyzeRequest, SequenceFetchRequest, SequenceSearchRequest
-from app.utils.validators import validate_dna_sequence
+from app.utils.validators import validate_dna_sequence, validate_protein_sequence
 
 logger = logging.getLogger(__name__)
 
@@ -36,19 +36,35 @@ class SequenceService:
 
     def analyze(self, payload: SequenceAnalyzeRequest) -> ApiResponse:
         sequence = self._normalize_sequence(payload.sequence)
-        validate_dna_sequence(sequence)
-        result = self._build_sequence_analysis(sequence, motifs=payload.motifs)
+
+        # Detect sequence type: protein vs DNA/RNA
+        if FastaParser.is_protein_sequence(sequence):
+            validate_protein_sequence(sequence)
+            result = FastaParser._analyze_protein(sequence)
+            result["sequence_type"] = "protein"
+            result["dependency_policy"] = {
+                "internal_percent": 100,
+                "ncbi_percent": 0,
+                "note": "Protein analysis is computed by the backend and does not require NCBI.",
+            }
+            msg = "Protein sequence analyzed locally (Mw, pI, GRAVY, extinction coefficients)"
+        else:
+            validate_dna_sequence(sequence)
+            result = self._build_sequence_analysis(sequence, motifs=payload.motifs)
+            result["sequence_type"] = "dna"
+            msg = "DNA sequence analyzed locally without NCBI dependency"
+
         if payload.save and self.sequence_repository:
             saved = self.sequence_repository.create(
                 sequence=sequence,
                 analysis=result,
-                name=payload.name or "User DNA sequence",
+                name=payload.name or ("User protein sequence" if result.get("sequence_type") == "protein" else "User DNA sequence"),
                 source="user_input",
             )
             result["workspace_record"] = saved
         return ApiResponse(
             success=True,
-            message="Sequence analyzed locally without NCBI dependency",
+            message=msg,
             data=result,
             meta=MetaInfo(source="internal", cached=False, stale=False),
         )
@@ -303,13 +319,12 @@ class SequenceService:
             raise
 
     # Threshold for skipping expensive string outputs
-    _LARGE_SEQ_THRESHOLD = 50_000
-    _COMPLEMENT_MAP = str.maketrans({"A": "T", "T": "A", "G": "C", "C": "G", "N": "N"})
+    _LARGE_SEQ_THRESHOLD = 200_000
 
     def reverse_complement(self, sequence: str) -> str:
         sequence = self._normalize_sequence(sequence)
         validate_dna_sequence(sequence)
-        return sequence.translate(self._COMPLEMENT_MAP)[::-1]
+        return sequence.translate(_IUPAC_COMPLEMENT)[::-1]
 
     def transcribe(self, sequence: str) -> str:
         sequence = self._normalize_sequence(sequence)
@@ -320,7 +335,7 @@ class SequenceService:
 
     def _reverse_complement_fast(self, sequence: str) -> str:
         """Reverse complement without re-normalising (caller guarantees clean input)."""
-        return sequence.translate(self._COMPLEMENT_MAP)[::-1]
+        return sequence.translate(_IUPAC_COMPLEMENT)[::-1]
 
     def _transcribe_fast(self, sequence: str) -> str:
         """Transcribe without re-normalising (caller guarantees clean input)."""
@@ -397,31 +412,56 @@ class SequenceService:
         return results
 
     def _find_orfs(self, sequence: str, seq_length: int = 0) -> list[dict[str, Any]]:
+        """Find ORFs across all 6 reading frames (+1..+3, -1..-3).
+
+        Supports canonical ATG start as well as alternative start codons
+        GTG and TTG (NCBI Genetic Code Table 11 — Bacterial/Mitochondrial).
+        """
         stop_codons = {"TAA", "TAG", "TGA"}
+        start_codons = {"ATG", "GTG", "TTG"}
         # For large sequences, only look for ORFs with minimum length
         min_orf_length = 300 if seq_length > 10_000 else 0
-        max_orfs = 30 if seq_length > 10_000 else 50
-        orfs = []
-        for frame in range(3):
-            i = frame
-            while i <= len(sequence) - 3:
-                codon = sequence[i : i + 3]
-                if codon == "ATG":
-                    j = i + 3
-                    while j <= len(sequence) - 3:
-                        stop = sequence[j : j + 3]
-                        if stop in stop_codons:
-                            orf_len = j + 3 - i
-                            if orf_len >= min_orf_length:
-                                orfs.append({"frame": frame + 1, "start": i, "end": j + 3, "length": orf_len, "stop_codon": stop})
-                            break
-                        j += 3
-                    i = j
-                i += 3
+        max_orfs = 50 if seq_length > 10_000 else 100
+        orfs: list[dict[str, Any]] = []
+
+        # Build reverse complement for the minus strand
+        rev_comp = self._reverse_complement_fast(sequence)
+
+        for strand_label, strand_seq in [('+', sequence), ('-', rev_comp)]:
+            strand_len = len(strand_seq)
+            for frame_offset in range(3):
+                frame_num = frame_offset + 1 if strand_label == '+' else -(frame_offset + 1)
+                i = frame_offset
+                while i <= strand_len - 3:
+                    codon = strand_seq[i : i + 3]
+                    if codon in start_codons:
+                        j = i + 3
+                        while j <= strand_len - 3:
+                            stop = strand_seq[j : j + 3]
+                            if stop in stop_codons:
+                                orf_len = j + 3 - i
+                                if orf_len >= min_orf_length:
+                                    orfs.append({
+                                        "frame": frame_num,
+                                        "strand": strand_label,
+                                        "start": i,
+                                        "end": j + 3,
+                                        "length": orf_len,
+                                        "start_codon": codon,
+                                        "stop_codon": stop,
+                                    })
+                                break
+                            j += 3
+                        i = j
+                    i += 3
+                    if len(orfs) >= max_orfs:
+                        break
                 if len(orfs) >= max_orfs:
                     break
             if len(orfs) >= max_orfs:
                 break
+        # Sort by length descending (most biologically significant first)
+        orfs.sort(key=lambda x: x["length"], reverse=True)
         return orfs[:max_orfs]
 
     def _codon_frequency(self, sequence: str, seq_length: int = 0) -> list[dict[str, Any]]:
@@ -516,7 +556,15 @@ class SequenceService:
 
         try:
             if provider == "ebi":
-                job_id = await self.blast_client.ebi_submit(raw_seq, seq_type, database)
+                job_id = await self.blast_client.ebi_submit(
+                    raw_seq,
+                    seq_type,
+                    database,
+                    matrix=payload.matrix,
+                    exp=payload.evalue_cutoff,
+                    gapopen=payload.gap_open,
+                    gapextend=payload.gap_extend,
+                )
             else:  # uniprot
                 job_id = await self.blast_client.uniprot_submit(raw_seq)
         except httpx.HTTPStatusError as exc:

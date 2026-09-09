@@ -33,6 +33,14 @@ async def search_genes(
         pattern="^(local_first|local_only|external_refresh)$",
         description="local_first uses local cache/database before NCBI; local_only never calls NCBI; external_refresh refreshes from NCBI and saves locally.",
     ),
+    provider: str | None = Query(
+        default=None,
+        description="Preferred provider hint (auto, ncbi, ensembl, uniprot, bvbrc, phytozome). Currently advisory.",
+    ),
+    fallback: bool = Query(
+        default=True,
+        description="Whether to allow fallback to alternative providers when the primary is unavailable.",
+    ),
     db: Session = Depends(get_db),
 ):
     service = GeneService(db)

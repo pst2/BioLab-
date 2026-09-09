@@ -51,10 +51,27 @@ async def test_search_pubmed_extracts_authors_and_doi(monkeypatch):
             }
         }
 
+    async def fake_get_text(endpoint, params):
+        return """<?xml version="1.0"?>
+        <PubmedArticleSet>
+          <PubmedArticle>
+            <MedlineCitation>
+              <PMID>123</PMID>
+              <Article>
+                <Abstract>
+                  <AbstractText>Study of shrimp genome sequencing and annotation.</AbstractText>
+                </Abstract>
+              </Article>
+            </MedlineCitation>
+          </PubmedArticle>
+        </PubmedArticleSet>"""
+
     monkeypatch.setattr(client, "_get_json", fake_get_json)
+    monkeypatch.setattr(client, "_get_text", fake_get_text)
     result = await client.search_pubmed("shrimp genome")
     assert result[0]["authors"] == ["Nguyen A", "Tran B"]
     assert result[0]["doi"] == "10.1000/example"
+    assert result[0]["abstract"] == "Study of shrimp genome sequencing and annotation."
 
 
 @pytest.mark.asyncio

@@ -31,6 +31,22 @@ class SequenceSearchRequest(BaseModel):
         default=None,
         description="Override target database (EBI: uniprotkb_swissprot, uniprotkb, pdb, emrel; UniProt: UniProtKB)",
     )
+    evalue_cutoff: float | None = Field(
+        default=10.0,
+        description="Expectation value (E-value) threshold",
+    )
+    matrix: str | None = Field(
+        default="BLOSUM62",
+        description="Scoring matrix for protein alignments (BLOSUM62, BLOSUM45, PAM30, PAM70)",
+    )
+    gap_open: int | None = Field(
+        default=None,
+        description="Cost to open a gap (optional)",
+    )
+    gap_extend: int | None = Field(
+        default=None,
+        description="Cost to extend a gap (optional)",
+    )
 
 
 class BlastHit(BaseModel):
@@ -41,6 +57,15 @@ class BlastHit(BaseModel):
     query_coverage_percent: float
     alignment_length: int
     source: str  # 'ebi' | 'uniprot'
+    bit_score: float | None = None
+    gaps: int | None = None
+    query_seq: str | None = None
+    match_seq: str | None = None
+    subject_seq: str | None = None
+    query_from: int | None = None
+    query_to: int | None = None
+    hit_from: int | None = None
+    hit_to: int | None = None
 
 
 class SequenceSearchJob(BaseModel):

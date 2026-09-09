@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.clients.ncbi_client import NCBIClient
 from app.core.exceptions import ServiceUnavailableException
+from app.db.models import utc_now
 from app.repositories.cache_repository import CacheRepository
 from app.repositories.history_repository import HistoryRepository
 
@@ -310,6 +311,16 @@ class BaseSearchService:
                     "internal_percent": internal_share,
                     "ncbi_percent": ncbi_share,
                     "fallback_provider_percent": fallback_provider_share,
+                },
+                "provenance": {
+                    "source_provider": source,
+                    "is_synthetic": source == "local_mock",
+                    "retrieved_at": utc_now().isoformat(),
+                    "cached": cached,
+                    "stale": stale,
+                    "cached_at": cached_at,
+                    "expires_at": expires_at,
+                    "data_integrity": "verified" if source != "local_mock" else "synthetic_mock",
                 },
             },
         }

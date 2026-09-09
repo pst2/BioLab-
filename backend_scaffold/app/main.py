@@ -9,7 +9,7 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
-from app.api.routes import genes, pubmed, sequence, system
+from app.api.routes import export, genes, pubmed, sequence, system
 from app.core.config import settings
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import configure_logging
@@ -74,6 +74,7 @@ app.include_router(system.router, prefix=settings.API_V1_PREFIX, tags=["system"]
 app.include_router(genes.router, prefix=f"{settings.API_V1_PREFIX}/genes", tags=["genes"])
 app.include_router(pubmed.router, prefix=f"{settings.API_V1_PREFIX}/pubmed", tags=["pubmed"])
 app.include_router(sequence.router, prefix=f"{settings.API_V1_PREFIX}/sequence", tags=["sequence"])
+app.include_router(export.router, prefix=f"{settings.API_V1_PREFIX}/export", tags=["export"])
 
 
 @app.get("/")
