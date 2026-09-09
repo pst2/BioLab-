@@ -11,7 +11,7 @@ function asGeneId(gene: GeneResult) {
   return String(gene.gene_id ?? gene.external_id ?? gene.id ?? gene.symbol ?? "");
 }
 
-function safe(value: unknown, fallback = "Unknown") {
+function safe(value: unknown, fallback = "—") {
   if (value === null || value === undefined || value === "") return fallback;
   return String(value);
 }

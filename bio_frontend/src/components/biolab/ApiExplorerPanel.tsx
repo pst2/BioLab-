@@ -26,7 +26,7 @@ export function ApiExplorerPanel({ t }: { t: Translate }) {
     } catch (error) {
       setApiResponse(
         JSON.stringify(
-          { error: error instanceof Error ? error.message : "Request failed" },
+          { error: error instanceof Error ? error.message : t("api.requestFailed") },
           null,
           2
         )
@@ -61,7 +61,7 @@ export function ApiExplorerPanel({ t }: { t: Translate }) {
               value={pubmedQuery}
               onChange={(e) => setPubmedQuery(e.target.value)}
               className="bg-transparent px-3 py-2 text-xs text-slate-900 dark:text-slate-100 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
-              placeholder="PubMed query…"
+              placeholder={t("api.pubmedPlaceholder")}
             />
             <button
               onClick={() => runApiPlayground("pubmed")}
@@ -75,7 +75,7 @@ export function ApiExplorerPanel({ t }: { t: Translate }) {
 
       <div className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-6 shadow-sm">
         <h3 className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-          Response JSON
+          {t("api.responseJson")}
         </h3>
         <pre className="mt-3 min-h-48 overflow-x-auto rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 p-4 font-mono text-xs leading-5 text-slate-800 dark:text-slate-200 custom-scrollbar">
           {apiLoading ? t("api.loading") : apiResponse || t("api.empty")}

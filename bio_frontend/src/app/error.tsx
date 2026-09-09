@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 export default function ErrorBoundary({
   error,
@@ -10,6 +11,8 @@ export default function ErrorBoundary({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const { t } = useLanguage();
+
   useEffect(() => {
     console.error("Route error boundary caught an error:", error);
   }, [error]);
@@ -21,10 +24,10 @@ export default function ErrorBoundary({
       </div>
 
       <h2 className="mt-5 text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-        Something went wrong
+        {t("error.somethingWrong")}
       </h2>
       <p className="mt-2 max-w-md text-sm text-slate-500 dark:text-slate-400">
-        {error.message || "An unexpected error occurred in the BioLab application."}
+        {error.message || t("error.description")}
       </p>
 
       <button
@@ -32,7 +35,7 @@ export default function ErrorBoundary({
         className="mt-6 inline-flex items-center gap-2 rounded-xl bg-slate-900 dark:bg-cyan-500 px-5 py-2.5 text-xs font-semibold text-white dark:text-slate-950 shadow-sm transition hover:bg-slate-700 dark:hover:bg-cyan-400"
       >
         <RefreshCw className="h-4 w-4" />
-        Try again
+        {t("error.tryAgain")}
       </button>
     </div>
   );

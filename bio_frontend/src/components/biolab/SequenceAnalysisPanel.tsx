@@ -33,7 +33,7 @@ export function SequenceAnalysisPanel({ t }: { t: Translate }) {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [expandedHit, setExpandedHit] = useState<string | null>(null);
   const analysis = useSequenceAnalysis(t);
-  const blast = useBlastSearch();
+  const blast = useBlastSearch(t);
 
   const sequenceCounts: CountMap = analysis.result?.base_counts || {};
 
@@ -118,8 +118,8 @@ export function SequenceAnalysisPanel({ t }: { t: Translate }) {
                     {t("sequence.copyReverse")}
                   </button>
                 </div>
-                <Output label={t("sequence.reverse")} value={analysis.result.reverse_complement} />
-                <Output label={t("sequence.rna")} value={analysis.result.rna_sequence} />
+                <Output label={t("sequence.reverse")} value={analysis.result.reverse_complement} t={t} />
+                <Output label={t("sequence.rna")} value={analysis.result.rna_sequence} t={t} />
               </div>
             ) : (
               <EmptyState title={t("sequence.emptyTitle")} message={t("sequence.emptyMessage")} />
@@ -195,14 +195,14 @@ export function SequenceAnalysisPanel({ t }: { t: Translate }) {
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:underline"
               >
                 <Sliders className="h-3 w-3" />
-                <span>{showAdvanced ? "Hide Advanced BLAST Parameters" : "Advanced BLAST Parameters (Matrix, E-value, Gaps)"}</span>
+                <span>{showAdvanced ? t("blast.advancedHide") : t("blast.advancedShow")}</span>
                 {showAdvanced ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
               </button>
 
               {showAdvanced && (
                 <div className="mt-2.5 grid grid-cols-2 sm:grid-cols-4 gap-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 p-3 text-xs">
                   <label className="space-y-1">
-                    <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">E-value Cutoff</span>
+                    <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">{t("blast.evalueCutoff")}</span>
                     <input
                       type="number"
                       step="any"
@@ -214,7 +214,7 @@ export function SequenceAnalysisPanel({ t }: { t: Translate }) {
                   </label>
 
                   <label className="space-y-1">
-                    <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">Scoring Matrix</span>
+                    <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">{t("blast.scoringMatrix")}</span>
                     <select
                       value={blast.matrix}
                       onChange={(e) => blast.setMatrix(e.target.value)}
@@ -229,24 +229,24 @@ export function SequenceAnalysisPanel({ t }: { t: Translate }) {
                   </label>
 
                   <label className="space-y-1">
-                    <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">Gap Open</span>
+                    <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">{t("blast.gapOpen")}</span>
                     <input
                       type="number"
                       value={blast.gapOpen ?? ""}
                       onChange={(e) => blast.setGapOpen(e.target.value ? Number(e.target.value) : undefined)}
                       className="w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono"
-                      placeholder="Default"
+                      placeholder={t("common.default")}
                     />
                   </label>
 
                   <label className="space-y-1">
-                    <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">Gap Extend</span>
+                    <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">{t("blast.gapExtend")}</span>
                     <input
                       type="number"
                       value={blast.gapExtend ?? ""}
                       onChange={(e) => blast.setGapExtend(e.target.value ? Number(e.target.value) : undefined)}
                       className="w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono"
-                      placeholder="Default"
+                      placeholder={t("common.default")}
                     />
                   </label>
                 </div>
@@ -427,13 +427,13 @@ export function SequenceAnalysisPanel({ t }: { t: Translate }) {
                     <div className="mt-3 flex items-center justify-between border-t border-slate-100 dark:border-slate-800/80 pt-2.5">
                       <div className="flex items-center gap-3 text-[11px] text-slate-400">
                         {hit.bit_score !== undefined && hit.bit_score > 0 && (
-                          <span>Score: <strong className="text-slate-700 dark:text-slate-300">{hit.bit_score} bits</strong></span>
+                          <span>{t("blast.score")}: <strong className="text-slate-700 dark:text-slate-300">{hit.bit_score} bits</strong></span>
                         )}
                         {hit.gaps !== undefined && (
-                          <span>Gaps: <strong className="text-slate-700 dark:text-slate-300">{hit.gaps}</strong></span>
+                          <span>{t("blast.gaps")}: <strong className="text-slate-700 dark:text-slate-300">{hit.gaps}</strong></span>
                         )}
                         {hit.alignment_length > 0 && (
-                          <span>Length: <strong className="text-slate-700 dark:text-slate-300">{hit.alignment_length} bp/aa</strong></span>
+                          <span>{t("blast.length")}: <strong className="text-slate-700 dark:text-slate-300">{hit.alignment_length} bp/aa</strong></span>
                         )}
                       </div>
                       <button
@@ -441,7 +441,7 @@ export function SequenceAnalysisPanel({ t }: { t: Translate }) {
                         onClick={() => setExpandedHit(expandedHit === `${hit.accession}-${idx}` ? null : `${hit.accession}-${idx}`)}
                         className="inline-flex items-center gap-1 text-[11px] font-semibold text-cyan-600 dark:text-cyan-400 hover:underline"
                       >
-                        {expandedHit === `${hit.accession}-${idx}` ? "Hide Alignment" : "View Alignment"}
+                        {expandedHit === `${hit.accession}-${idx}` ? t("blast.hideAlignment") : t("blast.viewAlignment")}
                         {expandedHit === `${hit.accession}-${idx}` ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
                       </button>
                     </div>
@@ -450,8 +450,8 @@ export function SequenceAnalysisPanel({ t }: { t: Translate }) {
                     {expandedHit === `${hit.accession}-${idx}` && (
                       <div className="mt-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-950 p-3.5 font-mono text-xs text-slate-200 overflow-x-auto custom-scrollbar animate-fadeIn">
                         <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-[10px] text-slate-400">
-                          <span>Pairwise Alignment (Query vs Subject)</span>
-                          <span>Coordinates: Query [{hit.query_from || 1}..{hit.query_to || hit.alignment_length}] | Subject [{hit.hit_from || 1}..{hit.hit_to || hit.alignment_length}]</span>
+                          <span>{t("blast.pairwiseHeader")}</span>
+                          <span>{t("blast.coordinates")}: Query [{hit.query_from || 1}..{hit.query_to || hit.alignment_length}] | Subject [{hit.hit_from || 1}..{hit.hit_to || hit.alignment_length}]</span>
                         </div>
                         {hit.query_seq && hit.subject_seq ? (
                           <div className="space-y-1 leading-relaxed whitespace-pre font-mono text-[11px]">
@@ -472,7 +472,11 @@ export function SequenceAnalysisPanel({ t }: { t: Translate }) {
                           </div>
                         ) : (
                           <div className="py-2 text-center text-slate-400 text-xs">
-                            Full segment pair sequence is summarized via {hit.source.toUpperCase()}. Length: {hit.alignment_length} residues, Identity: {hit.identity_percent}%, E-value: {hit.e_value}.
+                            {t("blast.segmentSummary")
+                              .replace("{source}", hit.source.toUpperCase())
+                              .replace("{length}", String(hit.alignment_length))
+                              .replace("{identity}", String(hit.identity_percent))
+                              .replace("{evalue}", String(hit.e_value))}
                           </div>
                         )}
                       </div>
@@ -488,14 +492,14 @@ export function SequenceAnalysisPanel({ t }: { t: Translate }) {
   );
 }
 
-function Output({ label, value }: { label: string; value?: string }) {
+function Output({ label, value, t }: { label: string; value?: string; t?: Translate }) {
   return (
     <div className="mt-3">
       <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">
         {label}
       </span>
       <div className="mt-1 overflow-x-auto rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 p-3 font-mono text-xs text-slate-800 dark:text-slate-200 custom-scrollbar">
-        {value || "None"}
+        {value || (t ? t("common.none") : "—")}
       </div>
     </div>
   );

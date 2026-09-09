@@ -490,7 +490,7 @@ function GeneHero({ gene, geneId, external, loading, usingBrowserCache }: { gene
                     className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-slate-300 hover:bg-cyan-500/20 hover:text-cyan-300 transition"
                   >
                     <FileText className="h-3.5 w-3.5 text-cyan-400" />
-                    <span>Download .FASTA</span>
+                    <span>{t("export.downloadFasta")}</span>
                   </a>
                   <a
                     href={`/api/v1/export/gene/${geneId}/genbank`}
@@ -498,7 +498,7 @@ function GeneHero({ gene, geneId, external, loading, usingBrowserCache }: { gene
                     className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-slate-300 hover:bg-emerald-500/20 hover:text-emerald-300 transition"
                   >
                     <Database className="h-3.5 w-3.5 text-emerald-400" />
-                    <span>Download .GenBank (.gb)</span>
+                    <span>{t("export.downloadGenbank")}</span>
                   </a>
                   <a
                     href={`/api/v1/export/gene/${geneId}/bed`}
@@ -506,7 +506,7 @@ function GeneHero({ gene, geneId, external, loading, usingBrowserCache }: { gene
                     className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-slate-300 hover:bg-amber-500/20 hover:text-amber-300 transition"
                   >
                     <BarChart3 className="h-3.5 w-3.5 text-amber-400" />
-                    <span>Download .BED Exons</span>
+                    <span>{t("export.downloadBed")}</span>
                   </a>
                   <a
                     href={`/api/v1/export/gene/${geneId}/json`}
@@ -514,7 +514,7 @@ function GeneHero({ gene, geneId, external, loading, usingBrowserCache }: { gene
                     className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-slate-300 hover:bg-indigo-500/20 hover:text-indigo-300 transition"
                   >
                     <Download className="h-3.5 w-3.5 text-indigo-400" />
-                    <span>Download .JSON Metadata</span>
+                    <span>{t("export.downloadJson")}</span>
                   </a>
                   <div className="my-1 border-t border-slate-800" />
                   <button
@@ -526,7 +526,7 @@ function GeneHero({ gene, geneId, external, loading, usingBrowserCache }: { gene
                     className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-slate-400 hover:bg-white/10 hover:text-white transition"
                   >
                     <Copy className="h-3.5 w-3.5" />
-                    <span>Copy JSON to Clipboard</span>
+                    <span>{t("export.copyJson")}</span>
                   </button>
                 </div>
               )}
@@ -549,11 +549,11 @@ function GeneHero({ gene, geneId, external, loading, usingBrowserCache }: { gene
         <div className="shrink-0 rounded-lg p-5 md:w-56" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
           <p className="mb-3.5 text-[10px] font-medium uppercase tracking-[0.1em] text-slate-500">{t("detail.geneOverview")}</p>
           <div className="space-y-3">
-            <OverviewRow label="Organism" value={gene.organism || "—"} icon={Globe} />
-            {seqLen > 0 && <OverviewRow label="Length" value={`${seqLen.toLocaleString()} ${gene.data_type?.includes("protein") ? "aa" : "bp"}`} icon={FileText} />}
-            {gcVal > 0 && <OverviewRow label="GC Content" value={`${gcVal.toFixed(1)}%`} icon={BarChart3} />}
-            <OverviewRow label="Provider" value={gene.source || gene.database || "Unknown"} icon={Database} />
-            <OverviewRow label="Confidence" value={usingBrowserCache ? "Cached" : "High"} icon={ShieldCheck} highlight={!usingBrowserCache} />
+            <OverviewRow label={t("detail.organism")} value={gene.organism || "—"} icon={Globe} />
+            {seqLen > 0 && <OverviewRow label={t("detail.length")} value={`${seqLen.toLocaleString()} ${gene.data_type?.includes("protein") ? "aa" : "bp"}`} icon={FileText} />}
+            {gcVal > 0 && <OverviewRow label={t("detail.gcContent")} value={`${gcVal.toFixed(1)}%`} icon={BarChart3} />}
+            <OverviewRow label={t("search.provider")} value={gene.source || gene.database || t("common.unknown")} icon={Database} />
+            <OverviewRow label={t("detail.confidence")} value={usingBrowserCache ? t("detail.cached") : t("detail.confidenceHigh")} icon={ShieldCheck} highlight={!usingBrowserCache} />
           </div>
         </div>
       </div>
@@ -777,7 +777,7 @@ function AminoAcidCompositionPanel({ gene }: { gene: GeneDetail }) {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                 <span className="font-mono text-xs font-bold text-slate-800 dark:text-slate-200">{formatNumber(total)}</span>
-                <span className="text-[9px] uppercase tracking-wider text-slate-400">Residues</span>
+                <span className="text-[9px] uppercase tracking-wider text-slate-400">{t("detail.residues")}</span>
               </div>
             </div>
 
@@ -834,7 +834,7 @@ function AminoAcidCompositionPanel({ gene }: { gene: GeneDetail }) {
               onClick={() => setShowAll(!showAll)}
               className="mt-2 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 py-2 text-center text-xs font-semibold text-slate-600 dark:text-slate-400 transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200"
             >
-              {showAll ? t("toast.showLess") : `${t("toast.showAll")} (${allAminoAcids.length - 10} more)`}
+              {showAll ? t("toast.showLess") : `${t("toast.showAll")} (${allAminoAcids.length - 10} ${t("common.more")})`}
             </button>
           )}
         </div>
@@ -929,7 +929,7 @@ function GcDonut({ gene }: { gene: GeneDetail }) {
           <div>
             <p className="text-sm font-semibold text-slate-400 dark:text-slate-500">N/A</p>
             <p className="mt-1 text-[11px] text-slate-400 dark:text-slate-500 max-w-[160px]">
-              Quá lớn để tính GC content tự động ({formatNumber(totalLength)} bp)
+              {t("detail.tooLargeForGc").replace("{length}", formatNumber(totalLength))}
             </p>
           </div>
         </div>
@@ -997,9 +997,9 @@ function CompositionPanel({ gene }: { gene: GeneDetail }) {
         </div>
         {isLargeRecord ? (
           <div className="my-4 rounded-lg border border-cyan-100 dark:border-cyan-900/40 bg-cyan-50/50 dark:bg-cyan-950/20 p-4 text-xs leading-5 text-cyan-800 dark:text-cyan-300">
-            <p className="font-semibold">Trình tự quy mô lớn ({formatNumber(totalLength)} bp)</p>
+            <p className="font-semibold">{t("detail.largeScaleTitle").replace("{length}", formatNumber(totalLength))}</p>
             <p className="mt-1 text-slate-600 dark:text-slate-400">
-              Đếm bazơ chi tiết được bỏ qua cho các bản ghi nhiễm sắc thể/scaffold lớn. Bạn có thể duyệt và xem trực quan toàn bộ trình tự trong <strong>Genome Browser</strong> bên dưới.
+              {t("detail.largeScaleDesc")}
             </p>
           </div>
         ) : (
@@ -1159,7 +1159,7 @@ function SequencePanel({ gene, kind, wrapSequence, setWrapSequence, copied, onCo
             <div className="fasta-row">
               <span className="fasta-lineno">…</span>
               <span className="fasta-sequence" style={{ color: "#6e7681", fontStyle: "italic" }}>
-                {(totalLen - totalShown).toLocaleString()} more characters (copy to get full sequence)
+                {t("detail.moreCharacters").replace("{count}", (totalLen - totalShown).toLocaleString())}
               </span>
             </div>
           )}
@@ -1176,7 +1176,12 @@ function SequencePanel({ gene, kind, wrapSequence, setWrapSequence, copied, onCo
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 px-5 py-2.5 text-xs text-slate-400 dark:text-slate-500">
         <div className="flex items-center gap-4">
           {chunks.length > 0 && totalLen > 0 && (
-            <span className="tabular-nums">Showing 1–{totalShown.toLocaleString()} of <span className="font-mono text-slate-600 dark:text-slate-300">{totalLen.toLocaleString()}</span> {resolvedKind === "protein" ? "aa" : "bp"}</span>
+            <span className="tabular-nums">
+              {t("detail.showingOf")
+                .replace("{shown}", totalShown.toLocaleString())
+                .replace("{total}", totalLen.toLocaleString())
+                .replace("{unit}", resolvedKind === "protein" ? "aa" : "bp")}
+            </span>
           )}
           {chunks.length > 0 && (
             <span className="flex items-center gap-1.5">

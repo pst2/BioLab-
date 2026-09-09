@@ -162,7 +162,8 @@ export function Sidebar({
             <button
               onClick={() => setCollapsed(!collapsed)}
               className="hidden lg:flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
-              title="Toggle sidebar width"
+              title={t("sidebar.toggleCollapse")}
+              aria-label={t("sidebar.toggleCollapse")}
             >
               {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
             </button>

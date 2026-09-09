@@ -4,7 +4,9 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { api, BlastHit } from "@/lib/api";
 import { useToast } from "@/lib/Toast";
 
-export function useBlastSearch() {
+import { Translate } from "@/lib/i18n";
+
+export function useBlastSearch(t?: Translate) {
   const [seq, setSeq] = useState("");
   const [provider, setProvider] = useState<"auto" | "ebi" | "uniprot">("auto");
   const [seqType, setSeqType] = useState<"auto" | "dna" | "protein">("auto");
@@ -48,7 +50,7 @@ export function useBlastSearch() {
       pollCount.current += 1;
       if (pollCount.current > MAX_POLLS) {
         setStatus("ERROR");
-        setError("BLAST search timed out. Please try again or select a local provider.");
+        setError(t ? t("toast.blastTimedOut") : "BLAST search timed out. Please try again or select a local provider.");
         setLoading(false);
         clearInterval(intervalId);
         return;
@@ -62,9 +64,12 @@ export function useBlastSearch() {
             const hitResults = job.hits || [];
             setHits(hitResults);
             setLoading(false);
-            toast.success(`BLAST search complete — ${hitResults.length} alignments found`);
+            const successMsg = t
+              ? t("toast.blastComplete").replace("{count}", String(hitResults.length))
+              : `BLAST search complete — ${hitResults.length} alignments found`;
+            toast.success(successMsg);
           } else if (job.status === "ERROR" || job.status === "NOT_FOUND") {
-            setError(job.error || res.message || "BLAST search failed.");
+            setError(job.error || res.message || (t ? t("blast.failed") : "BLAST search failed."));
             setLoading(false);
           }
         }
@@ -74,7 +79,7 @@ export function useBlastSearch() {
     }, 2000);
 
     return () => clearInterval(intervalId);
-  }, [jobId, status, toast]);
+  }, [jobId, status, toast, t]);
 
   async function submitJob(event?: FormEvent) {
     event?.preventDefault();
@@ -100,9 +105,12 @@ export function useBlastSearch() {
       const job = response.data;
       setJobId(job.job_id);
       setStatus(job.status || "RUNNING");
-      toast.info(`BLAST job submitted: ${job.job_id}`);
+      const submittedMsg = t
+        ? t("toast.blastSubmitted").replace("{jobId}", job.job_id)
+        : `BLAST job submitted: ${job.job_id}`;
+      toast.info(submittedMsg);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to submit BLAST job";
+      const msg = err instanceof Error ? err.message : (t ? t("blast.failed") : "Failed to submit BLAST job");
       setError(msg);
       setStatus("ERROR");
       setLoading(false);

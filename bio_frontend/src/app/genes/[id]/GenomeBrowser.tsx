@@ -21,6 +21,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AlertCircle, Dna, Globe, Loader2, MapPin } from "lucide-react";
 import type { GeneDetail } from "@/lib/api";
+import { useLanguage } from "@/lib/i18n";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -102,27 +103,29 @@ function buildRelativeLocus(
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function BrowserSkeleton() {
+  const { t } = useLanguage();
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-12 text-slate-400 dark:text-slate-500">
       <Loader2 className="h-7 w-7 animate-spin text-cyan-500" />
-      <p className="text-sm font-medium">Initialising IGV Genome Browser…</p>
+      <p className="text-sm font-medium">{t("browser.loading")}</p>
       <p className="text-xs text-slate-400 dark:text-slate-500">
-        Fetching sequence from NCBI — this may take a few seconds.
+        {t("browser.loadingSub")}
       </p>
     </div>
   );
 }
 
 function UnsupportedPlaceholder({ gene }: { gene: GeneDetail }) {
+  const { t } = useLanguage();
   return (
     <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 py-10 px-6 text-center">
       <Globe className="h-8 w-8 text-slate-300 dark:text-slate-600" />
       <div>
         <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">
-          Genome Browser Unavailable
+          {t("browser.unavailable")}
         </p>
         <p className="mt-1 max-w-sm text-xs leading-5 text-slate-400 dark:text-slate-500">
-          No valid sequence accession or ID available for this record.
+          {t("browser.unavailableSub")}
         </p>
         {gene.ncbi_url && (
           <a
@@ -131,7 +134,7 @@ function UnsupportedPlaceholder({ gene }: { gene: GeneDetail }) {
             rel="noopener noreferrer"
             className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
           >
-            View on NCBI
+            {t("browser.viewOnNcbi")}
             <Globe className="h-3 w-3" />
           </a>
         )}
@@ -141,6 +144,7 @@ function UnsupportedPlaceholder({ gene }: { gene: GeneDetail }) {
 }
 
 function BrowserError({ message, onRetry, gene }: { message: string; onRetry: () => void; gene?: GeneDetail }) {
+  const { t } = useLanguage();
   const isRateLimit = /rate.?limit|429|abuse|misuse|temporarily blocking/i.test(message);
   const ncbiUrl = gene?.ncbi_url || (gene?.gene_id ? `https://www.ncbi.nlm.nih.gov/gene/${gene.gene_id}` : undefined);
 
@@ -153,13 +157,12 @@ function BrowserError({ message, onRetry, gene }: { message: string; onRetry: ()
       <AlertCircle className={`mt-0.5 h-4 w-4 shrink-0 ${isRateLimit ? "text-amber-500" : "text-red-500"}`} />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold">
-          {isRateLimit ? "NCBI Rate Limit Reached" : "Genome Browser Error"}
+          {isRateLimit ? t("browser.rateLimit") : t("browser.error")}
         </p>
         {isRateLimit ? (
           <>
             <p className="mt-1 text-xs leading-5">
-              NCBI is temporarily blocking requests from this server. This usually resolves within a few minutes.
-              You can still view the sequence directly on NCBI.
+              {t("browser.rateLimitSub")}
             </p>
             {ncbiUrl && (
               <a
@@ -169,7 +172,7 @@ function BrowserError({ message, onRetry, gene }: { message: string; onRetry: ()
                 className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
               >
                 <Globe className="h-3 w-3" />
-                View on NCBI
+                {t("browser.viewOnNcbi")}
               </a>
             )}
           </>
@@ -184,7 +187,7 @@ function BrowserError({ message, onRetry, gene }: { message: string; onRetry: ()
               : "border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-slate-700"
           }`}
         >
-          Try again
+          {t("browser.tryAgain")}
         </button>
       </div>
     </div>
@@ -413,11 +416,12 @@ export function GenomeBrowser({ gene }: GenomeBrowserProps) {
 // ── Small helpers ─────────────────────────────────────────────────────────────
 
 function SectionHeader({ children }: { children?: React.ReactNode }) {
+  const { t } = useLanguage();
   return (
     <div className="flex flex-wrap items-center justify-between gap-2">
       <h3 className="flex items-center gap-1.5 text-sm font-semibold text-slate-900 dark:text-slate-100">
         <Dna className="h-4 w-4 text-cyan-500" />
-        Genome Browser
+        {t("browser.title")}
       </h3>
       {children}
     </div>

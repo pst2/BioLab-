@@ -85,7 +85,7 @@ export function useGeneSearch(t: Translate) {
       });
       const results = response.data || [];
       setGenes(results);
-      const msg = response.message || `Found ${results.length} matching records.`;
+      const msg = response.message || t("search.foundRecords").replace("{count}", String(results.length));
       setMessage(msg);
       if (results.length > 0) {
         toast.success(`${t("toast.searchSuccess")}: ${results.length}`);
@@ -93,7 +93,7 @@ export function useGeneSearch(t: Translate) {
         toast.info(t("toast.searchEmpty"));
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Search failed";
+      const msg = err instanceof Error ? err.message : t("search.failed");
       setError(msg);
       toast.error(msg);
     } finally {

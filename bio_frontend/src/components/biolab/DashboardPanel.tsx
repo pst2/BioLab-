@@ -150,7 +150,7 @@ export function DashboardPanel({
     loading
       ? null
       : stats?.providers_active !== null && stats?.providers_active !== undefined
-      ? `${stats.providers_active} ${lang === "vi" ? "Nhà cung cấp" : "Active"}`
+      ? `${stats.providers_active} ${t("metric.providersActiveUnit")}`
       : "—",
     loading
       ? null
@@ -315,7 +315,7 @@ export function DashboardPanel({
               </div>
             </div>
             <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-cyan-600 dark:text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity">
-              Open <ArrowRight className="h-3 w-3" />
+              {t("dashboard.openFeature")} <ArrowRight className="h-3 w-3" />
             </span>
           </button>
         ))}

@@ -2,6 +2,7 @@
 
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { AlertCircle, Home, RefreshCw } from "lucide-react";
+import { useLanguage } from "./i18n";
 
 interface Props {
   children: ReactNode;
@@ -40,37 +41,54 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback;
-
       return (
-        <div className="error-boundary-container">
-          <div className="error-boundary-card">
-            <div className="error-boundary-icon-ring">
-              <AlertCircle className="h-8 w-8 text-red-500" />
-            </div>
-            <h2 className="error-boundary-title">Đã xảy ra lỗi</h2>
-            <p className="error-boundary-subtitle">
-              Ứng dụng gặp sự cố không mong muốn. Vui lòng thử lại hoặc quay về trang chủ.
-            </p>
-            {this.state.error && (
-              <pre className="error-boundary-detail">
-                {this.state.error.message}
-              </pre>
-            )}
-            <div className="error-boundary-actions">
-              <button onClick={this.handleRetry} className="error-boundary-btn-primary">
-                <RefreshCw className="h-4 w-4" />
-                Thử lại
-              </button>
-              <button onClick={this.handleGoHome} className="error-boundary-btn-secondary">
-                <Home className="h-4 w-4" />
-                Trang chủ
-              </button>
-            </div>
-          </div>
-        </div>
+        <ErrorFallbackView
+          error={this.state.error}
+          onRetry={this.handleRetry}
+          onGoHome={this.handleGoHome}
+        />
       );
     }
 
     return this.props.children;
   }
+}
+
+function ErrorFallbackView({
+  error,
+  onRetry,
+  onGoHome,
+}: {
+  error: Error | null;
+  onRetry: () => void;
+  onGoHome: () => void;
+}) {
+  const { t } = useLanguage();
+
+  return (
+    <div className="error-boundary-container">
+      <div className="error-boundary-card">
+        <div className="error-boundary-icon-ring">
+          <AlertCircle className="h-8 w-8 text-red-500" />
+        </div>
+        <h2 className="error-boundary-title">{t("error.somethingWrong")}</h2>
+        <p className="error-boundary-subtitle">{t("error.description")}</p>
+        {error && (
+          <pre className="error-boundary-detail">
+            {error.message}
+          </pre>
+        )}
+        <div className="error-boundary-actions">
+          <button onClick={onRetry} className="error-boundary-btn-primary">
+            <RefreshCw className="h-4 w-4" />
+            {t("error.tryAgain")}
+          </button>
+          <button onClick={onGoHome} className="error-boundary-btn-secondary">
+            <Home className="h-4 w-4" />
+            {t("error.home")}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
