@@ -86,33 +86,39 @@ class SequenceService:
         clean_acc = acc.split(".")[0]
 
         # 1. SequenceRecord lookup
-        if self.sequence_repository:
-            seq_rec = (
-                self.db.query(SequenceRecord)
+        try:
+            if self.sequence_repository:
+                seq_rec = (
+                    self.db.query(SequenceRecord)
+                    .filter(
+                        (SequenceRecord.name.ilike(acc))
+                        | (SequenceRecord.name.ilike(clean_acc))
+                    )
+                    .first()
+                )
+                if seq_rec and seq_rec.sequence:
+                    return seq_rec.sequence
+        except Exception as exc:
+            logger.warning("Local SequenceRecord lookup failed for %s: %s", accession, exc)
+
+        # 2. GeneRecord direct fields (symbol, ncbi_gene_id)
+        try:
+            gene_rec = (
+                self.db.query(GeneRecord)
                 .filter(
-                    (SequenceRecord.name.ilike(acc))
-                    | (SequenceRecord.name.ilike(clean_acc))
+                    (GeneRecord.symbol.ilike(acc))
+                    | (GeneRecord.symbol.ilike(clean_acc))
+                    | (GeneRecord.ncbi_gene_id == acc)
+                    | (GeneRecord.ncbi_gene_id == clean_acc)
                 )
                 .first()
             )
-            if seq_rec and seq_rec.sequence:
-                return seq_rec.sequence
-
-        # 2. GeneRecord direct fields (symbol, ncbi_gene_id)
-        gene_rec = (
-            self.db.query(GeneRecord)
-            .filter(
-                (GeneRecord.symbol.ilike(acc))
-                | (GeneRecord.symbol.ilike(clean_acc))
-                | (GeneRecord.ncbi_gene_id == acc)
-                | (GeneRecord.ncbi_gene_id == clean_acc)
-            )
-            .first()
-        )
-        if gene_rec and gene_rec.payload and isinstance(gene_rec.payload, dict):
-            seq = gene_rec.payload.get("sequence")
-            if seq and isinstance(seq, str) and len(seq.strip()) > 0:
-                return seq.strip()
+            if gene_rec and gene_rec.payload and isinstance(gene_rec.payload, dict):
+                seq = gene_rec.payload.get("sequence")
+                if seq and isinstance(seq, str) and len(seq.strip()) > 0:
+                    return seq.strip()
+        except Exception as exc:
+            logger.warning("Local GeneRecord lookup failed for %s: %s", accession, exc)
 
         # 3. GeneRecord payload search (genomic_accession, caption, accession inside JSON)
         try:

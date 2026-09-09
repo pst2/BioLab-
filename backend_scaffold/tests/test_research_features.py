@@ -203,6 +203,25 @@ def test_db_models_fair_provenance_columns(db_session, sample_gene):
     assert record["accession_version"] == "NC_000017.11"
 
 
+def test_sequence_record_provenance_columns(db_session):
+    from app.db.models import SequenceRecord
+    seq = SequenceRecord(
+        name="test_seq",
+        sequence="ATGC",
+        sequence_length=4,
+        gc_content_percent=50.0,
+        at_content_percent=50.0,
+        taxid=9606,
+        accession_version="NC_000017.11",
+    )
+    db_session.add(seq)
+    db_session.commit()
+    db_session.refresh(seq)
+    assert seq.taxid == 9606
+    assert seq.accession_version == "NC_000017.11"
+
+
+
 @pytest.mark.asyncio
 async def test_search_service_provenance_metadata(db_session, sample_gene):
     service = GeneService(db_session)
