@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   Activity,
   BarChart3,
+  BookOpen,
   ChevronLeft,
   ChevronRight,
   Database,
@@ -19,7 +20,7 @@ import {
 } from "lucide-react";
 import { LanguageToggle, ThemeToggle, Translate } from "@/lib/i18n";
 
-type ActiveTab = "dashboard" | "search" | "sequence" | "api" | "settings";
+type ActiveTab = "dashboard" | "search" | "sequence" | "pubmed" | "api" | "settings";
 type StatusState = "idle" | "checking" | "online" | "offline";
 
 interface SidebarProps {
@@ -117,6 +118,13 @@ export function Sidebar({
             active={activeTab === "sequence"}
             collapsed={collapsed}
             onClick={() => setActiveTab("sequence")}
+          />
+          <NavItem
+            icon={BookOpen}
+            label={t("tab.pubmed")}
+            active={activeTab === "pubmed"}
+            collapsed={collapsed}
+            onClick={() => setActiveTab("pubmed")}
           />
           <NavItem
             icon={Terminal}

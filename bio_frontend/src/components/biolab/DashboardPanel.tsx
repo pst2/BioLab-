@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   BarChart3,
+  BookOpen,
   Database,
   Dna,
   FlaskConical,
@@ -19,7 +20,7 @@ import { Translate, useLanguage } from "@/lib/i18n";
 import { SearchMode } from "@/hooks/useGeneSearch";
 import { useSystemStats } from "@/hooks/useSystemStats";
 
-type ActiveTab = "dashboard" | "search" | "sequence" | "api" | "settings";
+type ActiveTab = "dashboard" | "search" | "sequence" | "pubmed" | "api" | "settings";
 
 const sampleGenes = ["BRCA1", "TP53", "EGFR", "NM_007294", "P53_HUMAN", "APOE"];
 
@@ -115,6 +116,12 @@ const FEATURES: FeatureCard[] = [
     titleKey: "feature.visualization.title",
     textKey: "feature.visualization.text",
     tab: "sequence",
+  },
+  {
+    icon: BookOpen,
+    titleKey: "feature.pubmed.title",
+    textKey: "feature.pubmed.text",
+    tab: "pubmed",
   },
   {
     icon: TrendingUp,
@@ -294,7 +301,7 @@ export function DashboardPanel({
       </div>
 
       {/* ── Capabilities Feature Grid ──────────────────────────────────── */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {FEATURES.map((feature) => (
           <button
             key={feature.titleKey}

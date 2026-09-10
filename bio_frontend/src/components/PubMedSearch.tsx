@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { api, ApiResponse, PubMedResult } from "@/lib/api";
 import { Badge, BarChart, Button, Card, EmptyState, ErrorBox, MetaBadge, SearchInput, Spinner, StatCard } from "./ui";
+import { useLanguage } from "@/lib/i18n";
 
 function extractYear(pubdate: string) {
   const match = pubdate?.match(/\b(19|20)\d{2}\b/);
@@ -44,6 +45,7 @@ function buildRisUrl(article: PubMedResult): string {
 }
 
 export default function PubMedSearch() {
+  const { t } = useLanguage();
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ApiResponse<PubMedResult[]> | null>(null);
@@ -85,19 +87,19 @@ export default function PubMedSearch() {
     <Card>
       <div className="card-header">
         <div>
-          <h2 className="card-title">PubMed Search</h2>
+          <h2 className="card-title">{t("pubmed.title")}</h2>
           <p className="card-description">
-            Search biomedical literature with full abstracts, MeSH terms, and citation export.
+            {t("pubmed.desc")}
           </p>
         </div>
-        <Badge>Literature</Badge>
+        <Badge>{t("pubmed.badge")}</Badge>
       </div>
 
       <SearchInput
         value={query}
         onChange={setQuery}
         onSubmit={search}
-        placeholder="Enter medical term or gene name, e.g. cancer, BRCA1, covid"
+        placeholder={t("pubmed.placeholder")}
         loading={loading}
       />
 
@@ -115,23 +117,23 @@ export default function PubMedSearch() {
       {result && !loading && (
         <>
           <div className="stat-grid">
-            <StatCard label="Articles" value={articles.length} />
-            <StatCard label="With Abstract" value={withAbstracts} />
-            <StatCard label="Journals" value={journals.length} />
-            <StatCard label="With DOI" value={articles.filter((article) => article.doi).length} />
+            <StatCard label={t("pubmed.statArticles")} value={articles.length} />
+            <StatCard label={t("pubmed.statWithAbstract")} value={withAbstracts} />
+            <StatCard label={t("pubmed.statJournals")} value={journals.length} />
+            <StatCard label={t("pubmed.statWithDoi")} value={articles.filter((article) => article.doi).length} />
           </div>
 
           <MetaBadge source={result.meta?.source} cached={result.meta?.cached} stale={result.meta?.stale} />
 
           {articles.length > 0 && (
             <div className="grid two" style={{ marginTop: 18 }}>
-              <BarChart title="Publication timeline" items={years} />
-              <BarChart title="Top journals" items={journals} />
+              <BarChart title={t("pubmed.timeline")} items={years} />
+              <BarChart title={t("pubmed.topJournals")} items={journals} />
             </div>
           )}
 
           {articles.length === 0 ? (
-            <EmptyState title="No articles found" description={`No PubMed records for "${query}".`} />
+            <EmptyState title={t("pubmed.noResultsTitle")} description={t("pubmed.noResultsDesc").replace("{query}", query)} />
           ) : (
             <div className="result-list">
               {articles.map((article, index) => (
@@ -141,13 +143,13 @@ export default function PubMedSearch() {
                       <h3 className="result-title">{article.title}</h3>
                       <div className="result-meta">
                         <span>PMID: {article.pmid}</span>
-                        <span>{article.source || "Unknown journal"}</span>
-                        <span>{article.pubdate || "Unknown date"}</span>
+                        <span>{article.source || t("pubmed.unknownJournal")}</span>
+                        <span>{article.pubdate || t("pubmed.unknownDate")}</span>
                       </div>
                       {article.authors?.length > 0 && (
                         <p className="small muted" style={{ marginTop: 10 }}>
                           {article.authors.slice(0, 5).join(", ")}
-                          {article.authors.length > 5 ? ` +${article.authors.length - 5} more` : ""}
+                          {article.authors.length > 5 ? ` ${t("pubmed.authorsMore").replace("{count}", String(article.authors.length - 5))}` : ""}
                         </p>
                       )}
 
@@ -168,7 +170,7 @@ export default function PubMedSearch() {
                               padding: 0,
                             }}
                           >
-                            {expandedAbstracts.has(article.pmid) ? "▾ Hide Abstract" : "▸ Show Abstract"}
+                            {expandedAbstracts.has(article.pmid) ? `▾ ${t("pubmed.hideAbstract")}` : `▸ ${t("pubmed.showAbstract")}`}
                           </button>
                           {expandedAbstracts.has(article.pmid) && (
                             <p
@@ -209,7 +211,7 @@ export default function PubMedSearch() {
                           ))}
                           {article.mesh_terms.length > 6 && (
                             <span style={{ fontSize: 10, color: "var(--text-muted, #64748b)" }}>
-                              +{article.mesh_terms.length - 6} more
+                              {t("pubmed.meshMore").replace("{count}", String(article.mesh_terms.length - 6))}
                             </span>
                           )}
                         </div>
@@ -237,7 +239,7 @@ export default function PubMedSearch() {
                             textDecoration: "none",
                           }}
                         >
-                          BibTeX
+                          {t("pubmed.exportBibtex")}
                         </a>
                         <a
                           href={buildRisUrl(article)}
@@ -254,7 +256,7 @@ export default function PubMedSearch() {
                             textDecoration: "none",
                           }}
                         >
-                          RIS
+                          {t("pubmed.exportRis")}
                         </a>
                       </div>
                     </div>
@@ -264,7 +266,7 @@ export default function PubMedSearch() {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      PubMed ↗
+                      {t("pubmed.viewOnPubmed")} ↗
                     </a>
                   </div>
                 </article>

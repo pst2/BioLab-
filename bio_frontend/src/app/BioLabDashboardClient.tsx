@@ -11,9 +11,10 @@ import { DashboardPanel } from "@/components/biolab/DashboardPanel";
 import { GeneSearchPanel } from "@/components/biolab/GeneSearchPanel";
 import { SequenceAnalysisPanel } from "@/components/biolab/SequenceAnalysisPanel";
 import { ApiExplorerPanel } from "@/components/biolab/ApiExplorerPanel";
+import { PubMedPanel } from "@/components/biolab/PubMedPanel";
 import { SettingsPanel } from "@/components/biolab/SettingsPanel";
 
-type ActiveTab = "dashboard" | "search" | "sequence" | "api" | "settings";
+type ActiveTab = "dashboard" | "search" | "sequence" | "pubmed" | "api" | "settings";
 type StatusState = "idle" | "checking" | "online" | "offline";
 
 export default function BioLabDashboard() {
@@ -100,6 +101,8 @@ export default function BioLabDashboard() {
                   ? t("tab.search")
                   : activeTab === "sequence"
                   ? t("tab.sequence")
+                  : activeTab === "pubmed"
+                  ? t("tab.pubmed")
                   : activeTab === "api"
                   ? t("tab.api")
                   : t("tab.settings")}
@@ -156,6 +159,8 @@ export default function BioLabDashboard() {
             )}
 
             {activeTab === "sequence" && <SequenceAnalysisPanel t={t} />}
+
+            {activeTab === "pubmed" && <PubMedPanel t={t} />}
 
             {activeTab === "api" && <ApiExplorerPanel t={t} />}
 
