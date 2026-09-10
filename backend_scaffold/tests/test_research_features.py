@@ -233,3 +233,27 @@ async def test_search_service_provenance_metadata(db_session, sample_gene):
     assert prov["is_synthetic"] is False
     assert prov["data_integrity"] == "verified"
     assert "retrieved_at" in prov
+
+
+# ── Phase 5: BLAST Normalization & Mock Fallback Tests ─────────────────────────
+
+def test_normalize_exp_values():
+    from app.clients.blast_client import normalize_exp
+    assert normalize_exp(None) == "10"
+    assert normalize_exp(10.0) == "10"
+    assert normalize_exp("10.0") == "10"
+    assert normalize_exp(10) == "10"
+    assert normalize_exp(1.0) == "1.0"
+    assert normalize_exp(0.001) == "1e-3"
+    assert normalize_exp("1e-5") == "1e-5"
+    assert normalize_exp(100.0) == "100"
+
+
+def test_mock_blast_fallback():
+    from app.data.mock_blast import get_mock_blast_hits
+    kras_seq = "MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGETCLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHHYREQIKRVKDSEDVPMVLVGNKCDLPSRTVDTKQAQDLARSYGIPFIETSAKTRQGVDDAFYTLVREIRKHKEKMSKDGKKKKKKSKTKCIM"
+    hits = get_mock_blast_hits(kras_seq, "protein")
+    assert hits is not None
+    assert len(hits) >= 3
+    assert hits[0]["accession"] == "P01116"
+    assert hits[0]["identity_percent"] == 100.0

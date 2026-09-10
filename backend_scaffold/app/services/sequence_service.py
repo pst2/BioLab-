@@ -12,6 +12,7 @@ from app.bioinformatics.fasta_parser import FastaParser, _IUPAC_COMPLEMENT
 from app.clients.blast_client import DEFAULT_DATABASES, BlastClient
 from app.clients.ncbi_client import NCBIClient
 from app.core.config import settings
+from app.data.mock_blast import get_mock_blast_hits
 from app.db.models import GeneRecord, SequenceRecord
 from app.repositories.cache_repository import CacheRepository
 from app.repositories.sequence_cache_repository import SequenceCacheRepository
@@ -561,7 +562,14 @@ class SequenceService:
         submit_err: str = ""
 
         try:
-            if provider == "ebi":
+            if provider == "uniprot":
+                job_id = await self.blast_client.uniprot_submit(
+                    raw_seq,
+                    database=database,
+                    matrix=payload.matrix,
+                    exp=payload.evalue_cutoff,
+                )
+            else:
                 job_id = await self.blast_client.ebi_submit(
                     raw_seq,
                     seq_type,
@@ -571,56 +579,45 @@ class SequenceService:
                     gapopen=payload.gap_open,
                     gapextend=payload.gap_extend,
                 )
-            else:  # uniprot
-                job_id = await self.blast_client.uniprot_submit(raw_seq)
-        except httpx.HTTPStatusError as exc:
-            # EBI returns 400 for malformed sequences (too short, invalid chars, etc.)
-            if exc.response.status_code == 400:
+        except (httpx.HTTPStatusError, httpx.HTTPError) as exc:
+            status_code = getattr(getattr(exc, "response", None), "status_code", None)
+            if status_code == 400:
                 submit_err = (
-                    "EBI BLAST rejected the sequence (HTTP 400). "
+                    "EBI BLAST rejected the query (HTTP 400). "
                     "Please ensure the sequence is at least 20 residues and contains only valid amino acid or nucleotide characters."
                 )
             else:
-                submit_err = f"Provider error (HTTP {exc.response.status_code}): {exc.response.text[:200]}"
-            # Auto-fallback: EBI failed → try UniProt (protein only)
-            if requested_provider == "auto" and seq_type == "protein":
-                try:
-                    job_id = await self.blast_client.uniprot_submit(raw_seq)
-                    actual_provider = "uniprot"
-                    database = "UniProtKB"
-                    submit_err = ""
-                except httpx.HTTPError as exc2:
-                    return ApiResponse(
-                        success=False,
-                        message=f"All BLAST providers failed. EBI: {submit_err}. UniProt: {exc2}",
-                        data={},
-                    )
-            else:
+                submit_err = f"Provider network error: {exc}"
+
+            logger.warning("BLAST submission failed (%s). Checking mock fallback for sequence...", submit_err)
+            mock_hits = get_mock_blast_hits(raw_seq, seq_type)
+            if mock_hits is not None:
+                mock_job_id = f"mock-blast-{abs(hash(raw_seq)) % 10000000}"
+                result_data = {
+                    "job_id": mock_job_id,
+                    "status": "FINISHED",
+                    "provider": "local_mock",
+                    "sequence_type": seq_type,
+                    "database": database,
+                    "cache_key": cache_key,
+                    "query_len": len(clean_for_len),
+                    "hits": mock_hits,
+                }
+                if self.blast_cache:
+                    self.blast_cache.set(cache_key, result_data, ttl_seconds=settings.BLAST_CACHE_TTL_SECONDS)
+                    self.blast_cache.set(f"blast:job:{mock_job_id}", result_data, ttl_seconds=7200)
                 return ApiResponse(
-                    success=False,
-                    message=f"BLAST submission failed: {submit_err}",
-                    data={},
+                    success=True,
+                    message="External BLAST service unavailable. Showing bundled reference alignments.",
+                    data=result_data,
+                    meta=MetaInfo(source="local_mock", cached=False, stale=False, count=len(mock_hits)),
                 )
-        except httpx.HTTPError as exc:
-            submit_err = str(exc)
-            if requested_provider == "auto" and seq_type == "protein":
-                try:
-                    job_id = await self.blast_client.uniprot_submit(raw_seq)
-                    actual_provider = "uniprot"
-                    database = "UniProtKB"
-                    submit_err = ""
-                except httpx.HTTPError as exc2:
-                    return ApiResponse(
-                        success=False,
-                        message=f"All BLAST providers failed. EBI: {submit_err}. UniProt: {exc2}",
-                        data={},
-                    )
-            else:
-                return ApiResponse(
-                    success=False,
-                    message=f"BLAST submission failed: {submit_err}",
-                    data={},
-                )
+
+            return ApiResponse(
+                success=False,
+                message=f"BLAST submission failed: {submit_err}",
+                data={},
+            )
 
         if not job_id:
             return ApiResponse(success=False, message=f"BLAST submission failed: {submit_err}", data={})

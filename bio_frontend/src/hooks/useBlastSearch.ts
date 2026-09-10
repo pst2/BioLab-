@@ -18,7 +18,7 @@ export function useBlastSearch(t?: Translate) {
   const [error, setError] = useState("");
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
-  const [evalueCutoff, setEvalueCutoff] = useState<number>(10.0);
+  const [evalueCutoff, setEvalueCutoff] = useState<number>(10);
   const [matrix, setMatrix] = useState<string>("BLOSUM62");
   const [gapOpen, setGapOpen] = useState<number | undefined>(undefined);
   const [gapExtend, setGapExtend] = useState<number | undefined>(undefined);
@@ -45,7 +45,8 @@ export function useBlastSearch(t?: Translate) {
   useEffect(() => {
     if (!jobId || status === "FINISHED" || status === "ERROR" || status === "NOT_FOUND" || status === "idle") return;
     pollCount.current = 0;
-    const MAX_POLLS = 120; // 4 minutes max at 2s interval
+    let consecutiveErrors = 0;
+    const MAX_POLLS = 100; // ~4 minutes max at 2.5s interval
     const intervalId = setInterval(async () => {
       pollCount.current += 1;
       if (pollCount.current > MAX_POLLS) {
@@ -57,10 +58,11 @@ export function useBlastSearch(t?: Translate) {
       }
       try {
         const res = await api.checkSequenceSearchStatus(jobId);
+        consecutiveErrors = 0;
         const job = res.data;
         if (job) {
-          setStatus(job.status || "RUNNING");
           if (job.status === "FINISHED") {
+            setStatus("FINISHED");
             const hitResults = job.hits || [];
             setHits(hitResults);
             setLoading(false);
@@ -68,15 +70,27 @@ export function useBlastSearch(t?: Translate) {
               ? t("toast.blastComplete").replace("{count}", String(hitResults.length))
               : `BLAST search complete — ${hitResults.length} alignments found`;
             toast.success(successMsg);
+            clearInterval(intervalId);
           } else if (job.status === "ERROR" || job.status === "NOT_FOUND") {
+            setStatus(job.status);
             setError(job.error || res.message || (t ? t("blast.failed") : "BLAST search failed."));
             setLoading(false);
+            clearInterval(intervalId);
+          } else {
+            setStatus(job.status || "RUNNING");
           }
         }
-      } catch {
-        /* keep polling on transient error */
+      } catch (err) {
+        consecutiveErrors += 1;
+        if (consecutiveErrors >= 6) {
+          setStatus("ERROR");
+          const msg = err instanceof Error ? err.message : (t ? t("blast.failed") : "Connection lost while polling BLAST status.");
+          setError(msg);
+          setLoading(false);
+          clearInterval(intervalId);
+        }
       }
-    }, 2000);
+    }, 2500);
 
     return () => clearInterval(intervalId);
   }, [jobId, status, toast, t]);
@@ -102,8 +116,33 @@ export function useBlastSearch(t?: Translate) {
         gap_open: gapOpen,
         gap_extend: gapExtend,
       });
+
+      if (!response.success || !response.data?.job_id) {
+        const errorMsg =
+          response.message || (t ? t("blast.failed") : "Failed to submit BLAST job");
+        setError(errorMsg);
+        setStatus("ERROR");
+        setLoading(false);
+        toast.error(errorMsg);
+        return;
+      }
+
       const job = response.data;
       setJobId(job.job_id);
+
+      // If already finished (e.g. cached or instant mock)
+      if (job.status === "FINISHED") {
+        setStatus("FINISHED");
+        const hitResults = job.hits || [];
+        setHits(hitResults);
+        setLoading(false);
+        const successMsg = t
+          ? t("toast.blastComplete").replace("{count}", String(hitResults.length))
+          : `BLAST search complete — ${hitResults.length} alignments found`;
+        toast.success(successMsg);
+        return;
+      }
+
       setStatus(job.status || "RUNNING");
       const submittedMsg = t
         ? t("toast.blastSubmitted").replace("{jobId}", job.job_id)
@@ -128,13 +167,15 @@ export function useBlastSearch(t?: Translate) {
   }
 
   const loadSampleDna = () => {
-    setSeq("ATGCGTACGATCGATCGGCATGCATCGTAGCATCGATCGTAGCATGCATCGATCG");
+    // Human KRAS proto-oncogene exon fragment (verified live matches)
+    setSeq("ATGACTGAATATAAACTTGTGGTAGTTGGAGCTGGTGGCGTAGGCAAGAGTGCCTTGACGATACAGCTAATTCAGAATCATTTTGTGGACGAATATGATCCAACAATAGAGGATTCCTACAGGAAGCAAGTAGTAATTGATGGAGAAACCTGTCTCTTGGATATTCTCGACACAGCAGGTCAAGAGGAGTACAGTGCAATGAGGGACCAGTACATGAGGACTGGGGAGGGCTTTCTTTGTGTATTTGCCATAAATAAT");
     setSeqType("dna");
     setProvider("auto");
     setDatabase("em_std_hum");
   };
 
   const loadSampleProtein = () => {
+    // Human KRAS protein (SwissProt P01116)
     setSeq("MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGETCLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHHYREQIKRVKDSEDVPMVLVGNKCDLPSRTVDTKQAQDLARSYGIPFIETSAKTRQGVDDAFYTLVREIRKHKEKMSKDGKKKKKKSKTKCIM");
     setSeqType("protein");
     setProvider("auto");

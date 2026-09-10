@@ -30,6 +30,45 @@ UNIPROT_URL = "https://rest.uniprot.org"
 _PROTEIN_UNIQUE: frozenset[str] = frozenset("EFILPQXZJOB")
 _DNA_CHARS: frozenset[str] = frozenset("ATGCNRYWSMKHBVD")
 
+# Allowed expectation values restricted by EBI NCBI BLAST API
+_ALLOWED_EVALUES: list[tuple[float, str]] = [
+    (1e-200, "1e-200"),
+    (1e-100, "1e-100"),
+    (1e-50, "1e-50"),
+    (1e-10, "1e-10"),
+    (1e-5, "1e-5"),
+    (1e-4, "1e-4"),
+    (1e-3, "1e-3"),
+    (1e-2, "1e-2"),
+    (1e-1, "1e-1"),
+    (1.0, "1.0"),
+    (10.0, "10"),
+    (100.0, "100"),
+    (1000.0, "1000"),
+]
+
+
+def normalize_exp(exp: float | str | None) -> str:
+    """Map any float or string E-value cutoff to an allowed EBI threshold string."""
+    if exp is None:
+        return "10"
+    if isinstance(exp, str):
+        exp_str = exp.strip().lower()
+        for _, token in _ALLOWED_EVALUES:
+            if exp_str == token.lower():
+                return token
+        try:
+            val = float(exp_str)
+        except ValueError:
+            return "10"
+    else:
+        val = float(exp)
+
+    # Snap to closest allowed value
+    closest = min(_ALLOWED_EVALUES, key=lambda item: abs(item[0] - val))
+    return closest[1]
+
+
 # Default databases per provider × sequence type
 DEFAULT_DATABASES: dict[str, dict[str, str]] = {
     "ebi": {
@@ -37,8 +76,8 @@ DEFAULT_DATABASES: dict[str, dict[str, str]] = {
         "dna": "em_std_hum",
     },
     "uniprot": {
-        "protein": "UniProtKB",
-        "dna": "",   # UniProt BLAST is protein-only
+        "protein": "uniprotkb",
+        "dna": "em_std_hum",   # EBI handles DNA if requested
     },
 }
 
@@ -124,7 +163,7 @@ class BlastClient:
             "database": database,
             "alignments": "50",
             "scores": "50",
-            "exp": str(exp if exp is not None else "10"),
+            "exp": normalize_exp(exp),
         }
         if seq_type == "protein" and matrix:
             params["matrix"] = matrix
@@ -153,7 +192,7 @@ class BlastClient:
     async def ebi_results(self, job_id: str, query_len: int = 1) -> list[dict[str, Any]]:
         """Fetch finished EBI BLAST results and normalise into BlastHit dicts."""
         client = await self._client()
-        resp = await client.get(f"{EBI_URL}/result/{job_id}/json", timeout=60.0)
+        resp = await client.get(f"{EBI_URL}/result/{job_id}/json", timeout=45.0)
         resp.raise_for_status()
         data = resp.json()
         q_len = int(data.get("query_len") or query_len or 1)
@@ -199,46 +238,41 @@ class BlastClient:
             )
         return sorted(results, key=lambda x: x["e_value"])
 
-    # ── UniProt BLAST ─────────────────────────────────────────────────────── #
+    # ── UniProt BLAST (Executed via EBI JDispatcher for UniProtKB) ─────────── #
 
-    async def uniprot_submit(self, sequence: str) -> str:
-        """Submit a protein sequence to UniProt BLAST and return the job ID."""
-        clean = self.strip_header(sequence)
-        client = await self._client()
-        resp = await client.post(
-            f"{UNIPROT_URL}/blast/run",
-            data={
-                "sequence": f">Query\n{clean}",
-                "ids": "UniProtKB",
-                "taxId": "",
-            },
+    async def uniprot_submit(
+        self,
+        sequence: str,
+        *,
+        database: str = "uniprotkb",
+        matrix: str | None = None,
+        exp: float | str | None = None,
+    ) -> str:
+        """Submit a protein sequence to UniProt BLAST via EBI JDispatcher.
+
+        UniProt delegates programmatic BLAST executions to EBI's ncbiblast service
+        targeting UniProtKB or SwissProt databases.
+        """
+        return await self.ebi_submit(
+            sequence=sequence,
+            seq_type="protein",
+            database=database or "uniprotkb",
+            matrix=matrix,
+            exp=exp,
         )
-        resp.raise_for_status()
-        return resp.text.strip()
 
     async def uniprot_status(self, job_id: str) -> str:
-        """Poll UniProt BLAST job status. Returns normalised status string."""
-        client = await self._client()
-        resp = await client.get(f"{UNIPROT_URL}/blast/status/{job_id}")
-        resp.raise_for_status()
-        try:
-            data = resp.json()
-            return str(data.get("status", "RUNNING")).upper()
-        except Exception:
-            return resp.text.strip().upper()
+        """Poll UniProt job status (delegates to EBI status)."""
+        return await self.ebi_status(job_id)
 
     async def uniprot_results(
         self, job_id: str, query_len: int = 1
     ) -> list[dict[str, Any]]:
-        """Fetch finished UniProt BLAST results in TSV format and normalise."""
-        client = await self._client()
-        resp = await client.get(
-            f"{UNIPROT_URL}/blast/stream/{job_id}",
-            params={"format": "tsv"},
-            timeout=60.0,
-        )
-        resp.raise_for_status()
-        return self._parse_uniprot_tsv(resp.text, query_len)
+        """Fetch finished UniProt BLAST results (delegates to EBI results)."""
+        hits = await self.ebi_results(job_id, query_len=query_len)
+        for h in hits:
+            h["source"] = "uniprot"
+        return hits
 
     def _parse_uniprot_tsv(
         self, tsv_text: str, query_len: int

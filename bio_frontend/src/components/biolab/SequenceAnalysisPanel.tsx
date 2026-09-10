@@ -207,9 +207,9 @@ export function SequenceAnalysisPanel({ t }: { t: Translate }) {
                       type="number"
                       step="any"
                       value={blast.evalueCutoff}
-                      onChange={(e) => blast.setEvalueCutoff(Number(e.target.value) || 10.0)}
+                      onChange={(e) => blast.setEvalueCutoff(e.target.value ? Number(e.target.value) : 10)}
                       className="w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono"
-                      placeholder="10.0"
+                      placeholder="10"
                     />
                   </label>
 
