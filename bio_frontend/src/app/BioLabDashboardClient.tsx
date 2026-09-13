@@ -20,6 +20,7 @@ type StatusState = "idle" | "checking" | "online" | "offline";
 export default function BioLabDashboard() {
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<ActiveTab>("dashboard");
+  const [initialSubTab, setInitialSubTab] = useState<"analyze" | "blast">("analyze");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -32,7 +33,31 @@ export default function BioLabDashboard() {
 
   useEffect(() => {
     setMounted(true);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get("tab") as ActiveTab | null;
+      if (tabParam && ["dashboard", "search", "sequence", "pubmed", "api", "settings"].includes(tabParam)) {
+        setActiveTab(tabParam);
+      }
+      const subtabParam = params.get("subtab");
+      if (subtabParam === "blast" || subtabParam === "analyze") {
+        setInitialSubTab(subtabParam as "analyze" | "blast");
+      }
+    }
   }, []);
+
+  const handleSelectTab = (tab: ActiveTab) => {
+    setActiveTab(tab);
+    setMobileOpen(false);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", tab);
+      if (tab !== "sequence") {
+        url.searchParams.delete("subtab");
+      }
+      window.history.replaceState(null, "", url.toString());
+    }
+  };
 
   async function checkStatus() {
     setStatus("checking");
@@ -63,10 +88,7 @@ export default function BioLabDashboard() {
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] antialiased transition-colors duration-200">
       <Sidebar
         activeTab={activeTab}
-        setActiveTab={(tab) => {
-          setActiveTab(tab);
-          setMobileOpen(false);
-        }}
+        setActiveTab={handleSelectTab}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
         collapsed={sidebarCollapsed}
@@ -158,7 +180,7 @@ export default function BioLabDashboard() {
               />
             )}
 
-            {activeTab === "sequence" && <SequenceAnalysisPanel t={t} />}
+            {activeTab === "sequence" && <SequenceAnalysisPanel t={t} initialSubTab={initialSubTab} />}
 
             {activeTab === "pubmed" && <PubMedPanel t={t} />}
 

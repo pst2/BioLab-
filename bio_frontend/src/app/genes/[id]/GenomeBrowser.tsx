@@ -19,7 +19,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { AlertCircle, Dna, Globe, Loader2, MapPin } from "lucide-react";
+import { AlertCircle, Box, Dna, ExternalLink, Globe, Loader2, MapPin, Sparkles } from "lucide-react";
 import type { GeneDetail } from "@/lib/api";
 import { useLanguage } from "@/lib/i18n";
 
@@ -41,11 +41,10 @@ const ASSEMBLY_LABELS: Record<string, string> = {
 
 /**
  * Regex for valid IGV FASTA reference accessions.
- * Must look like a real RefSeq or INSDC accession (e.g. NC_000005.10, NM_007294, CM000667.2).
+ * Must look like a real RefSeq or INSDC accession (e.g. NC_000005.10, NM_007294, MK570060.1, CM000667.2).
  * A plain numeric gene ID (e.g. "672") is NOT a valid FASTA accession for IGV.
- * The underscore or dot requirement filters out bare numbers and symbol-only strings.
  */
-const VALID_ACCESSION_RE = /^[A-Za-z]{1,6}[_\.][A-Za-z0-9_.]+$/;
+const VALID_ACCESSION_RE = /^(?=.*[A-Za-z])[A-Za-z0-9_.-]{3,40}$/;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -243,24 +242,156 @@ async function loadIgvCreateBrowser(): Promise<(container: HTMLElement, options:
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
+function ProteinStructureCard({ gene }: { gene: GeneDetail }) {
+  const { t } = useLanguage();
+  const uniprotId =
+    gene.protein?.uniprot_id ||
+    (gene.source === "uniprot" ? String(gene.gene_id) : undefined) ||
+    (/^([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2})$/i.test(String(gene.gene_id)) ? String(gene.gene_id) : undefined) ||
+    (/^([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2})$/i.test(String(gene.symbol)) ? String(gene.symbol) : undefined);
+
+  const seq = (gene.protein?.sequence || gene.sequence || "").replace(/[^A-Za-z]/g, "").toUpperCase();
+  const length = gene.sequence_length || gene.protein?.length || seq.length;
+
+  return (
+    <section className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-6 shadow-sm animate-fadeIn">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-500 dark:text-indigo-400">
+            <Box className="h-4 w-4" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+              {t("detail.proteinStructure")}
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {t("detail.proteinStructureDesc")}
+            </p>
+          </div>
+        </div>
+        {uniprotId && (
+          <span className="rounded-full border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1 font-mono text-xs font-semibold text-indigo-600 dark:text-indigo-300">
+            UniProt: {uniprotId}
+          </span>
+        )}
+      </div>
+
+      {/* Action cards to AlphaFold, UniProtKB, PDB */}
+      <div className="mt-5 grid gap-4 sm:grid-cols-3">
+        <a
+          href={uniprotId ? `https://alphafold.ebi.ac.uk/entry/${uniprotId}` : `https://alphafold.ebi.ac.uk/search/text/${encodeURIComponent(gene.symbol || gene.name || "")}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex flex-col justify-between rounded-xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-br from-cyan-500/5 via-slate-50 dark:via-slate-800/40 to-transparent p-4 transition hover:-translate-y-0.5 hover:border-cyan-500 hover:shadow-md"
+        >
+          <div>
+            <div className="flex items-center justify-between text-xs font-bold text-cyan-600 dark:text-cyan-400">
+              <span>AlphaFold DB</span>
+              <ExternalLink className="h-3.5 w-3.5 opacity-70 group-hover:opacity-100 transition" />
+            </div>
+            <h4 className="mt-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+              {t("detail.alphaFoldViewer")}
+            </h4>
+            <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
+              DeepMind AI 3D coordinates with atomic pLDDT confidence scores.
+            </p>
+          </div>
+          <span className="mt-4 inline-flex items-center gap-1 text-[11px] font-semibold text-cyan-600 dark:text-cyan-400">
+            Open 3D Viewer →
+          </span>
+        </a>
+
+        <a
+          href={uniprotId ? `https://www.uniprot.org/uniprotkb/${uniprotId}/entry` : `https://www.uniprot.org/uniprotkb?query=${encodeURIComponent(gene.symbol || gene.name || "")}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex flex-col justify-between rounded-xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-br from-indigo-500/5 via-slate-50 dark:via-slate-800/40 to-transparent p-4 transition hover:-translate-y-0.5 hover:border-indigo-500 hover:shadow-md"
+        >
+          <div>
+            <div className="flex items-center justify-between text-xs font-bold text-indigo-600 dark:text-indigo-400">
+              <span>UniProtKB</span>
+              <ExternalLink className="h-3.5 w-3.5 opacity-70 group-hover:opacity-100 transition" />
+            </div>
+            <h4 className="mt-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+              {t("detail.uniProtEntry")}
+            </h4>
+            <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
+              Curated functional domains, catalytic sites, isoforms & variants.
+            </p>
+          </div>
+          <span className="mt-4 inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400">
+            Inspect Entry →
+          </span>
+        </a>
+
+        <a
+          href={`https://www.rcsb.org/search?request=%7B%22query%22%3A%7B%22type%22%3A%22terminal%22%2C%22service%22%3A%22text%22%2C%22parameters%22%3A%7B%22value%22%3A%22${encodeURIComponent(uniprotId || gene.symbol || "")}%22%7D%7D%7D`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex flex-col justify-between rounded-xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-br from-emerald-500/5 via-slate-50 dark:via-slate-800/40 to-transparent p-4 transition hover:-translate-y-0.5 hover:border-emerald-500 hover:shadow-md"
+        >
+          <div>
+            <div className="flex items-center justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400">
+              <span>RCSB PDB</span>
+              <ExternalLink className="h-3.5 w-3.5 opacity-70 group-hover:opacity-100 transition" />
+            </div>
+            <h4 className="mt-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+              {t("detail.pdbSearch")}
+            </h4>
+            <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
+              Experimentally resolved X-ray, NMR and Cryo-EM crystal structures.
+            </p>
+          </div>
+          <span className="mt-4 inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+            Explore PDB →
+          </span>
+        </a>
+      </div>
+
+      {/* Sequence architecture track */}
+      {length > 0 && (
+        <div className="mt-6 rounded-xl border border-slate-200/60 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 p-4">
+          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2">
+            <span className="font-semibold uppercase tracking-wider text-[10px]">Sequence Architecture Track</span>
+            <span className="font-mono">1 – {length.toLocaleString()} aa</span>
+          </div>
+          <div className="relative h-6 w-full rounded-md bg-slate-200 dark:bg-slate-700 overflow-hidden flex">
+            <div className="h-full bg-cyan-500/80 hover:bg-cyan-400 transition" style={{ width: "100%" }} title={`${length} residues`} />
+          </div>
+          <div className="mt-2 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+            <span>N-terminus</span>
+            <span>C-terminus</span>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 export function GenomeBrowser({ gene }: GenomeBrowserProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<BrowserStatus>("idle");
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [retryKey, setRetryKey] = useState(0);
 
+  const dataType = String(gene.data_type || gene.sequence_type || "").toLowerCase();
+  const source = String(gene.source || gene.database || "").toLowerCase();
+  const rawSeq = (gene.sequence || gene.protein?.sequence || "").replace(/[^A-Za-z]/g, "").toUpperCase();
+  const isProtein =
+    dataType.includes("protein") ||
+    source.includes("uniprot") ||
+    Boolean(gene.protein?.uniprot_id) ||
+    Boolean(rawSeq && !/^[ACGTUN]+$/.test(rawSeq));
+
   // Resolve accession: prefer genomic_accession (NC_/NW_/NZ_ etc.), then
-  // fall back to symbol or gene_id ONLY if they look like real accessions
-  // (contain '_' or '.' e.g. NM_007294, NM_007294.3, CM000667.2).
-  // Plain numeric gene IDs ("672") and short gene symbols ("BRCA1") are NOT
-  // valid FASTA accessions for IGV and will cause a fetch error.
+  // fall back to gene_id or symbol if they look like real sequence accessions.
   const looksLikeAccession = (value?: string | number) =>
-    Boolean(value && /[_.]/.test(String(value)));
+    Boolean(value && VALID_ACCESSION_RE.test(String(value)));
 
   const accession =
     gene.genomic_accession ||
-    (looksLikeAccession(gene.symbol) ? gene.symbol : undefined) ||
-    (looksLikeAccession(gene.gene_id) ? String(gene.gene_id) : undefined);
+    (looksLikeAccession(gene.gene_id) ? String(gene.gene_id) : undefined) ||
+    (looksLikeAccession(gene.symbol) ? gene.symbol : undefined);
 
   const start = gene.start ?? 1;
   const end = gene.end ?? (gene.sequence_length ? gene.sequence_length : 50_000);
@@ -270,7 +401,7 @@ export function GenomeBrowser({ gene }: GenomeBrowserProps) {
   const isSupported = Boolean(accession && VALID_ACCESSION_RE.test(accession));
 
   useEffect(() => {
-    if (!isSupported) return;
+    if (isProtein || !isSupported) return;
     if (!containerRef.current) return;
 
     const container = containerRef.current;
@@ -356,6 +487,10 @@ export function GenomeBrowser({ gene }: GenomeBrowserProps) {
   }, [isSupported, accession, start, end, chromosome, retryKey]);
 
   // ── Render ──────────────────────────────────────────────────────────────────
+
+  if (isProtein) {
+    return <ProteinStructureCard gene={gene} />;
+  }
 
   if (!isSupported) {
     return (

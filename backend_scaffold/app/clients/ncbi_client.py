@@ -227,10 +227,20 @@ class NCBIClient:
                     organism = organism.get("scientificname") or organism.get("commonname") or "Unknown"
                 slen = item.get("slen")
 
+                # Extract cleaner gene symbol from title if present, e.g. "(KRAS)" or "GN=KRAS"
+                extracted_symbol = caption
+                paren_match = re.search(r"\(([A-Za-z0-9_-]{2,15})\)", title)
+                if paren_match:
+                    extracted_symbol = paren_match.group(1)
+                else:
+                    gn_match = re.search(r"\bGN=([A-Za-z0-9_-]+)", title)
+                    if gn_match:
+                        extracted_symbol = gn_match.group(1)
+
                 record: dict[str, Any] = {
                     "gene_id": caption or record_id,
                     "external_id": caption,
-                    "symbol": caption,
+                    "symbol": extracted_symbol,
                     "name": title,
                     "description": title,
                     "summary": title,
