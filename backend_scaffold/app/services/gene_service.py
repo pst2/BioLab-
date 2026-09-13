@@ -182,6 +182,7 @@ class GeneService(BaseSearchService):
     async def _get_gene_detail_inner(self, gene_id: str):
         # 1. Try local DB first, then enrich the cached provider payload when possible.
         local = self.gene_repo.get_by_gene_id(gene_id)
+        is_placeholder = False
         if local:
             has_data = bool(local.get("sequence") or local.get("fasta"))
             data_type = str(local.get("data_type") or "gene").lower()
@@ -197,8 +198,11 @@ class GeneService(BaseSearchService):
                 and not has_data
             )
 
-            if has_data or not is_placeholder:
-                enriched = await self._enrich_detail_record(local)
+            # Try to enrich local record
+            enriched = await self._enrich_detail_record(local)
+            has_enriched_data = bool(enriched.get("sequence") or enriched.get("fasta"))
+
+            if has_enriched_data or has_data:
                 if enriched != local:
                     self.gene_repo.upsert(enriched, source=enriched.get("source") or local.get("source") or "local_db")
                     self.db.commit()
@@ -212,6 +216,8 @@ class GeneService(BaseSearchService):
                     mode="local_first",
                     external_used=bool(enriched.get("sequence") or enriched.get("fasta") or enriched.get("visualization")),
                 )
+            # If local record exists but lacks sequence, don't stop here.
+            # Continue below to fetch full data from external providers (NCBI/providers).
 
         # 2. If the detail ID is clearly from a fallback provider, query that provider directly.
         provider_detail = await self._fetch_provider_detail(gene_id)
@@ -264,6 +270,7 @@ class GeneService(BaseSearchService):
             try:
                 bio_record = await self.ncbi_client.get_bio_record_by_id(gene_id)
                 if bio_record:
+                    bio_record["gene_id"] = gene_id
                     bio_record = enrich_with_sequence_fields(bio_record)
                     self.gene_repo.upsert(bio_record, source="ncbi")
                     self.db.commit()
@@ -279,7 +286,11 @@ class GeneService(BaseSearchService):
                         external_used=True,
                     )
             except Exception:
-                pass
+                logger.exception("Error importing NCBI bio record for %s", gene_id)
+                try:
+                    self.db.rollback()
+                except Exception:
+                    pass
 
         # 3c. Fallback search resolution if lookup by exact ID failed
         try:
@@ -302,7 +313,21 @@ class GeneService(BaseSearchService):
         except Exception:
             pass
 
-        # 4. Nothing found anywhere — return a minimal placeholder so the UI does not crash.
+        # 4. If an existing local record was found (even without full sequence), return it now
+        if local and not is_placeholder:
+            enriched = enrich_with_sequence_fields(local)
+            return self._response(
+                message="Gene detail loaded from local workspace",
+                data=enriched,
+                source=local.get("source") or "local_db",
+                cached=False,
+                stale=False,
+                keyword=gene_id,
+                mode="local_first",
+                external_used=False,
+            )
+
+        # 5. Nothing found anywhere — return a minimal placeholder so the UI does not crash.
         placeholder = enrich_with_sequence_fields({
             "id": gene_id,
             "gene_id": gene_id,
@@ -374,13 +399,24 @@ class GeneService(BaseSearchService):
                 return await self.ensembl_provider.get_detail(record_id, organism=record.get("organism")) or enrich_with_sequence_fields(record)
             if source == "uniprot" or record.get("database") == "uniprotkb":
                 return await self.uniprot_provider.get_detail(record_id) or enrich_with_sequence_fields(record)
-            # For NCBI nucleotide/protein records without sequence, try to re-fetch from nuccore/protein.
-            # Note: record_id may be a numeric UID or an accession like NM_007294 — both are valid.
-            if source == "ncbi" and record.get("data_type") in ("nucleotide", "protein") and not has_real_data:
+            # For NCBI nucleotide/protein records or any accession without sequence, try to re-fetch from nuccore/protein.
+            acc_cand = (
+                record_id
+                or str(record.get("accession_version") or "")
+                or str(record.get("genomic_accession") or "")
+                or str(record.get("external_id") or "")
+            ).strip()
+            looks_like_acc = (
+                acc_cand.isdigit()
+                or (any(ch.isalpha() for ch in acc_cand) and any(ch.isdigit() for ch in acc_cand))
+            )
+            if looks_like_acc and not has_real_data:
                 try:
-                    bio = await self.ncbi_client.get_bio_record_by_id(record_id)
+                    bio = await self.ncbi_client.get_bio_record_by_id(acc_cand)
                     if bio and (bio.get("fasta") or bio.get("sequence")):
-                        return enrich_with_sequence_fields(bio)
+                        merged = {**record, **bio}
+                        merged["gene_id"] = record.get("gene_id") or acc_cand
+                        return enrich_with_sequence_fields(merged)
                 except Exception:
                     pass
         except Exception:

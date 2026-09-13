@@ -87,6 +87,68 @@ function readCachedGene(id: string): GeneDetail | null {
   }
 }
 
+function mergeGeneDetails(cached: GeneDetail | null, fresh: GeneDetail): GeneDetail {
+  if (!cached) return fresh;
+
+  const isFreshPlaceholder =
+    fresh.description === "No local gene record found." ||
+    fresh.description === "No description available." ||
+    fresh.summary?.includes("Try searching this gene with mode=external_refresh");
+
+  const sequence = fresh.sequence || cached.sequence;
+  const sequenceLength =
+    fresh.sequence_length ||
+    cached.sequence_length ||
+    (sequence ? sequence.length : undefined);
+  const fasta = fresh.fasta || cached.fasta;
+  const baseCounts =
+    fresh.base_counts && Object.values(fresh.base_counts).some((v) => Number(v) > 0)
+      ? fresh.base_counts
+      : cached.base_counts;
+  const gcContent = fresh.gc_content ?? cached.gc_content;
+  const atContent = fresh.at_content ?? cached.at_content;
+  const protein = fresh.protein || cached.protein;
+
+  const mergedVis = {
+    ...cached.visualization,
+    ...fresh.visualization,
+    location: {
+      ...cached.visualization?.location,
+      ...fresh.visualization?.location,
+    },
+    sequence_composition:
+      fresh.visualization?.sequence_composition ||
+      cached.visualization?.sequence_composition ||
+      (baseCounts
+        ? {
+            sequence_length: sequenceLength,
+            base_counts: baseCounts,
+            gc_content: gcContent,
+            at_content: atContent,
+          }
+        : undefined),
+    protein: fresh.visualization?.protein || cached.visualization?.protein || protein,
+  };
+
+  return {
+    ...cached,
+    ...fresh,
+    symbol: isFreshPlaceholder ? cached.symbol : (fresh.symbol || cached.symbol),
+    name: isFreshPlaceholder ? cached.name : (fresh.name || cached.name),
+    description: isFreshPlaceholder ? cached.description : (fresh.description || cached.description),
+    organism: isFreshPlaceholder || fresh.organism === "Unknown" ? cached.organism : (fresh.organism || cached.organism),
+    summary: isFreshPlaceholder ? cached.summary : (fresh.summary || cached.summary),
+    sequence,
+    sequence_length: sequenceLength,
+    fasta,
+    base_counts: baseCounts,
+    gc_content: gcContent,
+    at_content: atContent,
+    protein,
+    visualization: mergedVis,
+  };
+}
+
 function writeCachedGene(id: string, gene: GeneDetail) {
   if (typeof window === "undefined") return;
   try {
@@ -279,9 +341,10 @@ export default function GeneDetailClient({ id }: { id: string }) {
     try {
       const response = await api.geneDetail(id, { signal });
       const freshGene = normalizeGene(id, response.data || {});
-      setGene(freshGene);
+      const mergedGene = mergeGeneDetails(cached, freshGene);
+      setGene(mergedGene);
       setUsingBrowserCache(Boolean(response.meta?.cached));
-      writeCachedGene(id, freshGene);
+      writeCachedGene(id, mergedGene);
     } catch (event) {
       if (event instanceof DOMException && event.name === "AbortError") return;
       const message = event instanceof Error ? event.message : t("detail.loadFailed");

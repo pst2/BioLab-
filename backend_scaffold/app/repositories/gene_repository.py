@@ -33,12 +33,17 @@ class GeneRepository:
 
     def get_by_gene_id(self, gene_id: str) -> dict[str, Any] | None:
         gid = str(gene_id).strip()
+        base_gid = gid.split(".")[0] if "." in gid else gid
         row = (
             self.db.query(GeneRecord)
             .filter(
                 (GeneRecord.ncbi_gene_id == gid)
+                | (GeneRecord.accession_version == gid)
+                | (GeneRecord.ncbi_gene_id == base_gid)
+                | (GeneRecord.accession_version.ilike(f"{base_gid}%"))
                 | (GeneRecord.id == self._safe_int(gid))
                 | (GeneRecord.symbol.ilike(gid))
+                | (GeneRecord.symbol.ilike(base_gid))
             )
             .first()
         )
@@ -53,13 +58,41 @@ class GeneRepository:
         symbol = (item.get("symbol") or item.get("name") or "").strip() or "Unknown"
         organism = (item.get("organism") or "Unknown").strip() or "Unknown"
         ncbi_gene_id = str(item.get("gene_id") or item.get("ncbi_gene_id") or "").strip() or None
+        data_type = str(item.get("data_type") or "gene").lower()
+        acc = str(
+            item.get("accession_version")
+            or item.get("genomic_accession")
+            or item.get("external_id")
+            or item.get("caption")
+            or ""
+        ).strip() or None
 
         query = self.db.query(GeneRecord)
         row = None
         if ncbi_gene_id:
             row = query.filter(GeneRecord.ncbi_gene_id == ncbi_gene_id).first()
-        if row is None:
+        if row is None and acc:
+            row = query.filter((GeneRecord.accession_version == acc) | (GeneRecord.ncbi_gene_id == acc)).first()
+        if row is None and data_type == "gene":
             row = query.filter(GeneRecord.symbol == symbol, GeneRecord.organism == organism).first()
+
+        # Disambiguate if (symbol, organism) collides with an existing row under uq_gene_symbol_organism
+        existing_collision = query.filter(
+            GeneRecord.symbol == symbol,
+            GeneRecord.organism == organism,
+            GeneRecord.id != (row.id if row else None),
+        ).first()
+
+        if existing_collision:
+            dist_id = acc or ncbi_gene_id
+            if dist_id and dist_id != symbol:
+                symbol = f"{symbol} ({dist_id})"
+                if query.filter(
+                    GeneRecord.symbol == symbol,
+                    GeneRecord.organism == organism,
+                    GeneRecord.id != (row.id if row else None),
+                ).first():
+                    symbol = dist_id
 
         if row is None:
             row = GeneRecord(symbol=symbol, organism=organism)
@@ -73,7 +106,7 @@ class GeneRepository:
         row.genome_assembly = item.get("genome_assembly") or item.get("assembly")
         raw_taxid = item.get("taxid") or item.get("taxonomy_id")
         row.taxid = int(raw_taxid) if raw_taxid and str(raw_taxid).isdigit() else None
-        row.accession_version = item.get("accession_version") or item.get("genomic_accession")
+        row.accession_version = item.get("accession_version") or item.get("genomic_accession") or acc
         row.source = source
         row.payload = item
         return row
