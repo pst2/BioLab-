@@ -193,7 +193,68 @@ function BrowserError({ message, onRetry, gene }: { message: string; onRetry: ()
   );
 }
 
+function installIgvNetworkInterceptors() {
+  if (typeof window === "undefined" || (window as any).__igv_interceptor_installed) return;
+  (window as any).__igv_interceptor_installed = true;
+
+  // 1. Intercept window.fetch for igv.org endpoints
+  const originalFetch = window.fetch.bind(window);
+  window.fetch = async function (input: RequestInfo | URL, init?: RequestInit) {
+    const urlStr = typeof input === "string" ? input : input instanceof URL ? input.toString() : (input as Request).url;
+    if (urlStr.includes("igv.org/data/url_mappings.tsv")) {
+      return new Response("# empty url mappings\n", {
+        status: 200,
+        headers: { "Content-Type": "text/plain" },
+      });
+    }
+    if (urlStr.includes("igv.org/genomes/")) {
+      return new Response("[]", {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    return originalFetch(input, init);
+  };
+
+  // 2. Intercept XMLHttpRequest for igv.org endpoints (used by IGV's internal igvxhr)
+  const originalOpen = XMLHttpRequest.prototype.open;
+  const originalSend = XMLHttpRequest.prototype.send;
+
+  XMLHttpRequest.prototype.open = function (this: any, method: string, url: string | URL, ...rest: any[]) {
+    this.__targetUrl = String(url);
+    return originalOpen.apply(this, [method, url, ...rest] as any);
+  };
+
+  XMLHttpRequest.prototype.send = function (this: any, body?: Document | XMLHttpRequestBodyInit | null) {
+    const url = this.__targetUrl || "";
+    if (url.includes("igv.org/data/url_mappings.tsv") || url.includes("igv.org/genomes/")) {
+      const isJson = url.includes("genomes");
+      const fakeData = isJson ? "[]" : "# empty url mappings\n";
+
+      Object.defineProperty(this, "status", { value: 200, configurable: true, writable: true });
+      Object.defineProperty(this, "statusText", { value: "OK", configurable: true, writable: true });
+      Object.defineProperty(this, "readyState", { value: 4, configurable: true, writable: true });
+      Object.defineProperty(this, "responseText", { value: fakeData, configurable: true, writable: true });
+      Object.defineProperty(this, "response", { value: fakeData, configurable: true, writable: true });
+
+      setTimeout(() => {
+        if (typeof this.onreadystatechange === "function") {
+          this.onreadystatechange(new Event("readystatechange"));
+        }
+        if (typeof this.onload === "function") {
+          this.onload(new ProgressEvent("load"));
+        }
+        this.dispatchEvent(new Event("readystatechange"));
+        this.dispatchEvent(new ProgressEvent("load"));
+      }, 0);
+      return;
+    }
+    return originalSend.apply(this, [body]);
+  };
+}
+
 async function loadIgvCreateBrowser(): Promise<(container: HTMLElement, options: any) => Promise<any>> {
+  installIgvNetworkInterceptors();
   if (typeof window !== "undefined" && (window as any).igv?.createBrowser) {
     return (window as any).igv.createBrowser;
   }
@@ -443,6 +504,8 @@ export function GenomeBrowser({ gene }: GenomeBrowserProps) {
         };
 
         browser = await createBrowserFn(container, {
+          loadDefaultGenomes: false,
+          genomeList: [],
           reference: {
             id: accession!,
             name: `${accession} (${gene.symbol || "Sequence"})`,
