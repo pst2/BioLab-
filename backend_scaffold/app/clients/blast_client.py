@@ -10,6 +10,7 @@ sequence, the client will transparently retry with UniProt BLAST.
 """
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import logging
 import urllib.parse
@@ -82,8 +83,27 @@ DEFAULT_DATABASES: dict[str, dict[str, str]] = {
 }
 
 
+# ── Tiered timeouts ────────────────────────────────────────────────────────────
+# Submission & results can take much longer than a status poll.
+_TIMEOUT_SUBMIT = httpx.Timeout(timeout=60.0, connect=15.0)
+_TIMEOUT_STATUS = httpx.Timeout(timeout=15.0, connect=10.0)
+_TIMEOUT_RESULTS = httpx.Timeout(timeout=60.0, connect=15.0)
+_TIMEOUT_DEFAULT = httpx.Timeout(timeout=30.0, connect=10.0)
+
+# Connection pool: reuse connections across requests for the same host
+_POOL_LIMITS = httpx.Limits(
+    max_connections=10,
+    max_keepalive_connections=5,
+    keepalive_expiry=120,  # seconds
+)
+
+
 class BlastClient:
-    """Async client for EBI NCBI BLAST and UniProt BLAST."""
+    """Async client for EBI NCBI BLAST and UniProt BLAST.
+
+    Uses a persistent httpx.AsyncClient with connection pooling so that
+    repeated status-polling requests reuse existing TCP connections.
+    """
 
     def __init__(self) -> None:
         self._http: httpx.AsyncClient | None = None
@@ -93,13 +113,56 @@ class BlastClient:
     async def _client(self) -> httpx.AsyncClient:
         if self._http is None or self._http.is_closed:
             self._http = httpx.AsyncClient(
-                timeout=30.0,
+                timeout=_TIMEOUT_DEFAULT,
+                limits=_POOL_LIMITS,
                 follow_redirects=True,
+                http2=False,
                 headers={
                     "User-Agent": f"{settings.APP_NAME}/{settings.APP_VERSION} (contact:{settings.BLAST_CONTACT_EMAIL})"
                 },
             )
         return self._http
+
+    async def _retry_request(
+        self,
+        method: str,
+        url: str,
+        *,
+        retries: int = 2,
+        backoff: float = 1.0,
+        timeout: httpx.Timeout | None = None,
+        **kwargs: Any,
+    ) -> httpx.Response:
+        """Execute an HTTP request with retry on transient (5xx/timeout) errors."""
+        client = await self._client()
+        last_exc: Exception | None = None
+        for attempt in range(retries + 1):
+            try:
+                resp = await client.request(
+                    method, url, timeout=timeout, **kwargs
+                )
+                # Retry on server errors (502, 503, 504)
+                if resp.status_code in (502, 503, 504) and attempt < retries:
+                    logger.warning(
+                        "BLAST %s %s returned %d, retrying (%d/%d)…",
+                        method, url, resp.status_code, attempt + 1, retries,
+                    )
+                    await asyncio.sleep(backoff * (attempt + 1))
+                    continue
+                resp.raise_for_status()
+                return resp
+            except (httpx.TimeoutException, httpx.ConnectError) as exc:
+                last_exc = exc
+                if attempt < retries:
+                    logger.warning(
+                        "BLAST %s %s failed (%s), retrying (%d/%d)…",
+                        method, url, exc, attempt + 1, retries,
+                    )
+                    await asyncio.sleep(backoff * (attempt + 1))
+                    continue
+                raise
+        # Should not reach here, but satisfy type checker
+        raise last_exc or httpx.HTTPError("Max retries exceeded")  # type: ignore[arg-type]
 
     async def close(self) -> None:
         if self._http and not self._http.is_closed:
@@ -173,27 +236,35 @@ class BlastClient:
             params["gapextend"] = str(gapextend)
 
         data = urllib.parse.urlencode(params).encode("utf-8")
-        client = await self._client()
-        resp = await client.post(
+        resp = await self._retry_request(
+            "POST",
             f"{EBI_URL}/run",
             content=data,
             headers={"Content-Type": "application/x-www-form-urlencoded"},
+            timeout=_TIMEOUT_SUBMIT,
+            retries=2,
         )
-        resp.raise_for_status()
         return resp.text.strip()
 
     async def ebi_status(self, job_id: str) -> str:
         """Poll EBI BLAST job status. Returns the raw status string."""
-        client = await self._client()
-        resp = await client.get(f"{EBI_URL}/status/{job_id}")
-        resp.raise_for_status()
+        resp = await self._retry_request(
+            "GET",
+            f"{EBI_URL}/status/{job_id}",
+            timeout=_TIMEOUT_STATUS,
+            retries=1,
+        )
         return resp.text.strip()
 
     async def ebi_results(self, job_id: str, query_len: int = 1) -> list[dict[str, Any]]:
         """Fetch finished EBI BLAST results and normalise into BlastHit dicts."""
-        client = await self._client()
-        resp = await client.get(f"{EBI_URL}/result/{job_id}/json", timeout=45.0)
-        resp.raise_for_status()
+        resp = await self._retry_request(
+            "GET",
+            f"{EBI_URL}/result/{job_id}/json",
+            timeout=_TIMEOUT_RESULTS,
+            retries=2,
+            backoff=2.0,
+        )
         data = resp.json()
         q_len = int(data.get("query_len") or query_len or 1)
         return self._parse_ebi_hits(data.get("hits", []), q_len)
@@ -339,3 +410,17 @@ class BlastClient:
                 continue
 
         return sorted(results, key=lambda x: x["e_value"])
+
+
+# ── Module-level singleton ─────────────────────────────────────────────────────
+# Share a single BlastClient (and its httpx connection pool) across all requests.
+_singleton: BlastClient | None = None
+
+
+def get_blast_client() -> BlastClient:
+    """Return the module-level singleton BlastClient instance."""
+    global _singleton
+    if _singleton is None:
+        _singleton = BlastClient()
+    return _singleton
+

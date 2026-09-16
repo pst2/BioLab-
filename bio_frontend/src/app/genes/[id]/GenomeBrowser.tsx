@@ -18,8 +18,30 @@
  *  /api/v1/sequence/igv/fasta?accession={genomic_accession}&start={start-PADDING}&end={end+PADDING}
  */
 
-import { useEffect, useRef, useState } from "react";
-import { AlertCircle, Box, Dna, ExternalLink, Globe, Loader2, MapPin, Sparkles } from "lucide-react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import {
+  AlertCircle,
+  Box,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Clipboard,
+  Dna,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  Globe,
+  Loader2,
+  MapPin,
+  Maximize2,
+  Minimize2,
+  Minus,
+  Plus,
+  RotateCcw,
+  Sparkles,
+  ZoomIn,
+  ZoomOut,
+} from "lucide-react";
 import type { GeneDetail } from "@/lib/api";
 import { useLanguage } from "@/lib/i18n";
 
@@ -46,9 +68,17 @@ const ASSEMBLY_LABELS: Record<string, string> = {
  */
 const VALID_ACCESSION_RE = /^(?=.*[A-Za-z])[A-Za-z0-9_.-]{3,40}$/;
 
+/** Loading stage definitions for progress display */
+const LOADING_STAGES = [
+  { key: "stageLoadingIgv" as const, progress: 20 },
+  { key: "stageFetchingSeq" as const, progress: 60 },
+  { key: "stageRendering" as const, progress: 90 },
+] as const;
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type BrowserStatus = "idle" | "loading" | "ready" | "error";
+type LoadingStage = 0 | 1 | 2 | 3;
 
 interface GenomeBrowserProps {
   gene: GeneDetail;
@@ -99,17 +129,65 @@ function buildRelativeLocus(
   return `${accession}:${relStart}-${Math.max(relStart + 1, relEnd)}`;
 }
 
+function formatBp(bp: number): string {
+  if (bp >= 1_000_000) return `${(bp / 1_000_000).toFixed(2)} Mb`;
+  if (bp >= 1_000) return `${(bp / 1_000).toFixed(1)} kb`;
+  return `${bp} bp`;
+}
+
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function BrowserSkeleton() {
+function BrowserSkeleton({ stage }: { stage: LoadingStage }) {
   const { t } = useLanguage();
+  const stageInfo = stage < 3 ? LOADING_STAGES[stage as 0 | 1 | 2] : undefined;
+  const stageLabel = stageInfo
+    ? t(`browser.${stageInfo.key}`)
+    : t("browser.stageRendering");
+  const progress = stageInfo ? stageInfo.progress : 100;
+
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-12 text-slate-400 dark:text-slate-500">
-      <Loader2 className="h-7 w-7 animate-spin text-cyan-500" />
-      <p className="text-sm font-medium">{t("browser.loading")}</p>
-      <p className="text-xs text-slate-400 dark:text-slate-500">
-        {t("browser.loadingSub")}
-      </p>
+    <div className="flex flex-col gap-4 py-6 px-4 animate-fadeIn">
+      {/* Progress bar */}
+      <div className="relative">
+        <div className="h-1 w-full rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+          <div
+            className="igv-progress-bar"
+            style={{ "--igv-progress": `${progress}%` } as React.CSSProperties}
+          />
+        </div>
+        <div className="mt-3 flex items-center justify-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin text-cyan-500" />
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            {stageLabel}
+          </span>
+        </div>
+      </div>
+
+      {/* Skeleton tracks mimicking IGV layout */}
+      <div className="rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white dark:bg-slate-800/50 overflow-hidden">
+        {/* Fake navbar */}
+        <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-100 dark:border-slate-700/50">
+          <div className="h-6 w-16 rounded-md bg-slate-200/80 dark:bg-slate-700/80" style={{ animation: "igvSkeletonPulse 1.5s ease infinite" }} />
+          <div className="h-6 w-32 rounded-md bg-slate-200/80 dark:bg-slate-700/80" style={{ animation: "igvSkeletonPulse 1.5s ease infinite 150ms" }} />
+          <div className="flex-1" />
+          <div className="h-6 w-8 rounded-md bg-slate-200/80 dark:bg-slate-700/80" style={{ animation: "igvSkeletonPulse 1.5s ease infinite 300ms" }} />
+          <div className="h-6 w-8 rounded-md bg-slate-200/80 dark:bg-slate-700/80" style={{ animation: "igvSkeletonPulse 1.5s ease infinite 400ms" }} />
+        </div>
+        {/* Fake ruler */}
+        <div className="px-3 py-2">
+          <div className="igv-skeleton-ruler w-full" />
+        </div>
+        {/* Fake sequence track */}
+        <div className="px-3 py-1">
+          <div className="igv-skeleton-track w-full" />
+        </div>
+        {/* Fake annotation track */}
+        <div className="px-3 py-2 space-y-1.5">
+          <div className="igv-skeleton-track w-3/4" style={{ animationDelay: "200ms" }} />
+          <div className="igv-skeleton-track w-5/6" style={{ animationDelay: "350ms", height: "32px" }} />
+          <div className="igv-skeleton-track w-2/3" style={{ animationDelay: "500ms" }} />
+        </div>
+      </div>
     </div>
   );
 }
@@ -186,6 +264,7 @@ function BrowserError({ message, onRetry, gene }: { message: string; onRetry: ()
               : "border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-slate-700"
           }`}
         >
+          <RotateCcw className="h-3 w-3" />
           {t("browser.tryAgain")}
         </button>
       </div>
@@ -301,7 +380,216 @@ async function loadIgvCreateBrowser(): Promise<(container: HTMLElement, options:
   });
 }
 
-// ── Main Component ────────────────────────────────────────────────────────────
+// ── Toolbar Component ─────────────────────────────────────────────────────────
+
+function BrowserToolbar({
+  browserRef,
+  isFullscreen,
+  onToggleFullscreen,
+  tracksVisible,
+  onToggleTracks,
+  accession,
+  start,
+  end,
+  chromosome,
+}: {
+  browserRef: React.RefObject<any>;
+  isFullscreen: boolean;
+  onToggleFullscreen: () => void;
+  tracksVisible: boolean;
+  onToggleTracks: () => void;
+  accession: string;
+  start: number;
+  end: number;
+  chromosome: string;
+}) {
+  const { t } = useLanguage();
+  const [locusInput, setLocusInput] = useState("");
+  const [showLocusInput, setShowLocusInput] = useState(false);
+
+  const handleZoomIn = useCallback(() => {
+    browserRef.current?.zoomIn?.();
+  }, [browserRef]);
+
+  const handleZoomOut = useCallback(() => {
+    browserRef.current?.zoomOut?.();
+  }, [browserRef]);
+
+  const handleJumpToLocus = useCallback(() => {
+    if (!locusInput.trim() || !browserRef.current) return;
+    const locus = locusInput.includes(":") ? locusInput : `${accession}:${locusInput}`;
+    browserRef.current.search?.(locus)?.catch?.(() => {});
+    setShowLocusInput(false);
+    setLocusInput("");
+  }, [locusInput, browserRef, accession]);
+
+  // Build NCBI Sequence Viewer URL
+  const ncbiUrl = `https://www.ncbi.nlm.nih.gov/nuccore/${accession}?report=graph&from=${start}&to=${end}`;
+  // Build UCSC Genome Browser URL
+  const chrLabel = chromosome?.startsWith("chr") ? chromosome : `chr${chromosome || "1"}`;
+  const ucscUrl = `https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&position=${chrLabel}:${start}-${end}`;
+
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 py-2">
+      {/* Zoom controls */}
+      <div className="flex items-center rounded-lg border border-slate-200/60 dark:border-slate-700/60 overflow-hidden">
+        <button
+          onClick={handleZoomIn}
+          className="igv-toolbar-btn rounded-none border-0"
+          title={t("browser.zoomIn")}
+        >
+          <Plus />
+        </button>
+        <div className="w-px h-5 bg-slate-200 dark:bg-slate-700" />
+        <button
+          onClick={handleZoomOut}
+          className="igv-toolbar-btn rounded-none border-0"
+          title={t("browser.zoomOut")}
+        >
+          <Minus />
+        </button>
+      </div>
+
+      {/* Jump to locus */}
+      {showLocusInput ? (
+        <div className="flex items-center gap-1">
+          <input
+            type="text"
+            value={locusInput}
+            onChange={(e) => setLocusInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleJumpToLocus()}
+            placeholder={t("browser.jumpPlaceholder")}
+            className="h-7 w-40 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 text-xs font-mono text-slate-700 dark:text-slate-300 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/20 transition"
+            autoFocus
+          />
+          <button onClick={handleJumpToLocus} className="igv-toolbar-btn">
+            <MapPin />
+          </button>
+          <button onClick={() => { setShowLocusInput(false); setLocusInput(""); }} className="igv-toolbar-btn">
+            ✕
+          </button>
+        </div>
+      ) : (
+        <button onClick={() => setShowLocusInput(true)} className="igv-toolbar-btn">
+          <MapPin />
+          <span className="hidden sm:inline">{t("browser.jumpToLocus")}</span>
+        </button>
+      )}
+
+      {/* Toggle tracks */}
+      <button onClick={onToggleTracks} className={`igv-toolbar-btn ${!tracksVisible ? "active" : ""}`}>
+        {tracksVisible ? <Eye /> : <EyeOff />}
+        <span className="hidden sm:inline">{t("browser.toggleTracks")}</span>
+      </button>
+
+      {/* Spacer */}
+      <div className="flex-1" />
+
+      {/* External links */}
+      <a href={ncbiUrl} target="_blank" rel="noopener noreferrer" className="igv-toolbar-btn">
+        <Globe />
+        <span className="hidden sm:inline">{t("browser.openInNcbi")}</span>
+      </a>
+      <a href={ucscUrl} target="_blank" rel="noopener noreferrer" className="igv-toolbar-btn">
+        <ExternalLink />
+        <span className="hidden sm:inline">{t("browser.openInUcsc")}</span>
+      </a>
+
+      {/* Fullscreen */}
+      <button onClick={onToggleFullscreen} className="igv-toolbar-btn">
+        {isFullscreen ? <Minimize2 /> : <Maximize2 />}
+        <span className="hidden sm:inline">{isFullscreen ? t("browser.exitFullscreen") : t("browser.fullscreen")}</span>
+      </button>
+    </div>
+  );
+}
+
+// ── Status Bar Component ──────────────────────────────────────────────────────
+
+function BrowserStatusBar({
+  accession,
+  chromosome,
+  start,
+  end,
+  gene,
+}: {
+  accession: string;
+  chromosome: string;
+  start: number;
+  end: number;
+  gene: GeneDetail;
+}) {
+  const { t } = useLanguage();
+  const [copied, setCopied] = useState(false);
+  const chrLabel = chromosome?.startsWith("chr") ? chromosome : `chr${chromosome || "?"}`;
+  const locusStr = `${chrLabel}:${start.toLocaleString()}–${end.toLocaleString()}`;
+  const length = end - start + 1;
+  const strand = gene.strand === "-" || gene.strand === -1 ? "−" : "+";
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(`${accession} ${chrLabel}:${start}-${end}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback
+    }
+  }, [accession, chrLabel, start, end]);
+
+  return (
+    <div className="igv-status-bar">
+      {/* Accession */}
+      <span className="igv-status-item" title={t("browser.accession")}>
+        <Dna className="h-3 w-3 text-cyan-500" />
+        {accession}
+      </span>
+
+      <span className="igv-status-divider" />
+
+      {/* Coordinates */}
+      <span className="igv-status-item" title={t("browser.coordinates")}>
+        <MapPin className="h-3 w-3 text-indigo-500" />
+        {locusStr}
+      </span>
+
+      <span className="igv-status-divider" />
+
+      {/* Length */}
+      <span className="igv-status-item" title={t("browser.sequenceLength")}>
+        {formatBp(length)}
+      </span>
+
+      {/* Strand */}
+      <span className="igv-status-item" title={t("browser.strand")}>
+        {strand} {t("browser.strand").toLowerCase()}
+      </span>
+
+      {/* Spacer */}
+      <div className="flex-1" />
+
+      {/* Copy coordinates */}
+      <button
+        onClick={handleCopy}
+        className="igv-toolbar-btn text-[10px] py-0.5 px-1.5"
+        title={t("browser.copyLocus")}
+      >
+        {copied ? (
+          <>
+            <Check className="h-3 w-3 text-emerald-500" />
+            <span className="text-emerald-600 dark:text-emerald-400">{t("browser.copiedLocus")}</span>
+          </>
+        ) : (
+          <>
+            <Clipboard className="h-3 w-3" />
+            <span className="hidden sm:inline">{t("browser.copyLocus")}</span>
+          </>
+        )}
+      </button>
+    </div>
+  );
+}
+
+// ── Protein Structure Card ────────────────────────────────────────────────────
 
 function ProteinStructureCard({ gene }: { gene: GeneDetail }) {
   const { t } = useLanguage();
@@ -429,11 +717,17 @@ function ProteinStructureCard({ gene }: { gene: GeneDetail }) {
   );
 }
 
+// ── Main Component ────────────────────────────────────────────────────────────
+
 export function GenomeBrowser({ gene }: GenomeBrowserProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const browserInstanceRef = useRef<any>(null);
   const [status, setStatus] = useState<BrowserStatus>("idle");
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [retryKey, setRetryKey] = useState(0);
+  const [loadingStage, setLoadingStage] = useState<LoadingStage>(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [tracksVisible, setTracksVisible] = useState(true);
 
   const dataType = String(gene.data_type || gene.sequence_type || "").toLowerCase();
   const source = String(gene.source || gene.database || "").toLowerCase();
@@ -461,22 +755,55 @@ export function GenomeBrowser({ gene }: GenomeBrowserProps) {
   // Guard: require a valid accession string
   const isSupported = Boolean(accession && VALID_ACCESSION_RE.test(accession));
 
+  // Toggle tracks visibility
+  const handleToggleTracks = useCallback(() => {
+    const browser = browserInstanceRef.current;
+    if (!browser) return;
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Toggle track containers visibility
+    const trackDivs = container.querySelectorAll(".igv-track-container");
+    trackDivs.forEach((el: Element) => {
+      (el as HTMLElement).style.display = tracksVisible ? "none" : "";
+    });
+    setTracksVisible(!tracksVisible);
+  }, [tracksVisible]);
+
+  // Fullscreen toggle
+  const handleToggleFullscreen = useCallback(() => {
+    setIsFullscreen((prev) => !prev);
+  }, []);
+
+  // Escape key to exit fullscreen
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsFullscreen(false);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [isFullscreen]);
+
   useEffect(() => {
     if (isProtein || !isSupported) return;
     if (!containerRef.current) return;
 
     const container = containerRef.current;
-    let browser: { removeAllTracks(): void; dispose?(): void } | null = null;
+    let browser: { removeAllTracks(): void; dispose?(): void; zoomIn?(): void; zoomOut?(): void; search?(locus: string): Promise<void> } | null = null;
     let cancelled = false;
 
     setStatus("loading");
     setErrorMsg("");
+    setLoadingStage(0);
 
     (async () => {
       try {
+        setLoadingStage(0); // Loading IGV.js
         const createBrowserFn = await loadIgvCreateBrowser();
 
         if (cancelled) return;
+        setLoadingStage(1); // Fetching sequence
 
         const seqLen = gene.sequence_length || gene.sequence?.length;
         const { paddedStart, paddedEnd } = computePaddedRange(start, end, seqLen);
@@ -503,6 +830,8 @@ export function GenomeBrowser({ gene }: GenomeBrowserProps) {
           height: 40,
         };
 
+        setLoadingStage(2); // Rendering
+
         browser = await createBrowserFn(container, {
           loadDefaultGenomes: false,
           genomeList: [],
@@ -521,7 +850,11 @@ export function GenomeBrowser({ gene }: GenomeBrowserProps) {
           tracks: [annotationTrack],
         });
 
-        if (!cancelled) setStatus("ready");
+        if (!cancelled) {
+          browserInstanceRef.current = browser;
+          setLoadingStage(3);
+          setStatus("ready");
+        }
       } catch (err: unknown) {
         if (!cancelled) {
           const msg =
@@ -536,6 +869,7 @@ export function GenomeBrowser({ gene }: GenomeBrowserProps) {
 
     return () => {
       cancelled = true;
+      browserInstanceRef.current = null;
       try {
         if (browser?.dispose) {
           browser.dispose();
@@ -566,8 +900,8 @@ export function GenomeBrowser({ gene }: GenomeBrowserProps) {
     );
   }
 
-  return (
-    <section className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-5 shadow-sm">
+  const browserContent = (
+    <>
       <SectionHeader>
         {status === "ready" && (
           <div className="flex items-center gap-2">
@@ -596,17 +930,73 @@ export function GenomeBrowser({ gene }: GenomeBrowserProps) {
 
       {(status === "loading" || status === "idle") && (
         <div className="mt-4">
-          <BrowserSkeleton />
+          <BrowserSkeleton stage={loadingStage} />
         </div>
       )}
 
-      {/* IGV.js mounts here — container needs light background and explicit min-height */}
-      <div
-        ref={containerRef}
-        id="igv-browser-container"
-        className="mt-4 rounded-lg bg-white text-slate-900 p-2 border border-slate-200 dark:border-slate-700 shadow-inner overflow-hidden"
-        style={{ minHeight: "480px", display: status === "ready" ? "block" : "none" }}
-      />
+      {/* Toolbar — only visible when IGV is ready */}
+      {status === "ready" && (
+        <BrowserToolbar
+          browserRef={browserInstanceRef}
+          isFullscreen={isFullscreen}
+          onToggleFullscreen={handleToggleFullscreen}
+          tracksVisible={tracksVisible}
+          onToggleTracks={handleToggleTracks}
+          accession={accession!}
+          start={start}
+          end={end}
+          chromosome={chromosome}
+        />
+      )}
+
+      {/* IGV.js mounts here — container needs light background */}
+      <div className={`igv-browser-wrapper ${status === "ready" ? "igv-glow" : ""}`}>
+        <div
+          ref={containerRef}
+          id="igv-browser-container"
+          className="rounded-lg bg-white text-slate-900 border border-slate-200 dark:border-slate-700 shadow-inner overflow-hidden"
+          style={{ minHeight: "480px", display: status === "ready" ? "block" : "none" }}
+        />
+      </div>
+
+      {/* Status bar — visible when ready */}
+      {status === "ready" && (
+        <BrowserStatusBar
+          accession={accession!}
+          chromosome={chromosome}
+          start={start}
+          end={end}
+          gene={gene}
+        />
+      )}
+    </>
+  );
+
+  // Fullscreen overlay
+  if (isFullscreen) {
+    return (
+      <>
+        {/* Placeholder to maintain layout */}
+        <section className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-5 shadow-sm">
+          <SectionHeader />
+          <div className="flex items-center justify-center py-12 text-sm text-slate-400 dark:text-slate-500">
+            <Maximize2 className="h-4 w-4 mr-2" />
+            Genome Browser is in fullscreen mode
+          </div>
+        </section>
+        {/* Fullscreen overlay */}
+        <div className="igv-fullscreen-overlay">
+          <div className="max-w-[1600px] w-full mx-auto flex-1 flex flex-col">
+            {browserContent}
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <section className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-5 shadow-sm">
+      {browserContent}
     </section>
   );
 }

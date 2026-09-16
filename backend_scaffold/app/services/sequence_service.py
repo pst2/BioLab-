@@ -9,7 +9,7 @@ from sqlalchemy import String, cast
 from sqlalchemy.orm import Session
 
 from app.bioinformatics.fasta_parser import FastaParser, _IUPAC_COMPLEMENT
-from app.clients.blast_client import DEFAULT_DATABASES, BlastClient
+from app.clients.blast_client import DEFAULT_DATABASES, get_blast_client
 from app.clients.ncbi_client import NCBIClient
 from app.core.config import settings
 from app.data.mock_blast import get_mock_blast_hits
@@ -28,7 +28,7 @@ class SequenceService:
     def __init__(self, db: Session | None = None) -> None:
         self.db = db
         self.ncbi_client = NCBIClient()
-        self.blast_client = BlastClient()
+        self.blast_client = get_blast_client()
         self.cache_repository = (
             SequenceCacheRepository(db, ttl_seconds=settings.CACHE_TTL_SEQUENCE_SECONDS) if db else None
         )

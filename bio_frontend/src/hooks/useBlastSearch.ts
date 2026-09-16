@@ -52,7 +52,17 @@ export function useBlastSearch(t?: Translate) {
 
   const pollCount = useRef(0);
   const timerRef = useRef<any>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const submittingRef = useRef(false);
   const toast = useToast();
+
+  // Adaptive polling: start fast, slow down as job runs longer
+  function getPollingInterval(polls: number): number {
+    if (polls <= 5) return 3000;   // First 15s: poll every 3s
+    if (polls <= 15) return 4000;  // Next 40s:  poll every 4s
+    if (polls <= 30) return 6000;  // Next 90s:  poll every 6s
+    return 8000;                   // After ~2.5min: poll every 8s
+  }
 
   // Restore history and active session state on mount
   useEffect(() => {
@@ -177,18 +187,28 @@ export function useBlastSearch(t?: Translate) {
     if (!jobId || status === "FINISHED" || status === "ERROR" || status === "NOT_FOUND" || status === "idle") return;
     pollCount.current = 0;
     let consecutiveErrors = 0;
-    const MAX_POLLS = 100; // ~4 minutes max at 2.5s interval
-    const intervalId = setInterval(async () => {
+    const MAX_POLLS = 120; // ~10 minutes with adaptive intervals
+    let cancelled = false;
+
+    // Create a fresh AbortController for this polling session
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    async function poll() {
+      if (cancelled || controller.signal.aborted) return;
       pollCount.current += 1;
       if (pollCount.current > MAX_POLLS) {
         setStatus("ERROR");
         setError(t ? t("toast.blastTimedOut") : "BLAST search timed out. Please try again or select a local provider.");
         setLoading(false);
-        clearInterval(intervalId);
         return;
       }
       try {
-        const res = await api.checkSequenceSearchStatus(jobId);
+        if (!jobId) return;
+        const res = await api.checkSequenceSearchStatus(jobId, {
+          signal: controller.signal,
+        });
+        if (cancelled || controller.signal.aborted) return;
         consecutiveErrors = 0;
         const job = res.data;
         if (job) {
@@ -202,35 +222,61 @@ export function useBlastSearch(t?: Translate) {
               ? t("toast.blastComplete").replace("{count}", String(hitResults.length))
               : `BLAST search complete — ${hitResults.length} alignments found`;
             toast.success(successMsg);
-            clearInterval(intervalId);
+            return;
           } else if (job.status === "ERROR" || job.status === "NOT_FOUND") {
             setStatus(job.status);
             setError(job.error || res.message || (t ? t("blast.failed") : "BLAST search failed."));
             setLoading(false);
-            clearInterval(intervalId);
+            return;
           } else {
             setStatus(job.status || "RUNNING");
           }
         }
       } catch (err) {
+        if (cancelled || controller.signal.aborted) return;
         consecutiveErrors += 1;
         if (consecutiveErrors >= 6) {
           setStatus("ERROR");
           const msg = err instanceof Error ? err.message : (t ? t("blast.failed") : "Connection lost while polling BLAST status.");
           setError(msg);
           setLoading(false);
-          clearInterval(intervalId);
+          return;
         }
       }
-    }, 2500);
+      // Schedule next poll with adaptive interval
+      if (!cancelled && !controller.signal.aborted) {
+        timerRef.current = setTimeout(poll, getPollingInterval(pollCount.current));
+      }
+    }
 
-    return () => clearInterval(intervalId);
+    // Start first poll after initial delay
+    timerRef.current = setTimeout(poll, getPollingInterval(0));
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, [jobId, status, toast, t, seq, seqType, provider, database]);
 
   async function submitJob(event?: FormEvent) {
     event?.preventDefault();
     const cleanSeq = seq.trim();
     if (!cleanSeq) return;
+    // Prevent double-submit
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+
+    // Abort any previous in-flight polling
+    if (abortRef.current) {
+      abortRef.current.abort();
+      abortRef.current = null;
+    }
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
     setLoading(true);
     setError("");
     setHits([]);
@@ -287,10 +333,21 @@ export function useBlastSearch(t?: Translate) {
       setStatus("ERROR");
       setLoading(false);
       toast.error(msg);
+    } finally {
+      submittingRef.current = false;
     }
   }
 
   function reset() {
+    // Abort any in-flight polling requests
+    if (abortRef.current) {
+      abortRef.current.abort();
+      abortRef.current = null;
+    }
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
     setLoading(false);
     setJobId(null);
     setStatus("idle");

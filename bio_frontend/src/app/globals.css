@@ -1128,3 +1128,364 @@ html.dark .aa-tooltip {
 html.dark .theme-toggle { color: #94a3b8; border-color: rgba(148, 163, 184, 0.15); }
 html.dark .theme-toggle:hover { background: rgba(255,255,255,0.06); color: #e2e8f0; }
 
+/* ═══════════════════════════════════════════
+   IGV GENOME BROWSER OVERRIDES
+   Custom styling for IGV.js DOM elements
+═══════════════════════════════════════════ */
+
+/* ── Wrapper animations ─────────────────── */
+@keyframes igvFadeIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.995); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes igvGlowPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0), 0 1px 3px rgba(15,23,42,0.06); }
+  50%      { box-shadow: 0 0 20px 2px rgba(6, 182, 212, 0.08), 0 1px 3px rgba(15,23,42,0.06); }
+}
+@keyframes igvSkeletonPulse {
+  0%   { opacity: 0.4; }
+  50%  { opacity: 0.7; }
+  100% { opacity: 0.4; }
+}
+@keyframes igvProgressBar {
+  0%   { width: 0%; }
+  100% { width: var(--igv-progress, 0%); }
+}
+@keyframes igvTrackSlideIn {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Container & wrapper ────────────────── */
+.igv-browser-wrapper {
+  animation: igvFadeIn 500ms var(--ease-out) both;
+}
+.igv-browser-wrapper.igv-glow {
+  animation: igvFadeIn 500ms var(--ease-out) both, igvGlowPulse 3s ease-in-out 600ms 2;
+}
+
+#igv-browser-container {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 400ms var(--ease-out);
+}
+#igv-browser-container:hover {
+  box-shadow: 0 2px 16px rgba(6, 182, 212, 0.06), 0 1px 4px rgba(15,23,42,0.06);
+}
+
+/* ── IGV Navigation bar ─────────────────── */
+#igv-browser-container .igv-navbar {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px) saturate(1.4) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(1.4) !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2) !important;
+  padding: 6px 12px !important;
+  border-radius: 12px 12px 0 0 !important;
+  gap: 6px !important;
+  transition: background 200ms ease, border-color 200ms ease;
+}
+#igv-browser-container .igv-navbar:hover {
+  background: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Navigation buttons (zoom, pan, etc.) */
+#igv-browser-container .igv-navbar button,
+#igv-browser-container .igv-navbar .igv-nav-bar-button {
+  border-radius: 8px !important;
+  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+  color: #475569 !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  transition: all 180ms ease !important;
+  cursor: pointer !important;
+}
+#igv-browser-container .igv-navbar button:hover,
+#igv-browser-container .igv-navbar .igv-nav-bar-button:hover {
+  background: rgba(6, 182, 212, 0.08) !important;
+  border-color: rgba(6, 182, 212, 0.35) !important;
+  color: #0891b2 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.12);
+}
+#igv-browser-container .igv-navbar button:active,
+#igv-browser-container .igv-navbar .igv-nav-bar-button:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* Locus / search input within navbar */
+#igv-browser-container .igv-navbar input,
+#igv-browser-container .igv-search-input {
+  border-radius: 8px !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+  font-size: 11px !important;
+  padding: 5px 10px !important;
+  color: #1e293b !important;
+  transition: border-color 200ms ease, box-shadow 200ms ease !important;
+}
+#igv-browser-container .igv-navbar input:focus,
+#igv-browser-container .igv-search-input:focus {
+  outline: none !important;
+  border-color: #06b6d4 !important;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.12) !important;
+}
+
+/* ── Ruler / coordinate track ───────────── */
+#igv-browser-container .igv-ruler-track {
+  border-bottom: 1px solid rgba(6, 182, 212, 0.15) !important;
+}
+
+/* ── Center guide line ──────────────────── */
+#igv-browser-container .igv-center-guide {
+  border-left: 1px solid rgba(6, 182, 212, 0.35) !important;
+  border-right: 1px solid rgba(6, 182, 212, 0.35) !important;
+  background: rgba(6, 182, 212, 0.04) !important;
+  transition: background 150ms ease;
+}
+
+/* ── Cursor tracking guide ──────────────── */
+#igv-browser-container .igv-cursor-tracking-guide {
+  border-left: 1px dashed rgba(6, 182, 212, 0.4) !important;
+}
+
+/* ── Track containers ───────────────────── */
+#igv-browser-container .igv-track-container {
+  transition: background 180ms ease;
+}
+#igv-browser-container .igv-track-container:hover {
+  background: rgba(248, 250, 252, 0.5) !important;
+}
+
+/* Track labels / headers */
+#igv-browser-container .igv-track-label {
+  background: linear-gradient(135deg, #334155, #1e293b) !important;
+  color: #e2e8f0 !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+  padding: 3px 10px !important;
+  border-radius: 6px !important;
+  border: none !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15) !important;
+  transition: opacity 200ms ease !important;
+}
+#igv-browser-container .igv-track-label:hover {
+  opacity: 0.85 !important;
+}
+
+/* Track drag handles */
+#igv-browser-container .igv-track-drag-handle {
+  background: rgba(148, 163, 184, 0.12) !important;
+  border-right: 1px solid rgba(148, 163, 184, 0.15) !important;
+  transition: background 180ms ease !important;
+}
+#igv-browser-container .igv-track-drag-handle:hover {
+  background: rgba(6, 182, 212, 0.08) !important;
+}
+
+/* Track gear / menu icons */
+#igv-browser-container .igv-track-menu-container button,
+#igv-browser-container .igv-gear-menu-button {
+  border-radius: 6px !important;
+  transition: background 150ms ease, color 150ms ease !important;
+}
+#igv-browser-container .igv-track-menu-container button:hover,
+#igv-browser-container .igv-gear-menu-button:hover {
+  background: rgba(6, 182, 212, 0.1) !important;
+  color: #0891b2 !important;
+}
+
+/* ── Popups & menus ─────────────────────── */
+#igv-browser-container .igv-menu-popup,
+#igv-browser-container .igv-popover {
+  border-radius: 10px !important;
+  border: 1px solid rgba(148, 163, 184, 0.2) !important;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12), 0 2px 8px rgba(15, 23, 42, 0.06) !important;
+  backdrop-filter: blur(8px) !important;
+  overflow: hidden !important;
+}
+#igv-browser-container .igv-menu-popup-entry {
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  transition: background 120ms ease !important;
+}
+#igv-browser-container .igv-menu-popup-entry:hover {
+  background: rgba(6, 182, 212, 0.08) !important;
+}
+
+/* ── Custom scrollbars (WebKit) ─────────── */
+#igv-browser-container ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+#igv-browser-container ::-webkit-scrollbar-track {
+  background: transparent;
+}
+#igv-browser-container ::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 99px;
+  transition: background 200ms ease;
+}
+#igv-browser-container ::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.4);
+}
+
+/* Firefox scrollbar */
+#igv-browser-container * {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+
+/* ── Skeleton track placeholders ────────── */
+.igv-skeleton-track {
+  height: 24px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s linear infinite;
+}
+.igv-skeleton-ruler {
+  height: 18px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #cbd5e1 25%, #e2e8f0 50%, #cbd5e1 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s linear infinite 100ms;
+}
+html.dark .igv-skeleton-track {
+  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+  background-size: 200% 100%;
+}
+html.dark .igv-skeleton-ruler {
+  background: linear-gradient(90deg, #0f172a 25%, #1e293b 50%, #0f172a 75%);
+  background-size: 200% 100%;
+}
+
+/* ── Progress bar ───────────────────────── */
+.igv-progress-bar {
+  height: 3px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #06b6d4, #22d3ee, #67e8f9);
+  animation: igvProgressBar 600ms var(--ease-out) both;
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
+}
+
+/* ── Status bar ─────────────────────────── */
+.igv-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  background: rgba(248, 250, 252, 0.8);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 0 0 12px 12px;
+  font-size: 11px;
+  color: #64748b;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  transition: background 200ms ease;
+}
+.igv-status-bar .igv-status-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.04);
+  transition: background 150ms ease;
+}
+.igv-status-bar .igv-status-item:hover {
+  background: rgba(6, 182, 212, 0.08);
+}
+.igv-status-bar .igv-status-divider {
+  width: 1px;
+  height: 14px;
+  background: rgba(148, 163, 184, 0.2);
+}
+
+/* ── Toolbar actions ────────────────────── */
+.igv-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(255, 255, 255, 0.8);
+  color: #475569;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 180ms ease;
+  white-space: nowrap;
+}
+.igv-toolbar-btn:hover {
+  background: rgba(6, 182, 212, 0.08);
+  border-color: rgba(6, 182, 212, 0.35);
+  color: #0891b2;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.1);
+}
+.igv-toolbar-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+.igv-toolbar-btn.active {
+  background: rgba(6, 182, 212, 0.12);
+  border-color: rgba(6, 182, 212, 0.4);
+  color: #0891b2;
+}
+.igv-toolbar-btn svg {
+  width: 14px;
+  height: 14px;
+}
+html.dark .igv-toolbar-btn {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+}
+html.dark .igv-toolbar-btn:hover {
+  background: rgba(6, 182, 212, 0.12);
+  border-color: rgba(6, 182, 212, 0.3);
+  color: #22d3ee;
+}
+
+/* ── Fullscreen mode ────────────────────── */
+.igv-fullscreen-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(4px);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  animation: igvFadeIn 300ms var(--ease-out) both;
+  overflow-y: auto;
+}
+html.dark .igv-fullscreen-overlay {
+  background: rgba(15, 23, 42, 0.98);
+}
+
+/* ── Responsive adjustments ─────────────── */
+@media (max-width: 768px) {
+  #igv-browser-container .igv-navbar {
+    padding: 4px 8px !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+  }
+  .igv-status-bar {
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px 10px;
+    font-size: 10px;
+  }
+  .igv-toolbar-btn {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+}
+
+
