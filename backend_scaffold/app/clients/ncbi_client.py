@@ -539,7 +539,10 @@ class NCBIClient:
         mesh_map: dict[str, list[str]] = {}
         keyword_map: dict[str, list[str]] = {}
         try:
-            from lxml import etree
+            try:
+                from lxml import etree
+            except ImportError:
+                import xml.etree.ElementTree as etree
             root = etree.fromstring(xml_text.encode("utf-8"))
             for article in root.findall(".//PubmedArticle"):
                 pmid_el = article.find(".//PMID")

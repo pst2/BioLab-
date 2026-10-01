@@ -56,3 +56,9 @@ yarn-debug.log*
 
 # Alembic auto-generated (optional — keep if you want migration files in repo)
 # alembic/versions/
+
+# Scratch notes & temporary extracts
+extracted_report.txt
+figures_ch4.txt
+i18n_matches.txt
+search_4_4.txt
