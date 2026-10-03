@@ -1,0 +1,14 @@
+Cách tổ chức này giúp người dùng dễ dàng theo dõi quá trình xử lý dữ liệu và giảm thời gian chuyển đổi giữa các công cụ khác nhau.
+---
+Trong quá trình thực nghiệm, bảng cache_entries ghi nhận tổng cộng 45 bản ghi dữ liệu được lưu trữ. Các dữ liệu này được tạo ra sau khi hệ thống thực hiện thành công các truy vấn tới các provider bên ngoài như NCBI, Ensembl hoặc các nguồn dữ liệu sinh học khác. Sau khi nhận được kết quả, hệ thống tiến hành chuẩn hóa dữ liệu và lưu lại trong cache nhằm phục vụ các lần truy vấn tiếp theo.
+---
+Kết quả đo hiệu năng tại mục 4.3. Đánh giá hiệu năng phản hồi và khả năng tăng tốc của cơ chế Caching cho thấy thời gian phản hồi khi truy xuất dữ liệu từ In-Memory Cache đạt 0.46ms-0.95ms.
+---
+Khi nguồn dữ liệu chính không phản hồi, hệ thống có khả năng phát hiện lỗi, tự động chuyển hướng yêu cầu sang nguồn dữ liệu thay thế trong thời gian [thời gian chuyển đổi], đồng thời duy trì cấu trúc dữ liệu trả về bao gồm các thông tin quan trọng như thông tin gene, tọa độ nhiễm sắc thể và metadata nguồn dữ liệu.
+---
+Kết quả kiểm thử tự động cho thấy toàn bộ 78/78 bài kiểm thử đều đạt trạng thái PASSED với thời gian thực thi 7,95s.
+---
+Các phép đo hiệu năng chứng minh hiệu quả của cơ chế Local-First và Caching khi thời gian phản hồi từ In-Memory Cache chỉ dao động 0.46ms-0.95ms so với 2500ms-3500ms khi truy vấn trực tiếp qua mạng tới NCBI.
+---
+Bên cạnh đánh giá chức năng, hiệu năng hệ thống được kiểm chứng thông qua việc so sánh thời gian truy xuất dữ liệu giữa cơ chế lưu trữ nội bộ và truy vấn trực tiếp tới nguồn dữ liệu bên ngoài. Kết quả cho thấy thời gian phản hồi từ In-Memory Cache đạt khoảng 0,46–0,95 ms, trong khi truy vấn trực tiếp tới NCBI thông qua kết nối Internet mất khoảng 2500–3500 ms.
+---

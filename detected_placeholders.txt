@@ -1,0 +1,3 @@
+Line 923: [thời gian chuyển đổi]
+  Context: Khi nguồn dữ liệu chính không phản hồi, hệ thống có khả năng phát hiện lỗi, tự động chuyển hướng yêu cầu sang nguồn dữ liệu thay thế trong thời gian [thời gian chuyển đổi], đồng thời duy trì cấu trúc dữ liệu trả về bao gồm các thông tin quan trọng như thông tin gene, tọa độ nhiễm sắc thể và metadata nguồn dữ liệu.
+

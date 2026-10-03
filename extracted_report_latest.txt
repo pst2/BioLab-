@@ -1,0 +1,1034 @@
+ĐẠI HỌC QUỐC GIA HÀ NỘI
+TRƯỜNG ĐẠI HỌC CÔNG NGHỆ
+Phan Sơn Thịnh
+XÂY DỰNG NỀN TẢNG BIOLAB HỖ TRỢ TRA CỨU, PHÂN TÍCH VÀ TRỰC QUAN HÓA DỮ LIỆU DI TRUYỀN
+ĐỒ ÁN TỐT NGHIỆP ĐẠI HỌC HỆ CHÍNH QUY
+Ngành: Công nghệ Nông nghiệp
+HÀ NỘI - 2026
+ĐẠI HỌC QUỐC GIA HÀ NỘI
+TRƯỜNG ĐẠI HỌC CÔNG NGHỆ
+Phan Sơn Thịnh
+XÂY DỰNG NỀN TẢNG BIOLAB HỖ TRỢ TRA CỨU, PHÂN TÍCH VÀ TRỰC QUAN HÓA DỮ LIỆU DI TRUYỀN
+ĐỒ ÁN TỐT NGHIỆP ĐẠI HỌC HỆ CHÍNH QUY
+Ngành: Công nghệ Nông nghiệp
+Cán bộ hướng dẫn: TS. Chu Đức Hà
+HÀ NỘI - 2026
+[Heading1] LỜI CAM ĐOAN
+Tôi xin cam đoan đây là công trình nghiên cứu và thực hiện của riêng tôi dưới sự hướng dẫn khoa học của TS. Chu Đức Hà, thuộc Khoa Công nghệ Nông nghiệp, Trường Đại học Công nghệ – Đại học Quốc gia Hà Nội.
+Các nội dung, kết quả nghiên cứu, số liệu, hình ảnh, thiết kế hệ thống và đánh giá được trình bày trong Đồ án tốt nghiệp này là trung thực, do tôi trực tiếp thực hiện và chưa từng được công bố trong bất kỳ công trình nghiên cứu nào khác.
+Mọi tài liệu tham khảo, trích dẫn, bảng biểu, sơ đồ, thuật toán, đoạn mã nguồn và các nội dung kế thừa từ các tác giả khác được sử dụng trong đồ án đều được ghi rõ nguồn gốc và kê khai đầy đủ trong danh mục Tài liệu tham khảo theo đúng quy định về học thuật.
+Tôi xin hoàn toàn chịu trách nhiệm về tính trung thực và chính xác của các nội dung được trình bày trong đồ án tốt nghiệp này.
+Hà Nội, ngày    tháng    năm 2026
+Giảng viên hướng dẫn Sinh viên thực hiện
+TS. Chu Đức Hà     Phan Sơn Thịnh
+[Heading1] XÁC NHẬN CỦA GIẢNG VIÊN HƯỚNG DẪN
+“Tôi chấp thuận khóa luận tốt nghiệp này đã sẵn sàng cho hội đồng thẩm định như một yêu cầu để tốt nghiệp với bằng kỹ sư Công nghệ Nông nghiệp tại Trường Đại học Công nghệ - Đại học Quốc gia Hà Nội.”
+
+--- TABLE (1 rows) ---
+ | Hà Nội, ngày   tháng    năm 2026 Giảng viên hướng dẫn TS. Chu Đức Hà
+--- END TABLE ---
+
+[Heading1] LỜI CẢM ƠN
+Để hoàn thành đồ án tốt nghiệp này, em xin gửi lời cảm ơn chân thành và sâu sắc tới các thầy cô giáo thuộc Trường Đại học Công nghệ – Đại học Quốc gia Hà Nội, đặc biệt là các thầy cô Khoa Công nghệ Nông nghiệp, những người đã tận tình giảng dạy, truyền đạt cho em những kiến thức chuyên môn quý báu, đồng thời rèn luyện tư duy nghiên cứu, khả năng phân tích và các kỹ năng cần thiết trong suốt quá trình học tập tại trường.
+Đặc biệt, em xin bày tỏ lòng biết ơn sâu sắc tới TS. Chu Đức Hà, giảng viên hướng dẫn khoa học, đã luôn tận tình hướng dẫn, định hướng nghiên cứu, đóng góp những ý kiến chuyên môn quý báu và tạo điều kiện thuận lợi để em có thể hoàn thành đồ án tốt nghiệp với đề tài “Xây dựng nền tảng web BioLab hỗ trợ tra cứu, phân tích và trực quan hóa dữ liệu di truyền”.
+Em cũng xin gửi lời cảm ơn tới gia đình, bạn bè và các anh chị, bạn học đã luôn quan tâm, động viên, hỗ trợ và chia sẻ những kinh nghiệm quý báu trong suốt quá trình học tập, nghiên cứu và hoàn thiện đồ án này.
+Mặc dù đã nỗ lực và cố gắng trong quá trình thực hiện, đồ án tốt nghiệp của em chắc chắn không tránh khỏi những thiếu sót và hạn chế nhất định. Em rất mong nhận được những nhận xét, góp ý và đánh giá quý báu từ các thầy cô trong Hội đồng đánh giá Đồ án Tốt nghiệp để em có thể tiếp tục hoàn thiện kiến thức, kỹ năng và phát triển sản phẩm trong tương lai.
+Em xin chân thành cảm ơn!
+[Heading1] TÓM TẮT
+Hiện nay, sự bùng nổ của dữ liệu sinh học phân tử và hệ gen học (Genomics) đã tạo ra khối lượng thông tin khổng lồ lưu trữ rải rác trên các cơ sở dữ liệu quốc tế lớn như NCBI, Ensembl, UniProt, BV-BRC và Phytozome. Tuy nhiên, việc khai thác và phân tích các nguồn dữ liệu này đang gặp phải nhiều thách thức lớn: tần suất truy vấn bị giới hạn (Rate Limiting), nguy cơ gián đoạn dịch vụ khi máy chủ trung tâm bị quá tải, sự thiếu đồng bộ về định dạng dữ liệu, và nguy cơ mất dấu nguồn gốc dữ liệu (Data Provenance). Đồ án này nghiên cứu và phát triển BioLab Workspace – một nền tảng tin sinh học toàn diện (Full-Stack Bioinformatics Platform) dựa trên kiến trúc phân lớp (Layered Architecture) hiện đại, kết hợp triết lý thiết kế Local-First và cơ chế dung lỗi đa nhà cung cấp (Multi-Provider Fault Tolerance).
+Hệ thống tích hợp 4 cổng dữ liệu quốc tế (NCBI, Ensembl, UniProt, BV-BRC) với cơ chế tự động chuyển đổi dự phòng (Fallback Orchestrator), đảm bảo quá trình truy vấn dữ liệu gen và protein không bị gián đoạn. BioLab Workspace quản lý dữ liệu tuân thủ nghiêm ngặt nguyên tắc FAIR (Findable, Accessible, Interoperable, Reusable), cho phép ghi nhận và lưu trữ chính xác các chỉ số nguồn gốc (taxid, genome_assembly, accession_version). Hệ thống tích hợp trình duyệt hệ gen IGV.js với thuật toán cắt trình tự FASTA động (Dynamic FASTA Slicing Engine), bộ công cụ phân tích lý hóa protein (trọng lượng phân tử, điểm đẳng điện pI, chỉ số GRAVY), thuật toán tìm khung đọc mở 6-Frame ORF Finder hỗ trợ cả codon khởi đầu thay thế, và module khai phá y văn PubMed hỗ trợ xuất trích dẫn khoa học (BibTeX, RIS).
+Đánh giá thực nghiệm trên hệ thống cho thấy BioLab Workspace đạt chất lượng phần mềm vượt trội với bộ kiểm thử tự động 78/78 bài test passed (tỷ lệ 100%). Cơ chế lưu trữ đệm (Caching) và local database giúp tăng tốc độ phản hồi từ ~2,500ms - 3,500ms (gọi trực tiếp API quốc tế) xuống < 1.0ms (gọi local), tương đương hệ số tăng tốc hơn 800 lần (Local DB) và hơn 3,000 lần (Cache). Phân tích nhật ký 821 request thực tế chứng minh tỷ lệ xử lý thành công đạt 93.9%, khẳng định tính ổn định cao và khả năng ứng dụng thực tiễn vượt trội trong nghiên cứu và đào tạo y sinh.
+Từ khóa: Tin sinh học, BioLab Workspace, Multi-Provider Fallback, Local-First, FAIR Data Provenance, IGV.js, 6-Frame ORF Finder.
+[Heading1] DANH MỤC CÁC KÝ HIỆU VÀ CHỮ VIẾT TẮT
+
+--- TABLE (22 rows) ---
+Chữ viết tắt | Từ tiếng Anh | Nghĩa tiếng Việt
+API | Application Programming Interface | Giao diện lập trình ứng dụng
+BED | Browser Extensible Data | Định dạng dữ liệu biểu diễn tọa độ hệ gen
+BLAST | Basic Local Alignment Search Tool | Công cụ tìm kiếm căn hàng cục bộ cơ bản
+BV-BRC | Bacterial and Viral Bioinformatics Resource Center | Trung tâm tài nguyên tin sinh học vi khuẩn và virus
+CORS | Cross-Origin Resource Sharing | Cơ chế chia sẻ tài nguyên giữa các nguồn khác nhau
+DNA | Deoxyribonucleic Acid | Axit deoxyribonucleic (Vật chất di truyền)
+E-Utilities | Entrez Programming Utilities | Bộ công cụ lập trình truy vấn Entrez của NCBI
+FAIR | Findable, Accessible, Interoperable, Reusable | Khả năng Tìm thấy, Truy cập, Tương tác và Tái sử dụng
+FASTA | FAST-All | Định dạng trình tự sinh học dạng văn bản phẳng
+GC Content | Guanine-Cytosine Content | Tỷ lệ nucleotide Guanine và Cytosine
+GRAVY | Grand Average of Hydropathicity | Chỉ số kỵ nước trung bình toàn thể của protein
+IGV.js | Integrated Genomics Viewer JavaScript | Trình duyệt trực quan hóa hệ gen nhúng trên Web
+IUPAC | International Union of Pure and Applied Chemistry | Liên minh Quốc tế về Hóa học Thuần túy và Ứng dụng
+NCBI | National Center for Biotechnology Information | Trung tâm Thông tin Công nghệ Sinh học Quốc gia Mỹ
+ORF | Open Reading Frame | Khung đọc mở
+pI | Isoelectric Point | Điểm đẳng điện của protein
+REST | Representational State Transfer | Kiểu kiến trúc dịch vụ web chuẩn
+RIS | Research Information Systems | Định dạng trao đổi trích dẫn dữ liệu học thuật
+RNA | Ribonucleic Acid | Axit ribonucleic
+TTL | Time To Live | Thời gian tồn tại của dữ liệu đệm cache
+UniProt | Universal Protein Resource | Kho dữ liệu thông tin protein toàn cầu
+--- END TABLE ---
+
+[Heading1] DANH MỤC BẢNG
+[TableofFigures] Bảng 1.1. Tổng hợp các nguồn dữ liệu sinh học được tích hợp trong nền tảng BioLab.15
+[TableofFigures] Bảng 2.1. So sánh các chế độ truy xuất dữ liệu trong BioLab28
+[TableofFigures] Bảng 3.1. Bảng mã nucleotide suy biến IUPAC và ký tự bổ sung tương ứng37
+[TableofFigures] Bảng 4.1. Cấu hình môi trường máy chủ thực nghiệm58
+[TableofFigures] Bảng 4.2. Phân bổ 78 bài test tự động theo module59
+[TableofFigures] Bảng 4.3. Kết quả đo thời gian phản hồi61
+[TableofFigures] Bảng 4.4. Thống kê mã trạng thái HTTP từ 821 request ghi nhận63
+[TableofFigures] Bảng 4.5. Thống kê bản ghi cơ sở dữ liệu nội bộ66
+[Heading1] DANH MỤC HÌNH VẼ VÀ ĐỒ THỊ
+[TableofFigures] Hình 3.1. Quy trình xử lý dữ liệu Multi FASTA trong BioLab35
+[TableofFigures] Hình 3.2. Sơ đồ ánh xạ nucleotide IUPAC và phép bổ sung trong BioLab38
+[TableofFigures] Hình 3.3. Sơ đồ phân loại tự động DNA/RNA/Protein trong BioLab39
+[TableofFigures] Hình 3.4. Quy trình tính toán các thông số lý hóa protein trong BioLab41
+[TableofFigures] Hình 3.5. Sơ đồ thuật toán tìm điểm đẳng điện pI bằng phương pháp Binary Search43
+[TableofFigures] Hình 3.6. Nguyên lý phân tích sáu khung đọc mở trên chuỗi DNA45
+[TableofFigures] Hình 3.7. Luồng xử lý thuật toán 6-Frame ORF Finder trong BioLab47
+[TableofFigures] Hình 3.8. Kiến trúc tích hợp Dynamic FASTA Slicing Engine và IGV.js trong BioLab48
+[TableofFigures] Hình 3.9. Quy trình truy xuất một vùng genome bằng Dynamic FASTA Slicing49
+[TableofFigures] Hình 3.10. Giao diện trực quan hóa genome bằng IGV.js trong BioLab52
+[TableofFigures] Hình 3.11. Luồng xử lý tìm kiếm tài liệu PubMed trong BioLab53
+[TableofFigures] Hình 3.12. Bố cục giao diện Bento Grid của BioLab55
+[TableofFigures] Hình 3.13. Luồng thao tác người dùng trong nền tảng BioLab56
+[TableofFigures] Hình 4.1. Mô hình môi trường thực nghiệm nền tảng BioLab58
+[TableofFigures] Hình 4.2. Biểu đồ so sánh thời gian phản hồi giữa Cache, Database và truy vấn trực tuyến62
+[TableofFigures] Hình 4.3. Quy trình thu thập và phân tích request metrics trong BioLab63
+[TableofFigures] Hình 4.4. Biểu đồ phân bố các mã trạng thái HTTP trong 821 request65
+[TableofFigures] Hình 4.5. Luồng xử lý dữ liệu khi sử dụng cache trong BioLab67
+[TableofFigures] Hình 4.6. Luồng xử lý Fallback khi provider chính gặp sự cố69
+[Heading1] PHẦN MỞ ĐẦU
+[Heading2] 1. Tính cấp thiết của đề tài
+Trong những năm gần đây, sự phát triển mạnh mẽ của công nghệ sinh học phân tử, đặc biệt là sự ra đời và phổ biến của các kỹ thuật giải trình tự thế hệ mới (Next Generation Sequencing – NGS), đã tạo ra bước tiến lớn trong khả năng thu thập và khai thác dữ liệu di truyền. Các công nghệ giải trình tự hiện đại cho phép tạo ra lượng lớn dữ liệu sinh học với tốc độ ngày càng cao, bao gồm thông tin về trình tự nucleotide, trình tự protein, cấu trúc hệ gen, chú giải gene và các đặc điểm chức năng liên quan.
+Sự phát triển nhanh chóng của dữ liệu di truyền đã mở ra nhiều hướng nghiên cứu quan trọng trong các lĩnh vực như sinh học phân tử, nghiên cứu chức năng gene, phát hiện cơ chế gây bệnh, phát triển thuốc, nghiên cứu tiến hóa và y học chính xác (Precision Medicine). Trong các lĩnh vực này, khả năng truy cập, quản lý, phân tích và trực quan hóa dữ liệu sinh học đóng vai trò quan trọng nhằm hỗ trợ các nhà nghiên cứu đưa ra những nhận định có giá trị từ nguồn dữ liệu khổng lồ.
+Hiện nay, nhiều cơ sở dữ liệu sinh học quy mô lớn trên thế giới đã được xây dựng nhằm cung cấp nguồn dữ liệu mở phục vụ cộng đồng nghiên cứu, tiêu biểu như NCBI, Ensembl, UniProt, BV-BRC và Phytozome. Các hệ thống này lưu trữ lượng lớn thông tin liên quan đến gene, trình tự nucleotide, trình tự protein, dữ liệu chú giải hệ gen (genome annotation) và các công trình nghiên cứu khoa học liên quan.
+Tuy nhiên, việc khai thác hiệu quả các nguồn dữ liệu sinh học hiện nay vẫn còn gặp nhiều hạn chế. Một trong những thách thức lớn là dữ liệu được phân tán trên nhiều hệ thống khác nhau với sự khác biệt về cấu trúc dữ liệu, phương thức truy cập và giao diện khai thác. Trong quá trình nghiên cứu, người dùng thường phải sử dụng đồng thời nhiều công cụ riêng biệt để thực hiện các nhiệm vụ như tìm kiếm thông tin gene, lấy trình tự nucleotide, phân tích đặc điểm trình tự, quan sát vị trí gene trên hệ gen hoặc tra cứu các tài liệu khoa học liên quan.
+Bên cạnh đó, việc phụ thuộc trực tiếp vào các dịch vụ dữ liệu trực tuyến cũng đặt ra những vấn đề về tính ổn định và khả năng mở rộng của hệ thống. Các cơ sở dữ liệu sinh học công khai thường giới hạn số lượng truy vấn nhằm đảm bảo hiệu năng, dẫn đến nguy cơ giảm khả năng đáp ứng khi có nhiều yêu cầu đồng thời hoặc khi các dịch vụ bên ngoài gặp sự cố. Ngoài ra, dữ liệu được thu thập từ nhiều nguồn khác nhau cần được chuẩn hóa, quản lý phiên bản và lưu trữ kèm thông tin metadata nhằm đảm bảo khả năng truy xuất nguồn gốc, kiểm chứng và tái sử dụng trong các nghiên cứu tiếp theo.
+Một hạn chế khác của các công cụ phân tích sinh học hiện nay là sự phân tách về chức năng. Phần lớn các nền tảng chỉ tập trung giải quyết một nhóm tác vụ cụ thể như tra cứu gene, phân tích trình tự hoặc trực quan hóa genome. Điều này khiến người dùng phải chuyển đổi giữa nhiều môi trường khác nhau trong cùng một quy trình nghiên cứu, làm tăng độ phức tạp trong quá trình khai thác dữ liệu.
+Xuất phát từ những vấn đề trên, việc xây dựng một nền tảng tích hợp nhằm hỗ trợ tra cứu, phân tích và trực quan hóa dữ liệu di truyền trong một môi trường thống nhất là cần thiết. Vì vậy, đề tài “Xây dựng nền tảng BioLab hỗ trợ tra cứu, phân tích và trực quan hóa dữ liệu di truyền” được thực hiện với mục tiêu xây dựng một hệ thống web có khả năng kết nối, quản lý và khai thác dữ liệu sinh học một cách hiệu quả, hỗ trợ người dùng trong quá trình nghiên cứu và phân tích dữ liệu gene.
+Hệ thống BioLab được phát triển với các nhóm chức năng chính bao gồm:
+Tra cứu thông tin gene từ nhiều nguồn dữ liệu sinh học khác nhau.
+Thu thập và phân tích các loại trình tự sinh học như DNA, RNA và protein.
+Tính toán các đặc trưng của trình tự nucleotide như thành phần base, hàm lượng GC (GC content), trình tự bổ sung (reverse complement) và các đặc điểm lý hóa của protein.
+Xác định khung đọc mở (Open Reading Frame – ORF) trên trình tự nucleotide nhằm hỗ trợ bước phân tích chức năng gene.
+Trực quan hóa thông tin hệ gen thông qua công cụ genome browser.
+Hỗ trợ tìm kiếm tài liệu khoa học và xuất dữ liệu phục vụ quá trình nghiên cứu.
+Ngoài việc cung cấp các chức năng phân tích cơ bản, hệ thống còn áp dụng một số giải pháp kỹ thuật nhằm nâng cao hiệu quả hoạt động như cơ chế lưu trữ dữ liệu cục bộ, bộ nhớ đệm (cache), tích hợp nhiều nguồn dữ liệu sinh học và quản lý thông tin nguồn gốc dữ liệu (data provenance). Các giải pháp này giúp cải thiện tốc độ truy xuất, tăng tính ổn định, giảm sự phụ thuộc vào các dịch vụ bên ngoài và tạo nền tảng thuận lợi cho khả năng mở rộng trong tương lai.
+Thông qua việc xây dựng BioLab, đề tài hướng tới việc tạo ra một môi trường nghiên cứu tích hợp, giúp đơn giản hóa quá trình khai thác dữ liệu di truyền, đồng thời hỗ trợ người dùng tiếp cận các công cụ phân tích sinh học một cách thuận tiện và hiệu quả hơn.
+[Heading2] 2. Ý nghĩa khoa học và giá trị thực tiễn của đề tài
+2.1. Ý nghĩa khoa học
+Đề tài tập trung nghiên cứu, thiết kế và triển khai các giải pháp kỹ thuật nhằm xây dựng một nền tảng hỗ trợ khai thác dữ liệu di truyền theo hướng tích hợp, ổn định và có khả năng mở rộng. Mục tiêu chính của đề tài là giải quyết bài toán hợp nhất dữ liệu sinh học phân tán, hỗ trợ phân tích các thông tin di truyền cơ bản và cung cấp môi trường trực quan giúp người dùng thuận tiện hơn trong quá trình nghiên cứu.
+Thứ nhất, đề tài xây dựng cơ chế kết nối và điều phối dữ liệu từ nhiều nguồn sinh học khác nhau thông qua lớp tích hợp trung gian. Cách tiếp cận này giúp hệ thống có khả năng khai thác dữ liệu từ nhiều nhà cung cấp như NCBI, Ensembl, UniProt, BV-BRC và Phytozome thay vì phụ thuộc hoàn toàn vào một nguồn dữ liệu duy nhất.
+Thứ hai, đề tài áp dụng mô hình lưu trữ dữ liệu kết hợp giữa dữ liệu cục bộ và dữ liệu trực tuyến. Cơ chế cache và lưu trữ nội bộ giúp giảm số lần truy vấn tới nguồn dữ liệu bên ngoài, đồng thời cải thiện tốc độ phản hồi trong các trường hợp dữ liệu đã được xử lý trước đó.
+Thứ ba, đề tài nghiên cứu và triển khai các module xử lý dữ liệu sinh học bao gồm phân tích trình tự nucleotide, phân tích protein và tìm kiếm ORF. Các module này giúp chuyển đổi dữ liệu trình tự thô thành các thông tin có ý nghĩa phục vụ quá trình nghiên cứu.
+Thứ tư, đề tài nghiên cứu phương pháp quản lý metadata và thông tin nguồn gốc dữ liệu nhằm hỗ trợ khả năng truy xuất, kiểm tra và tái sử dụng dữ liệu trong quá trình khai thác thông tin di truyền.
+2.2. Giá trị thực tiễn
+Về mặt thực tiễn, đề tài xây dựng nền tảng BioLab nhằm hỗ trợ sinh viên, giảng viên và người nghiên cứu trong quá trình tiếp cận và phân tích dữ liệu di truyền.
+Hệ thống cung cấp các nhóm chức năng chính:
+Tìm kiếm và tra cứu thông tin gene.
+Phân tích trình tự DNA/RNA.
+Phân tích đặc tính lý hóa của protein.
+Tìm kiếm ORF trên sáu khung đọc.
+Trực quan hóa dữ liệu genome bằng IGV.js.
+Tra cứu tài liệu khoa học thông qua PubMed.
+Xuất dữ liệu dưới các định dạng phục vụ nghiên cứu như FASTA, GenBank, BED, JSON, BibTeX và RIS.
+Thông qua việc tích hợp các chức năng trên trong cùng một nền tảng, BioLab giúp giảm sự phân tán trong quy trình làm việc, hỗ trợ người dùng tiếp cận dữ liệu di truyền thuận tiện hơn và nâng cao hiệu quả trong quá trình phân tích.
+[Heading2] 3. Đối tượng và phạm vi nghiên cứu
+3.1. Đối tượng nghiên cứu
+Đối tượng nghiên cứu của đề tài là các thành phần kỹ thuật và dữ liệu liên quan đến việc xây dựng một nền tảng hỗ trợ tra cứu, phân tích và trực quan hóa dữ liệu di truyền. Đề tài tập trung nghiên cứu các phương pháp tích hợp, quản lý, xử lý và khai thác dữ liệu sinh học nhằm xây dựng một hệ thống có khả năng hỗ trợ người dùng tiếp cận và phân tích thông tin di truyền trong một môi trường thống nhất.
+3.1.1. Dữ liệu sinh học phân tử
+Đề tài tập trung nghiên cứu các loại dữ liệu sinh học phân tử phục vụ cho các bài toán phân tích di truyền, bao gồm trình tự nucleotide DNA/RNA, trình tự protein, thông tin gene, dữ liệu chú giải hệ gen (genome annotation) và metadata liên quan đến nguồn dữ liệu nghiên cứu.
+Bên cạnh đó, đề tài khảo sát và xử lý các định dạng dữ liệu sinh học phổ biến như FASTA, GenBank, BED cùng các ký hiệu nucleotide theo chuẩn IUPAC. Việc hỗ trợ các định dạng này giúp hệ thống có khả năng tiếp nhận, chuẩn hóa và khai thác dữ liệu từ nhiều nguồn sinh học khác nhau một cách linh hoạt.
+3.1.2. Các nguồn dữ liệu sinh học trực tuyến
+Đề tài nghiên cứu phương pháp tích hợp dữ liệu thông qua các giao diện lập trình ứng dụng (Application Programming Interface – API) từ các cơ sở dữ liệu sinh học trực tuyến phổ biến như NCBI, Ensembl, UniProt, BV-BRC và Phytozome. Các nguồn dữ liệu này cung cấp thông tin đa dạng về trình tự nucleotide, protein, gene, chú giải hệ gen và dữ liệu sinh học chuyên biệt trên nhiều nhóm sinh vật.
+Nội dung nghiên cứu tập trung vào xây dựng cơ chế kết nối, thu thập, chuẩn hóa và quản lý dữ liệu từ nhiều nguồn khác nhau, nhằm giảm sự phụ thuộc vào một hệ thống duy nhất, đồng thời đảm bảo tính linh hoạt, khả năng mở rộng và khả năng khai thác dữ liệu hiệu quả của nền tảng BioLab.
+3.1.3. Kiến trúc phần mềm và kỹ thuật xử lý dữ liệu
+Đề tài nghiên cứu và triển khai các giải pháp kỹ thuật phục vụ quá trình xây dựng nền tảng BioLab, bao gồm:
+Kiến trúc phần mềm phân lớp nhằm tách biệt các thành phần giao diện người dùng, xử lý nghiệp vụ và quản lý dữ liệu;
+Cơ chế tích hợp nhiều nguồn dữ liệu sinh học thông qua lớp trung gian;
+Giải pháp lưu trữ kết hợp giữa dữ liệu cục bộ và dữ liệu trực tuyến;
+Cơ chế caching nhằm tối ưu tốc độ truy xuất và giảm số lượng truy vấn tới các hệ thống bên ngoài;
+Phương pháp quản lý metadata và thông tin nguồn gốc dữ liệu;
+Các module xử lý và phân tích dữ liệu trình tự sinh học.
+Các nghiên cứu này nhằm đảm bảo hệ thống có khả năng hoạt động ổn định, dễ mở rộng và đáp ứng nhu cầu khai thác dữ liệu trong các bài toán sinh học tính toán.
+3.1.4. Các thuật toán phân tích dữ liệu di truyền
+Đề tài nghiên cứu và triển khai các thuật toán xử lý dữ liệu trình tự nhằm chuyển đổi dữ liệu sinh học thô thành các thông tin có giá trị phục vụ phân tích.
+Các chức năng chính bao gồm phân tích đặc điểm trình tự nucleotide như thành phần base, hàm lượng GC (GC content), tỷ lệ AT, tạo trình tự bổ sung ngược (reverse complement) và phiên mã DNA sang RNA. Bên cạnh đó, hệ thống hỗ trợ phân tích các đặc trưng lý hóa của protein và xác định vùng mã hóa thông qua thuật toán tìm kiếm khung đọc mở (Open Reading Frame – ORF) trên sáu khung đọc của trình tự nucleotide.
+Các thuật toán này đóng vai trò là nền tảng cho nhóm chức năng phân tích trình tự trong BioLab, cho phép hệ thống thực hiện trực tiếp các bước xử lý dữ liệu di truyền mà không phụ thuộc vào các công cụ phân tích bên ngoài.
+3.1.5. Trực quan hóa dữ liệu hệ gen
+Đề tài nghiên cứu phương pháp trực quan hóa dữ liệu hệ gen thông qua việc tích hợp thư viện IGV.js (Integrative Genomics Viewer JavaScript). Thành phần này cho phép biểu diễn trực quan các thông tin liên quan đến hệ gen, bao gồm:
+Vị trí và phạm vi của gene trên nhiễm sắc thể;
+Thông tin vùng trình tự nucleotide;
+Các lớp dữ liệu chú giải hệ gen liên quan.
+Việc tích hợp công cụ trực quan hóa giúp người dùng có thể quan sát mối quan hệ giữa trình tự, vị trí gene và các thông tin chú giải một cách trực quan, hỗ trợ hiệu quả cho quá trình phân tích dữ liệu di truyền.
+3.2. Phạm vi nghiên cứu
+Về mặt công nghệ phần mềm, đề tài tập trung xây dựng một hệ thống Web Full-stack gồm hai thành phần chính là Backend và Frontend.
+Backend được phát triển bằng ngôn ngữ Python với framework FastAPI, sử dụng SQLite làm cơ sở dữ liệu và SQLAlchemy làm công cụ ánh xạ đối tượng (ORM). Thành phần Backend đảm nhiệm các chức năng xử lý nghiệp vụ, quản lý dữ liệu nội bộ, kết nối với các nguồn dữ liệu sinh học bên ngoài, thực hiện các module phân tích dữ liệu và cung cấp các REST API phục vụ giao tiếp với Frontend.
+Frontend được xây dựng trên nền tảng Next.js, sử dụng thư viện giao diện React, ngôn ngữ TypeScript và framework giao diện Tailwind CSS. Thành phần này cung cấp môi trường tương tác cho người dùng, hỗ trợ các chức năng tìm kiếm gene, phân tích trình tự, hiển thị kết quả và trực quan hóa dữ liệu hệ gen.
+Về mặt dữ liệu, đề tài tập trung khai thác và xử lý các loại dữ liệu sinh học gồm thông tin gene, trình tự nucleotide, trình tự protein và dữ liệu chú giải hệ gen (genome annotation) từ các nguồn dữ liệu sinh học được tích hợp trong hệ thống.
+Về mặt đánh giá, hệ thống được kiểm thử thông qua các tiêu chí chính gồm kiểm tra chức năng của các module, đánh giá độ chính xác của các thành phần phân tích dữ liệu, đo lường thời gian phản hồi và kiểm tra khả năng xử lý lỗi nhằm đảm bảo tính ổn định trong quá trình vận hành.
+[Heading2] 4. Phương pháp nghiên cứu
+4.1. Phương pháp nghiên cứu lý thuyết
+Đề tài tiến hành nghiên cứu các kiến thức nền tảng trong lĩnh vực tin sinh học (bioinformatics) và kỹ thuật phát triển hệ thống phần mềm nhằm xây dựng cơ sở lý thuyết phục vụ quá trình thiết kế và triển khai nền tảng BioLab.
+Các nội dung nghiên cứu tập trung vào dữ liệu sinh học phân tử, bao gồm đặc điểm của DNA, RNA, protein, các định dạng dữ liệu phổ biến như FASTA, GenBank, BED và phương thức khai thác dữ liệu từ các cơ sở dữ liệu sinh học trực tuyến. Bên cạnh đó, đề tài nghiên cứu các kỹ thuật phát triển ứng dụng web, quản lý dữ liệu và xây dựng hệ thống có khả năng mở rộng.
+Về kiến trúc phần mềm, đề tài khảo sát và áp dụng một số mô hình tổ chức hệ thống như Layered Architecture, Service Layer Pattern, Repository Pattern và Caching Strategy nhằm phân tách chức năng, nâng cao khả năng bảo trì, tối ưu truy xuất dữ liệu và đảm bảo tính mở rộng của hệ thống.
+Các nghiên cứu lý thuyết này là cơ sở để lựa chọn kiến trúc, công nghệ và giải pháp kỹ thuật phù hợp trong quá trình xây dựng nền tảng BioLab.
+4.2. Phương pháp thiết kế và phát triển hệ thống
+Đề tài áp dụng phương pháp phát triển hệ thống theo hướng module hóa, trong đó các thành phần chức năng được thiết kế độc lập nhằm đảm bảo khả năng mở rộng, dễ bảo trì và thuận lợi trong quá trình tích hợp các nguồn dữ liệu sinh học.
+Quá trình phát triển BioLab được thực hiện qua các giai đoạn chính:
+Phân tích yêu cầu: Xác định các yêu cầu chức năng và phi chức năng của hệ thống, tập trung vào các nhóm chức năng chính như tra cứu dữ liệu gene, phân tích trình tự, trực quan hóa hệ gen và quản lý dữ liệu.
+Thiết kế kiến trúc hệ thống: Xây dựng mô hình tổng thể bao gồm Frontend, Backend, cơ sở dữ liệu, các module xử lý dữ liệu và lớp tích hợp với các nguồn dữ liệu sinh học bên ngoài.
+Triển khai các module chức năng: Xây dựng Backend phục vụ xử lý nghiệp vụ, quản lý dữ liệu, tích hợp API sinh học và phát triển Frontend hỗ trợ tương tác, tra cứu và trực quan hóa dữ liệu.
+Tích hợp nguồn dữ liệu bên ngoài: Kết nối với các cơ sở dữ liệu sinh học như NCBI, Ensembl, UniProt, BV-BRC và Phytozome thông qua các API, đồng thời thực hiện chuẩn hóa dữ liệu trước khi đưa vào hệ thống.
+Kiểm thử và hoàn thiện: Đánh giá hoạt động của từng module, kiểm tra tính chính xác của chức năng, khả năng xử lý lỗi và điều chỉnh hệ thống nhằm đảm bảo tính ổn định trong quá trình vận hành.
+Phương pháp phát triển theo hướng module hóa giúp BioLab có cấu trúc linh hoạt, tạo điều kiện thuận lợi cho việc mở rộng thêm các chức năng phân tích và tích hợp các nguồn dữ liệu mới trong tương lai.
+4.3. Phương pháp thực nghiệm và đánh giá
+Sau khi hoàn thiện hệ thống, đề tài tiến hành thực nghiệm nhằm đánh giá khả năng vận hành, hiệu năng và mức độ đáp ứng của nền tảng BioLab so với các yêu cầu đặt ra.
+Quá trình đánh giá được thực hiện thông qua các phương pháp chính:
+Kiểm thử chức năng: Đánh giá tính chính xác và khả năng hoạt động của các module cốt lõi như tra cứu gene, phân tích trình tự DNA/RNA/protein, tìm kiếm ORF và trực quan hóa dữ liệu hệ gen.
+Đánh giá hiệu năng: Đo lường thời gian phản hồi của hệ thống trong các kịch bản truy vấn khác nhau, đồng thời đánh giá hiệu quả của cơ chế lưu trữ đệm (cache) trong việc tối ưu khả năng truy xuất dữ liệu.
+Phân tích hoạt động hệ thống: Theo dõi log, trạng thái xử lý yêu cầu và các lỗi phát sinh nhằm đánh giá tính ổn định, khả năng kiểm soát lỗi và duy trì hoạt động của nền tảng.
+Các kết quả thực nghiệm là cơ sở để đánh giá mức độ hoàn thiện của BioLab, kiểm chứng hiệu quả của các giải pháp kỹ thuật được triển khai và định hướng các khả năng mở rộng hệ thống trong tương lai.
+[Heading1] CHƯƠNG 1: TỔNG QUAN VỀ LĨNH VỰC TIN SINH HỌC VÀ CÁC HỆ THỐNG HIỆN HÀNH
+[Heading2] 1.1. Bối cảnh nghiên cứu và thách thức bùng nổ dữ liệu y sinh
+1.1.1. Sự phát triển của công nghệ giải trình tự và sự gia tăng dữ liệu sinh học
+Trong những năm gần đây, sự phát triển của các công nghệ sinh học hiện đại, đặc biệt là công nghệ giải trình tự thế hệ mới (Next Generation Sequencing – NGS), đã tạo ra sự thay đổi lớn trong lĩnh vực nghiên cứu sinh học phân tử. Khác với phương pháp giải trình tự truyền thống chỉ có khả năng xử lý một lượng nhỏ dữ liệu trong thời gian dài, các công nghệ giải trình tự thông lượng cao cho phép thu thập số lượng lớn trình tự nucleotide trong thời gian ngắn, từ đó thúc đẩy sự phát triển mạnh mẽ của các lĩnh vực như hệ gen học (Genomics), hệ phiên mã (Transcriptomics) và tin sinh học (Bioinformatics).
+Sự phát triển của công nghệ giải trình tự đã làm gia tăng nhanh chóng lượng dữ liệu sinh học được tạo ra và lưu trữ. Các dữ liệu này bao gồm trình tự DNA, RNA, protein, thông tin chú giải gene, thông tin chức năng sinh học và các kết quả nghiên cứu liên quan. Khác với nhiều loại dữ liệu thông thường, dữ liệu di truyền có đặc điểm phức tạp do liên quan trực tiếp đến cấu trúc, chức năng và mối quan hệ giữa các thành phần trong hệ gen của sinh vật.
+Để hỗ trợ cộng đồng nghiên cứu khai thác nguồn dữ liệu ngày càng lớn này, nhiều cơ sở dữ liệu sinh học quốc tế đã được xây dựng và duy trì như NCBI, Ensembl, UniProt và BV-BRC. Các hệ thống này cung cấp khả năng truy cập dữ liệu gene, nucleotide, protein và các thông tin chú giải sinh học thông qua giao diện web hoặc các giao diện lập trình ứng dụng (Application Programming Interface – API).
+Tuy nhiên, sự phát triển về quy mô dữ liệu cũng đặt ra nhiều thách thức trong quá trình khai thác. Người dùng không chỉ cần khả năng truy cập dữ liệu mà còn cần các công cụ hỗ trợ xử lý, phân tích và trực quan hóa thông tin một cách hiệu quả. Việc xây dựng các nền tảng tích hợp có khả năng kết nối nhiều nguồn dữ liệu, hỗ trợ phân tích trình tự và cung cấp giao diện trực quan trở thành một yêu cầu quan trọng trong quá trình phát triển các hệ thống tin sinh học hiện đại.
+1.1.2. Đặc điểm của dữ liệu di truyền và yêu cầu trong quá trình phân tích
+Dữ liệu di truyền có đặc điểm khác biệt so với các dạng dữ liệu thông thường do chứa thông tin về cấu trúc và chức năng sinh học của sinh vật. Dữ liệu cơ bản trong nghiên cứu di truyền thường được biểu diễn dưới dạng các chuỗi nucleotide của DNA hoặc RNA và các chuỗi amino acid của protein.
+Một trình tự DNA được cấu tạo từ bốn loại nucleotide chính gồm Adenine (A), Thymine (T), Guanine (G) và Cytosine (C). Trong khi đó, trình tự protein được hình thành từ 20 loại amino acid khác nhau. Sự thay đổi trong thành phần hoặc thứ tự của các đơn vị này có thể ảnh hưởng đến cấu trúc và chức năng của gene hoặc protein tương ứng.
+Trong thực tế nghiên cứu, dữ liệu di truyền không chỉ bao gồm các chuỗi trình tự đơn thuần mà còn đi kèm với nhiều thông tin chú giải khác nhau. Một bản ghi gene có thể bao gồm các thông tin như:
+[ListParagraph] Tên gene và mã định danh.
+[ListParagraph] Loài sinh vật.
+[ListParagraph] Vị trí gene trên nhiễm sắc thể.
+[ListParagraph] Thông tin về vùng mã hóa.
+[ListParagraph] Trình tự nucleotide hoặc protein tương ứng.
+[ListParagraph] Các tài liệu nghiên cứu liên quan.
+Đối với dữ liệu hệ gen của các sinh vật phức tạp, việc phân tích còn liên quan đến cấu trúc gene gồm vùng exon, intron, vùng điều hòa và các dạng phiên mã khác nhau. Vì vậy, các hệ thống khai thác dữ liệu di truyền cần có khả năng xử lý nhiều dạng thông tin khác nhau thay vì chỉ lưu trữ và hiển thị chuỗi nucleotide.
+Bên cạnh đó, dữ liệu di truyền trong thực tế có thể chứa các ký hiệu nucleotide không xác định hoàn toàn theo chuẩn IUPAC. Ví dụ, ngoài bốn nucleotide cơ bản A, T, G, C còn tồn tại các ký hiệu đại diện cho nhiều khả năng nucleotide khác nhau. Do đó, các công cụ phân tích trình tự cần có khả năng xử lý các dạng dữ liệu này nhằm đảm bảo kết quả phân tích chính xác.
+Trong nền tảng BioLab, các đặc điểm trên được xem xét trong quá trình xây dựng các module phân tích trình tự, bao gồm xử lý dữ liệu FASTA, phân tích thành phần nucleotide, tính toán GC content, tạo chuỗi reverse complement, phiên mã DNA sang RNA, phân tích đặc tính protein và tìm kiếm khung đọc mở (Open Reading Frame – ORF).
+1.1.3. Những khó khăn trong quá trình khai thác dữ liệu di truyền từ nhiều nguồn
+Mặc dù các cơ sở dữ liệu sinh học quốc tế đã cung cấp nguồn dữ liệu phong phú, quá trình khai thác dữ liệu thực tế vẫn gặp nhiều khó khăn do sự khác biệt về hệ thống, cấu trúc dữ liệu và phương thức truy cập.
+Thứ nhất, dữ liệu di truyền được phân bố trên nhiều hệ thống độc lập. Mỗi cơ sở dữ liệu thường tập trung vào một nhóm dữ liệu chuyên biệt. Ví dụ, NCBI cung cấp dữ liệu gene, nucleotide và tài liệu khoa học; Ensembl tập trung vào chú giải hệ gen; UniProt chuyên về dữ liệu protein. Điều này khiến người dùng phải kết hợp nhiều nguồn dữ liệu khác nhau để có được thông tin đầy đủ về một đối tượng nghiên cứu.
+Thứ hai, các nguồn dữ liệu trực tuyến thường được truy cập thông qua API và có những giới hạn nhất định về số lượng truy vấn. Khi một ứng dụng gửi quá nhiều yêu cầu trong thời gian ngắn, hệ thống có thể trả về lỗi hoặc giới hạn quyền truy cập. Điều này ảnh hưởng đến khả năng xử lý liên tục của các ứng dụng phụ thuộc hoàn toàn vào dữ liệu trực tuyến.
+Thứ ba, dữ liệu từ các nguồn khác nhau có thể có sự khác biệt về cấu trúc biểu diễn. Một hệ thống có thể sử dụng JSON để trả về dữ liệu, trong khi hệ thống khác sử dụng XML, FASTA hoặc GenBank Flatfile. Việc tích hợp nhiều nguồn dữ liệu vì vậy cần có một lớp xử lý trung gian để chuẩn hóa và cung cấp dữ liệu theo định dạng thống nhất cho người dùng.
+Thứ tư, quá trình phân tích dữ liệu di truyền thường yêu cầu kết hợp nhiều công cụ khác nhau. Người dùng có thể phải sử dụng một công cụ để tìm kiếm gene, một công cụ khác để phân tích trình tự, một công cụ khác để trực quan hóa genome và một nền tảng riêng để tìm kiếm tài liệu khoa học. Sự phân tán này làm tăng độ phức tạp trong quá trình làm việc và gây khó khăn trong việc quản lý kết quả phân tích.
+Từ những vấn đề trên, nhu cầu xây dựng một nền tảng tích hợp hỗ trợ tra cứu, phân tích và trực quan hóa dữ liệu di truyền trở nên cần thiết. Nền tảng BioLab được phát triển nhằm giải quyết các vấn đề này thông qua việc kết hợp các nguồn dữ liệu sinh học, xây dựng các module phân tích nội bộ và cung cấp giao diện thống nhất cho người dùng.
+[Heading2] 1.2. Khảo sát các cơ sở dữ liệu sinh học quốc tế
+Trong lĩnh vực tin sinh học, dữ liệu di truyền được lưu trữ và quản lý bởi nhiều cơ sở dữ liệu khác nhau, mỗi hệ thống tập trung vào một nhóm dữ liệu chuyên biệt và cung cấp các phương thức truy cập riêng. Việc khai thác hiệu quả dữ liệu di truyền đòi hỏi khả năng kết nối, xử lý và tổng hợp thông tin từ nhiều nguồn khác nhau.
+Trong phạm vi của đề tài, nền tảng BioLab được xây dựng với khả năng tích hợp dữ liệu từ bốn nguồn dữ liệu sinh học phổ biến gồm NCBI, Ensembl, UniProt và BV-BRC (Phytozome được thiết kế dự phòng trong kiến trúc nhưng chưa triển khai thực tế). Các nguồn dữ liệu này được lựa chọn dựa trên vai trò quan trọng trong việc cung cấp thông tin về gene, nucleotide, protein, genome annotation và tài liệu nghiên cứu khoa học.
+1.2.1. Cơ sở dữ liệu NCBI
+NCBI (National Center for Biotechnology Information) là một trong những hệ thống dữ liệu sinh học lớn và được sử dụng rộng rãi trong nghiên cứu sinh học phân tử và y sinh học. Được phát triển bởi NIH (National Institutes of Health), NCBI cung cấp nhiều nguồn tài nguyên phục vụ việc lưu trữ, khai thác và phân tích dữ liệu di truyền.
+Các thành phần dữ liệu quan trọng được sử dụng trong BioLab bao gồm Gene Database cung cấp thông tin gene, Nucleotide Database lưu trữ trình tự DNA/RNA, Protein Database chứa dữ liệu protein và PubMed hỗ trợ truy xuất các công trình nghiên cứu khoa học liên quan.
+NCBI cung cấp cơ chế truy cập dữ liệu thông qua Entrez Programming Utilities (E-Utilities), bao gồm các API phục vụ tìm kiếm, truy xuất và liên kết dữ liệu giữa các hệ thống thành phần. Một số dịch vụ quan trọng gồm ESearch để tìm kiếm bản ghi, ESummary lấy thông tin tổng quan, EFetch truy xuất dữ liệu chi tiết như FASTA/GenBank và ELink hỗ trợ liên kết giữa các nhóm dữ liệu như gene và bài báo PubMed.
+Trong BioLab, NCBI đóng vai trò là nguồn dữ liệu chính phục vụ tra cứu thông tin gene, khai thác trình tự nucleotide và bổ sung thông tin nghiên cứu liên quan. Tuy nhiên, do lượng truy cập lớn, NCBI áp dụng các giới hạn đối với việc sử dụng API. Vì vậy, hệ thống cần triển khai các cơ chế quản lý truy vấn, lưu trữ đệm (cache) và điều phối yêu cầu nhằm đảm bảo hiệu năng và tính ổn định trong quá trình khai thác dữ liệu.
+1.2.2. Cơ sở dữ liệu Ensembl
+Ensembl là hệ thống dữ liệu sinh học được phát triển bởi EMBL-EBI (European Bioinformatics Institute) phối hợp cùng Wellcome Sanger Institute, tập trung cung cấp dữ liệu chú giải hệ gen (genome annotation) cho nhiều loài sinh vật, đặc biệt là các loài động vật có xương sống.
+Khác với NCBI là hệ thống dữ liệu sinh học tổng quát, Ensembl nổi bật với khả năng cung cấp thông tin chi tiết về cấu trúc và tổ chức của hệ gen, bao gồm vị trí gene trên nhiễm sắc thể, cấu trúc exon/intron, các dạng transcript, thông tin genome assembly và mối quan hệ tiến hóa giữa các gene.
+Ensembl cung cấp REST API cho phép truy vấn dữ liệu thông qua các định dạng trao đổi như JSON. Dữ liệu trong Ensembl được tổ chức theo mô hình phân cấp giữa gene, transcript và các vùng chức năng, giúp mô tả rõ mối liên hệ giữa các thành phần trong hệ gen.
+Trong BioLab, Ensembl được sử dụng như một nguồn dữ liệu bổ sung nhằm hỗ trợ khai thác thông tin chú giải gene và dữ liệu genome. Một vấn đề quan trọng khi làm việc với Ensembl là sự phụ thuộc vào phiên bản genome assembly, do cùng một gene có thể có sự thay đổi về tọa độ khi sử dụng các phiên bản hệ gen khác nhau. Vì vậy, BioLab cần quản lý thông tin phiên bản dữ liệu nhằm đảm bảo tính chính xác và khả năng truy xuất nguồn gốc trong quá trình phân tích.
+1.2.3. Cơ sở dữ liệu UniProt
+UniProt (Universal Protein Resource) là một trong những cơ sở dữ liệu protein quan trọng trong lĩnh vực sinh học tính toán, được phát triển và duy trì bởi UniProt Consortium. Khác với các hệ thống tập trung chủ yếu vào dữ liệu gene và genome như NCBI hay Ensembl, UniProt chuyên cung cấp các thông tin chuyên sâu về protein, bao gồm trình tự amino acid, chú giải chức năng, miền chức năng (protein domain), vị trí liên kết, biến đổi sau dịch mã và các thông tin liên quan đến cấu trúc – chức năng sinh học của protein.
+Thành phần chính của UniProt là UniProt Knowledgebase (UniProtKB), trong đó Swiss-Prot cung cấp các bản ghi được chú giải và kiểm duyệt thủ công bởi chuyên gia, đảm bảo độ tin cậy cao cho các nghiên cứu phân tích protein. Bên cạnh thông tin chức năng, UniProt còn cung cấp các đặc trưng lý hóa như thành phần amino acid, khối lượng phân tử dự đoán, điểm đẳng điện (Isoelectric Point – pI) và các thông số liên quan đến tính chất protein.
+Trong BioLab, dữ liệu từ UniProt được khai thác nhằm bổ sung thông tin chức năng cho các đối tượng gene liên quan, đồng thời hỗ trợ các module phân tích đặc điểm và tính chất lý hóa của trình tự protein.
+1.2.4. Cơ sở dữ liệu BV-BRC
+BV-BRC (Bacterial and Viral Bioinformatics Resource Center) là một nền tảng dữ liệu sinh học chuyên về các loài vi khuẩn và virus, được xây dựng nhằm hỗ trợ nghiên cứu về hệ gen vi sinh vật, tác nhân gây bệnh và các vấn đề liên quan đến y sinh học.
+Khác với các cơ sở dữ liệu tổng quát như NCBI hay Ensembl, BV-BRC tập trung vào nhóm dữ liệu vi sinh, bao gồm thông tin hệ gen vi khuẩn và virus, dữ liệu gene, các đặc điểm liên quan đến khả năng gây bệnh và thông tin phục vụ nghiên cứu kháng kháng sinh.
+Nguồn dữ liệu từ BV-BRC có vai trò quan trọng trong việc phân tích đặc điểm di truyền, so sánh hệ gen và nghiên cứu mối liên hệ giữa biến đổi gene với đặc tính sinh học của các chủng vi sinh vật.
+Trong BioLab, BV-BRC được tích hợp như một nguồn dữ liệu bổ sung, giúp mở rộng phạm vi khai thác dữ liệu sang nhóm sinh vật vi sinh, đồng thời hỗ trợ các bài toán phân tích liên quan đến hệ gen vi khuẩn và virus.
+1.2.5. Cơ sở dữ liệu Phytozome
+Phytozome là cơ sở dữ liệu hệ gen thực vật được phát triển bởi DOE Joint Genome Institute (DOE JGI), tập trung cung cấp dữ liệu di truyền của nhiều loài thực vật phục vụ các nghiên cứu về sinh học tiến hóa và di truyền học thực vật.
+Khác với các cơ sở dữ liệu hướng nhiều tới dữ liệu người, động vật hoặc vi sinh vật, Phytozome chuyên biệt cho nhóm sinh vật thực vật, cung cấp các thông tin phục vụ phân tích so sánh hệ gen, xác định gene tương đồng (orthologous genes), nghiên cứu quan hệ tiến hóa và khảo sát đặc điểm di truyền của các loài cây trồng.
+Nguồn dữ liệu từ Phytozome có tiềm năng hỗ trợ các bài toán phân tích mối quan hệ giữa các gene ở nhiều loài thực vật khác nhau, góp phần mở rộng phạm vi khai thác dữ liệu sinh học của hệ thống.
+Trong kiến trúc BioLab, Phytozome được thiết kế như một nguồn dữ liệu mở rộng dành cho nhóm sinh vật thực vật. Tuy nhiên, trong phiên bản hiện tại của hệ thống, nguồn dữ liệu này mới được định hướng tích hợp trong kiến trúc và chưa được triển khai kết nối thực tế.
+1.2.6. So sánh các cơ sở dữ liệu sinh học
+Mặc dù cùng phục vụ mục tiêu cung cấp dữ liệu sinh học, mỗi cơ sở dữ liệu có định hướng phát triển và phạm vi chuyên môn khác nhau. Việc kết hợp nhiều nguồn dữ liệu giúp nền tảng BioLab có khả năng hỗ trợ người dùng tiếp cận thông tin di truyền toàn diện hơn.
+[Caption] Bảng 1.1. Tổng hợp các nguồn dữ liệu sinh học được tích hợp trong nền tảng BioLab.
+
+--- TABLE (6 rows) ---
+Cơ sở dữ liệu | Phạm vi dữ liệu chính | Định dạng phổ biến | Vai trò trong BioLab
+NCBI | Gene, nucleotide, protein, tài liệu khoa học | FASTA, GenBank, XML | Nguồn dữ liệu gene và trình tự chính
+Ensembl | Genome annotation, exon/intron, transcript | JSON, GFF | Bổ sung thông tin chú giải hệ gen
+UniProt | Protein và chức năng protein | FASTA, JSON, XML | Hỗ trợ dữ liệu protein và phân tích chức năng
+BV-BRC | Vi khuẩn, virus, dữ liệu mầm bệnh | FASTA, JSON | Mở rộng dữ liệu vi sinh vật
+Phytozome | Genome thực vật | FASTA, GFF | Dự kiến hỗ trợ dữ liệu thực vật (chưa triển khai)
+--- END TABLE ---
+
+Qua quá trình khảo sát có thể thấy rằng không có một cơ sở dữ liệu đơn lẻ nào có thể đáp ứng toàn bộ nhu cầu khai thác dữ liệu di truyền. Mỗi hệ thống có thế mạnh riêng và việc tích hợp nhiều nguồn dữ liệu là hướng tiếp cận phù hợp để xây dựng các nền tảng hỗ trợ nghiên cứu tin sinh học.
+Trong bối cảnh đó, nền tảng BioLab được xây dựng nhằm cung cấp một môi trường thống nhất, cho phép người dùng tra cứu dữ liệu gene, phân tích trình tự và trực quan hóa thông tin di truyền mà không cần chuyển đổi giữa nhiều công cụ độc lập.
+[Heading2] 1.3. Đánh giá các hệ thống hiện hành và các vấn đề cần giải quyết
+Hiện nay, nhiều hệ thống hỗ trợ khai thác dữ liệu sinh học đã được phát triển nhằm phục vụ nhu cầu tra cứu và phân tích thông tin di truyền. Các nền tảng phổ biến như NCBI, Ensembl, UCSC Genome Browser, Galaxy hay các công cụ phân tích trình tự chuyên biệt đã đóng vai trò quan trọng trong việc hỗ trợ cộng đồng nghiên cứu tiếp cận nguồn dữ liệu sinh học quy mô lớn.
+Tuy nhiên, các hệ thống hiện có thường được xây dựng nhằm giải quyết một nhóm chức năng chuyên biệt. Ví dụ, NCBI tập trung vào lưu trữ và cung cấp dữ liệu gene, nucleotide cùng các tài liệu khoa học; Ensembl mạnh về chú giải hệ gen và thông tin transcript; UniProt chuyên sâu về dữ liệu protein; trong khi các công cụ như IGV hoặc UCSC Genome Browser tập trung vào việc trực quan hóa dữ liệu hệ gen.
+Cách tiếp cận chuyên biệt này mang lại hiệu quả cao đối với từng nhiệm vụ riêng lẻ, nhưng đồng thời tạo ra một số hạn chế khi người dùng cần thực hiện một quy trình phân tích dữ liệu di truyền hoàn chỉnh. Trong nhiều trường hợp, người nghiên cứu phải sử dụng nhiều hệ thống khác nhau để hoàn thành các bước từ tra cứu thông tin gene, lấy trình tự, phân tích đặc điểm sinh học, quan sát vị trí gene trên genome đến tìm kiếm tài liệu liên quan. Qua quá trình khảo sát các hệ thống hiện hành, đề tài xác định một số vấn đề chính cần được giải quyết trong việc xây dựng một nền tảng hỗ trợ khai thác dữ liệu di truyền tích hợp.
+1.3.1. Hạn chế trong việc tích hợp dữ liệu từ nhiều nguồn khác nhau
+Các cơ sở dữ liệu sinh học hiện nay được xây dựng với mục tiêu và cấu trúc dữ liệu riêng biệt. Mỗi hệ thống có cách tổ chức thông tin, chuẩn dữ liệu và phương thức truy cập khác nhau. Ví dụ, NCBI cung cấp dữ liệu thông qua hệ thống Entrez API với nhiều dạng truy vấn khác nhau; Ensembl cung cấp dữ liệu chú giải hệ gen thông qua REST API với cấu trúc JSON; UniProt tập trung vào dữ liệu protein và thông tin chức năng.
+Sự khác biệt này tạo ra khó khăn trong việc xây dựng các ứng dụng có khả năng khai thác đồng thời nhiều nguồn dữ liệu. Nếu không có một lớp trung gian để xử lý và chuẩn hóa dữ liệu, ứng dụng phải tự triển khai riêng biệt cho từng nguồn, làm tăng độ phức tạp trong quá trình phát triển và bảo trì. Đối với người dùng cuối, sự phân tán dữ liệu cũng khiến quá trình tìm kiếm thông tin trở nên phức tạp. Người dùng có thể phải thực hiện nhiều bước trên nhiều nền tảng khác nhau để thu thập đủ thông tin cần thiết cho một đối tượng nghiên cứu.
+Do đó, một nền tảng hỗ trợ dữ liệu di truyền cần có khả năng tích hợp nhiều nguồn dữ liệu, đồng thời cung cấp một giao diện thống nhất để người dùng có thể truy cập thông tin một cách thuận tiện hơn.
+1.3.2. Hạn chế về khả năng duy trì hoạt động khi nguồn dữ liệu bên ngoài gặp vấn đề
+Các hệ thống khai thác dữ liệu sinh học hiện nay thường phụ thuộc vào khả năng cung cấp dữ liệu của các máy chủ bên ngoài. Khi một nguồn dữ liệu không phản hồi, xảy ra lỗi kết nối hoặc giới hạn số lượng truy cập, các ứng dụng phụ thuộc trực tiếp có thể bị ảnh hưởng. Đặc biệt, các API công cộng thường áp dụng cơ chế giới hạn truy cập nhằm đảm bảo sự ổn định của hệ thống. Khi số lượng yêu cầu vượt quá giới hạn cho phép, ứng dụng có thể nhận được các phản hồi lỗi hoặc phải chờ trong thời gian dài để tiếp tục truy vấn. Đối với một nền tảng hỗ trợ nghiên cứu, việc phụ thuộc hoàn toàn vào nguồn dữ liệu trực tuyến có thể ảnh hưởng đến trải nghiệm người dùng. Vì vậy, cần có các cơ chế hỗ trợ như lưu trữ dữ liệu cục bộ, bộ nhớ đệm và khả năng xử lý linh hoạt khi nguồn dữ liệu bên ngoài tạm thời không khả dụng.
+Trong BioLab, vấn đề này được giải quyết thông qua việc kết hợp dữ liệu cục bộ với khả năng kết nối nhiều nguồn dữ liệu khác nhau, giúp giảm sự phụ thuộc vào một hệ thống duy nhất.
+1.3.3. Hạn chế trong quản lý và truy xuất thông tin dữ liệu
+Dữ liệu di truyền có đặc điểm thường xuyên được cập nhật và thay đổi theo các phiên bản mới của hệ thống chú giải. Một thông tin gene có thể liên quan đến nhiều phiên bản trình tự, genome assembly hoặc nguồn dữ liệu khác nhau. Nếu chỉ lưu trữ kết quả truy vấn mà không đi kèm các thông tin mô tả như nguồn dữ liệu, mã định danh, phiên bản bản ghi hoặc thông tin sinh vật, việc kiểm tra và tái sử dụng dữ liệu trong tương lai sẽ gặp nhiều khó khăn.
+Vì vậy, các hệ thống khai thác dữ liệu di truyền cần quan tâm đến việc quản lý metadata đi kèm dữ liệu. Các thông tin này giúp người dùng hiểu rõ dữ liệu được lấy từ đâu, thuộc phiên bản nào và có thể sử dụng lại trong những phân tích tiếp theo. Trong nền tảng BioLab, việc quản lý thông tin dữ liệu được xem xét thông qua cơ chế lưu trữ metadata cùng với dữ liệu gene và trình tự, hỗ trợ khả năng truy xuất và quản lý kết quả phân tích.
+1.3.4. Sự tách biệt giữa tra cứu, phân tích và trực quan hóa dữ liệu
+Một trong những hạn chế phổ biến của các công cụ tin sinh học hiện nay là sự phân tách giữa các nhóm chức năng. Ví dụ, quá trình nghiên cứu một gene có thể yêu cầu người dùng thực hiện nhiều bước:
+Tìm kiếm thông tin gene trong cơ sở dữ liệu.
+Lấy trình tự nucleotide tương ứng.
+Sử dụng công cụ riêng để phân tích trình tự.
+Chuyển sang genome browser để xem vị trí gene.
+Tra cứu các bài báo khoa học liên quan.
+Mặc dù mỗi công cụ riêng lẻ có thể thực hiện tốt chức năng của mình, việc phải chuyển đổi liên tục giữa nhiều nền tảng làm tăng thời gian thao tác và gây khó khăn trong việc quản lý kết quả. Do đó, một nền tảng tích hợp cần hướng tới việc kết hợp các nhóm chức năng quan trọng trong cùng một môi trường làm việc, bao gồm tra cứu dữ liệu, phân tích trình tự và trực quan hóa thông tin hệ gen.
+[Heading2] 1.4. Đề xuất giải pháp nền tảng BioLab
+Từ các vấn đề được phân tích ở trên, đề tài đề xuất xây dựng nền tảng BioLab nhằm hỗ trợ người dùng trong quá trình tra cứu, phân tích và trực quan hóa dữ liệu di truyền. BioLab được định hướng là một nền tảng web tích hợp các chức năng xử lý dữ liệu di truyền trong cùng một môi trường làm việc, giúp giảm sự phân tán giữa các công cụ và hỗ trợ người dùng tiếp cận dữ liệu thuận tiện hơn.
+Giải pháp của đề tài tập trung vào các nhóm chức năng chính sau:
+1.4.1. Tích hợp dữ liệu từ nhiều nguồn sinh học
+BioLab xây dựng cơ chế kết nối với nhiều nguồn dữ liệu sinh học khác nhau thông qua các API tương ứng. Việc tích hợp nhiều nguồn dữ liệu giúp hệ thống có khả năng khai thác thông tin đa dạng hơn thay vì chỉ phụ thuộc vào một cơ sở dữ liệu duy nhất. Các nguồn dữ liệu được tích hợp trong hệ thống bao gồm: NCBI, Ensembl, UniProt, BV-BRC, Phytozome.
+Thông qua lớp xử lý trung gian, dữ liệu từ các nguồn khác nhau được chuẩn hóa trước khi cung cấp cho người dùng.
+1.4.2. Kết hợp dữ liệu trực tuyến và dữ liệu lưu trữ cục bộ
+Trong các hệ thống khai thác dữ liệu sinh học, việc phụ thuộc hoàn toàn vào các nguồn dữ liệu trực tuyến có thể gây ảnh hưởng đến hiệu năng và tính ổn định của hệ thống do phụ thuộc vào tốc độ phản hồi, giới hạn truy cập và trạng thái hoạt động của các dịch vụ bên ngoài. Để giải quyết vấn đề này, BioLab áp dụng mô hình kết hợp giữa dữ liệu trực tuyến từ các cơ sở dữ liệu sinh học bên ngoài và dữ liệu được lưu trữ cục bộ trong hệ thống.
+Theo mô hình này, khi người dùng thực hiện một yêu cầu truy vấn dữ liệu, hệ thống sẽ ưu tiên kiểm tra nguồn dữ liệu nội bộ nhằm xác định liệu thông tin tương ứng đã được thu thập và lưu trữ trước đó hay chưa. Trong trường hợp dữ liệu đã tồn tại, hệ thống có thể sử dụng trực tiếp dữ liệu cục bộ để trả về kết quả mà không cần gửi thêm yêu cầu tới các nguồn dữ liệu bên ngoài. Ngược lại, nếu dữ liệu chưa được lưu trữ, hệ thống sẽ thực hiện truy vấn tới các API sinh học tương ứng, xử lý kết quả nhận được và có thể lưu lại để phục vụ các lần truy vấn tiếp theo.
+Cơ chế này giúp giảm số lượng yêu cầu gửi tới các hệ thống dữ liệu bên ngoài, hạn chế ảnh hưởng từ các vấn đề về giới hạn truy cập hoặc gián đoạn dịch vụ. Đồng thời, việc lưu trữ kết quả truy vấn giúp cải thiện đáng kể thời gian phản hồi đối với các dữ liệu thường xuyên được khai thác, nâng cao hiệu suất và khả năng đáp ứng của nền tảng.
+Bên cạnh việc cải thiện hiệu năng, mô hình kết hợp dữ liệu trực tuyến và dữ liệu cục bộ còn hỗ trợ khả năng quản lý dữ liệu lâu dài thông qua việc lưu trữ thông tin phiên bản, nguồn cung cấp và thời điểm cập nhật. Đây là yếu tố quan trọng trong các hệ thống tin sinh học, nơi dữ liệu cần đảm bảo khả năng truy xuất nguồn gốc (data provenance) và tái sử dụng trong các nghiên cứu tiếp theo.
+1.4.3. Xây dựng các module phân tích dữ liệu di truyền
+Một trong những thành phần chức năng quan trọng của nền tảng BioLab là nhóm các module phân tích trình tự sinh học được xây dựng và tích hợp trực tiếp trong hệ thống. Các module này có nhiệm vụ xử lý dữ liệu trình tự DNA, RNA và protein, chuyển đổi dữ liệu sinh học dạng thô thành các thông tin có ý nghĩa phục vụ quá trình nghiên cứu và phân tích.
+Khác với phương pháp truyền thống khi người dùng phải sử dụng nhiều công cụ riêng biệt cho từng tác vụ phân tích, BioLab tích hợp các thuật toán xử lý trình tự ngay trên cùng một nền tảng. Điều này giúp đơn giản hóa quy trình khai thác dữ liệu, giảm sự phụ thuộc vào các công cụ bên ngoài và tạo môi trường thống nhất cho quá trình phân tích.
+Các chức năng phân tích chính được triển khai bao gồm:
+Phân tích trình tự DNA/RNA: hỗ trợ xử lý và đánh giá các đặc điểm cơ bản của trình tự nucleotide, phục vụ các bước phân tích tiếp theo.
+Tính toán độ dài trình tự: xác định số lượng nucleotide trong chuỗi DNA/RNA hoặc số lượng amino acid trong trình tự protein.
+Tính toán hàm lượng GC (GC content): đánh giá tỷ lệ phần trăm của các nucleotide Guanine (G) và Cytosine (C), một chỉ số quan trọng trong phân tích đặc điểm và cấu trúc trình tự gene.
+Sinh trình tự bổ sung ngược (reverse complement): tạo ra trình tự bổ sung theo chiều ngược, hỗ trợ các thao tác phân tích trên cả hai mạch DNA.
+Phiên mã DNA sang RNA: mô phỏng quá trình chuyển đổi trình tự DNA thành trình tự RNA dựa trên nguyên tắc bổ sung nucleotide.
+Phân tích đặc tính lý hóa của protein: cung cấp các thông tin như chiều dài protein, thành phần amino acid và các đặc điểm liên quan đến tính chất của chuỗi protein.
+Tìm kiếm khung đọc mở (Open Reading Frame – ORF) trên sáu khung đọc: xác định các vùng trình tự nucleotide có khả năng mã hóa protein, hỗ trợ bước phân tích chức năng gene.
+Các module trên được thiết kế theo hướng độc lập và có khả năng mở rộng, cho phép bổ sung thêm các thuật toán phân tích sinh học trong tương lai. Việc tích hợp trực tiếp các chức năng phân tích trình tự vào nền tảng BioLab giúp người dùng có thể thực hiện các bước xử lý dữ liệu cơ bản ngay trong một môi trường thống nhất, từ đó nâng cao hiệu quả khai thác và phân tích dữ liệu di truyền.
+1.4.4. Trực quan hóa dữ liệu hệ gen
+BioLab tích hợp công cụ IGV.js nhằm hỗ trợ hiển thị trực quan thông tin hệ gen trên trình duyệt web. Thay vì yêu cầu người dùng sử dụng các phần mềm desktop riêng biệt, hệ thống cung cấp khả năng xem dữ liệu genome trực tiếp trong giao diện web. Chức năng này hỗ trợ người dùng quan sát vị trí gene và các thông tin liên quan trong quá trình phân tích dữ liệu di truyền.
+1.4.5. Xây dựng giao diện hỗ trợ quy trình nghiên cứu
+Bên cạnh các chức năng xử lý dữ liệu, BioLab được phát triển với giao diện web nhằm giúp người dùng thao tác thuận tiện hơn. Hệ thống cung cấp các khu vực chức năng như: tra cứu gene, phân tích trình tự, xem thông tin protein, tra cứu tài liệu pubmed, xuất dữ liệu.
+Việc tích hợp các chức năng trên trong cùng một nền tảng giúp BioLab trở thành môi trường hỗ trợ toàn bộ quá trình khai thác dữ liệu di truyền từ bước tìm kiếm, phân tích đến quan sát kết quả.
+[Heading2] 1.5. Kết luận chương
+Chương này đã trình bày tổng quan về bối cảnh phát triển của dữ liệu di truyền trong lĩnh vực sinh học phân tử, sự gia tăng nhanh chóng về quy mô dữ liệu cùng với vai trò ngày càng quan trọng của các hệ thống hỗ trợ khai thác và phân tích dữ liệu sinh học. Bên cạnh đó, chương cũng đã giới thiệu một số cơ sở dữ liệu sinh học phổ biến hiện nay như NCBI, Ensembl, UniProt và BV-BRC, đồng thời phân tích đặc điểm, vai trò và phương thức khai thác dữ liệu từ các hệ thống này.
+Qua quá trình khảo sát các nền tảng hiện có, có thể nhận thấy rằng các hệ thống sinh học hiện nay đã cung cấp nguồn dữ liệu phong phú và có giá trị cho cộng đồng nghiên cứu. Tuy nhiên, mỗi hệ thống vẫn tập trung chủ yếu vào một nhóm dữ liệu hoặc một số chức năng chuyên biệt, dẫn đến sự phân tán trong quá trình khai thác thông tin. Người dùng vẫn cần kết hợp nhiều công cụ khác nhau để thực hiện toàn bộ quy trình từ tra cứu gene, thu thập trình tự, phân tích dữ liệu đến trực quan hóa thông tin hệ gen.
+Từ những vấn đề được phân tích, chương này đã xác định nhu cầu xây dựng một nền tảng tích hợp nhằm hỗ trợ quá trình khai thác dữ liệu di truyền theo hướng thống nhất và hiệu quả hơn. Trên cơ sở đó, đề tài đề xuất xây dựng nền tảng BioLab với định hướng tích hợp nhiều nguồn dữ liệu sinh học, cung cấp các công cụ phân tích trình tự DNA/RNA/protein và hỗ trợ trực quan hóa dữ liệu hệ gen trong cùng một môi trường web.
+Các nội dung nghiên cứu trong chương này là cơ sở lý thuyết và định hướng kỹ thuật cho các chương tiếp theo, trong đó tập trung vào việc phân tích yêu cầu, thiết kế kiến trúc hệ thống và triển khai các thành phần chức năng của nền tảng BioLab.
+[Heading1] CHƯƠNG 2: KIẾN TRÚC VÀ GIẢI PHÁP KỸ THUẬT HỆ THỐNG BIOLAB WORKSPACE
+[Heading2] 2.1. Kiến trúc tổng thể hệ thống và công nghệ sử dụng
+Nền tảng BioLab được xây dựng theo mô hình ứng dụng web Full-stack, trong đó các thành phần của hệ thống được tổ chức theo các lớp chức năng riêng biệt nhằm đảm bảo khả năng phát triển, bảo trì và mở rộng trong tương lai. Kiến trúc tổng thể của hệ thống bao gồm hai thành phần chính:
+[ListParagraph] Frontend chịu trách nhiệm cung cấp giao diện tương tác với người dùng, tiếp nhận thao tác tra cứu, phân tích dữ liệu và hiển thị kết quả trực quan.
+[ListParagraph] Backend đảm nhiệm vai trò xử lý nghiệp vụ, quản lý dữ liệu, kết nối với các nguồn dữ liệu sinh học bên ngoài và thực hiện các thuật toán phân tích trình tự.
+[ListParagraph] Sự phân tách giữa frontend và backend giúp hệ thống giảm sự phụ thuộc giữa các thành phần, đồng thời tạo điều kiện thuận lợi cho việc phát triển độc lập từng module.
+Luồng xử lý chính của hệ thống được tổ chức như sau:
+Người dùng gửi yêu cầu thông qua giao diện web. Frontend tiếp nhận thao tác và gửi request tới hệ thống backend thông qua RESTful API. Backend tiếp nhận yêu cầu, thực hiện xử lý nghiệp vụ thông qua các service tương ứng, truy xuất dữ liệu từ cơ sở dữ liệu nội bộ hoặc các nguồn dữ liệu sinh học bên ngoài, sau đó trả kết quả về frontend để hiển thị.
+Cách tổ chức này cho phép BioLab kết hợp giữa khả năng khai thác dữ liệu trực tuyến từ các cơ sở dữ liệu sinh học quốc tế và khả năng xử lý dữ liệu nội bộ, phục vụ các chức năng tra cứu, phân tích và trực quan hóa dữ liệu di truyền.
+2.1.1. Kiến trúc phân lớp của hệ thống
+Backend của BioLab được thiết kế theo mô hình kiến trúc phân lớp (Layered Architecture), trong đó các thành phần của hệ thống được tổ chức thành các tầng độc lập nhằm phân tách trách nhiệm, nâng cao khả năng bảo trì và hỗ trợ mở rộng trong tương lai.
+Kiến trúc Backend bao gồm các tầng chính:
+Frontend Layer
+API Layer
+Service Layer
+Repository/Data Layer
+External Provider Layer
+Mỗi tầng đảm nhiệm một vai trò riêng trong quá trình tiếp nhận, xử lý và cung cấp dữ liệu.
+Frontend Layer chịu trách nhiệm cung cấp giao diện tương tác với người dùng, hỗ trợ các chức năng như tra cứu gene, phân tích trình tự, xem thông tin protein, trực quan hóa dữ liệu genome và xuất dữ liệu.
+API Layer đóng vai trò là lớp giao tiếp giữa Frontend và Backend, tiếp nhận các yêu cầu từ phía người dùng thông qua các REST API. Các endpoint được tổ chức theo nhóm chức năng như gene, sequence, PubMed, export và các dịch vụ hệ thống.
+Service Layer là tầng xử lý nghiệp vụ trung tâm của hệ thống, thực hiện các logic chính như tìm kiếm gene, phân tích trình tự DNA/RNA/protein, xử lý kết quả truy vấn và điều phối quá trình khai thác dữ liệu từ nhiều nguồn khác nhau.
+Repository/Data Layer đảm nhiệm việc quản lý và truy xuất dữ liệu từ cơ sở dữ liệu nội bộ. Việc tách biệt tầng dữ liệu khỏi tầng nghiệp vụ giúp hệ thống giảm sự phụ thuộc vào công nghệ lưu trữ, đồng thời thuận lợi hơn trong việc thay đổi hoặc mở rộng cơ chế quản lý dữ liệu.
+External Provider Layer chịu trách nhiệm kết nối với các cơ sở dữ liệu sinh học bên ngoài như NCBI, Ensembl, UniProt và BV-BRC. Lớp này đóng vai trò trung gian trong việc chuẩn hóa giao tiếp giữa các nguồn dữ liệu khác nhau, đồng thời cung cấp dữ liệu theo một cấu trúc thống nhất cho các tầng phía trên.
+Việc áp dụng kiến trúc phân lớp giúp BioLab đạt được sự tách biệt rõ ràng giữa giao diện, xử lý nghiệp vụ, quản lý dữ liệu và tích hợp nguồn bên ngoài. Đây là cơ sở quan trọng giúp hệ thống dễ dàng mở rộng thêm các chức năng phân tích mới hoặc tích hợp thêm các nguồn dữ liệu sinh học trong tương lai.
+2.1.2. Công nghệ phát triển Backend
+Backend của BioLab được xây dựng bằng ngôn ngữ Python với framework FastAPI. Đây là nền tảng phù hợp cho việc phát triển các hệ thống API phục vụ xử lý dữ liệu khoa học nhờ khả năng xây dựng API nhanh, hỗ trợ bất đồng bộ và dễ dàng tích hợp với các thư viện xử lý dữ liệu. Các công nghệ chính được sử dụng trong Backend bao gồm: Python 3.10+, FastAPI, SQLAlchemy ORM, SQLite Database, Pydantic Schema Validation.
+FastAPI được sử dụng để xây dựng các REST API phục vụ giao tiếp giữa frontend và backend. Các request gửi tới hệ thống được kiểm tra thông qua các schema dữ liệu nhằm đảm bảo dữ liệu đầu vào phù hợp trước khi đưa vào quá trình xử lý. Trong quá trình xử lý dữ liệu sinh học, việc kiểm tra dữ liệu đầu vào đóng vai trò quan trọng do các chuỗi nucleotide hoặc amino acid có yêu cầu nghiêm ngặt về định dạng. Cơ chế kiểm tra dữ liệu giúp hạn chế các lỗi phát sinh trong quá trình phân tích.
+SQLAlchemy được sử dụng để quản lý việc ánh xạ giữa các đối tượng trong chương trình và dữ liệu trong cơ sở dữ liệu. Việc sử dụng ORM giúp đơn giản hóa quá trình thao tác với dữ liệu và tăng khả năng mở rộng hệ thống. SQLite được lựa chọn làm hệ quản trị cơ sở dữ liệu trong phạm vi đồ án nhằm đáp ứng yêu cầu lưu trữ dữ liệu gene, sequence, cache và các thông tin liên quan.
+2.1.3. Công nghệ phát triển Frontend
+Frontend của BioLab được xây dựng trên nền tảng Next.js kết hợp với React và TypeScript. Kiến trúc này cho phép phát triển giao diện web hiện đại, có khả năng mở rộng và quản lý trạng thái dữ liệu hiệu quả. Các công nghệ chính bao gồm: Next.js, React, TypeScript, Tailwind CSS
+Frontend được tổ chức thành các component độc lập, trong đó mỗi component đảm nhiệm một nhóm chức năng riêng như: Gene Search, Sequence Analysis, Protein Analysis, PubMed Search, Genome Visualization, Export Data.
+Việc sử dụng TypeScript giúp kiểm soát kiểu dữ liệu trong quá trình phát triển giao diện, hạn chế các lỗi không tương thích giữa dữ liệu nhận từ backend và dữ liệu hiển thị trên giao diện.
+Hệ thống giao diện được thiết kế theo hướng trực quan, hỗ trợ người dùng thao tác với dữ liệu di truyền thông qua các khu vực chức năng riêng biệt. Ngoài ra, BioLab tích hợp IGV.js nhằm cung cấp khả năng trực quan hóa dữ liệu hệ gen trực tiếp trên trình duyệt.
+[Heading2] 2.2. Cơ chế điều phối dữ liệu đa nguồn (Multi-Provider Orchestrator)
+Một trong những thành phần quan trọng của BioLab là cơ chế điều phối dữ liệu từ nhiều nguồn sinh học khác nhau. Do các cơ sở dữ liệu sinh học có sự khác biệt về cấu trúc dữ liệu, phương thức truy cập và phạm vi thông tin cung cấp, hệ thống xây dựng một lớp trung gian để quản lý việc kết nối và xử lý dữ liệu từ các provider. Các nguồn dữ liệu được tích hợp bao gồm: NCBI, Ensembl, UniProt, BV-BRC, Phytozome.
+Lớp điều phối này đảm nhiệm các nhiệm vụ:
+Lựa chọn nguồn dữ liệu phù hợp.
+Gửi yêu cầu tới provider tương ứng.
+Chuẩn hóa dữ liệu trả về.
+Xử lý trường hợp nguồn dữ liệu không phản hồi.
+Cung cấp dữ liệu thống nhất cho các module nghiệp vụ.
+Cách tiếp cận này giúp BioLab giảm sự phụ thuộc vào một nguồn dữ liệu duy nhất và tạo điều kiện mở rộng thêm các nguồn dữ liệu mới trong tương lai.
+2.2.1. Cơ chế xử lý lỗi và chuyển đổi nguồn dữ liệu
+Trong quá trình truy vấn dữ liệu sinh học, các nguồn dữ liệu bên ngoài có thể xảy ra tình trạng chậm phản hồi hoặc không khả dụng do giới hạn truy cập, lỗi kết nối hoặc vấn đề từ phía máy chủ cung cấp. BioLab xử lý vấn đề này bằng cách kiểm tra trạng thái truy vấn và chuyển sang nguồn dữ liệu khác khi cần thiết. Quy trình xử lý gồm các bước:
+Bước 1: Hệ thống tiếp nhận yêu cầu tìm kiếm dữ liệu từ người dùng.
+Bước 2: Provider được lựa chọn để thực hiện truy vấn.
+Bước 3: Nếu dữ liệu được trả về hợp lệ, kết quả được chuẩn hóa và lưu trữ để sử dụng lại.
+Bước 4: Trong trường hợp xảy ra lỗi kết nối hoặc không nhận được phản hồi phù hợp, hệ thống thực hiện chuyển đổi sang provider khác.
+Bước 5: Kết quả cuối cùng được trả về người dùng cùng thông tin về nguồn dữ liệu đã sử dụng.
+Cơ chế này giúp duy trì khả năng hoạt động của hệ thống ngay cả khi một nguồn dữ liệu bên ngoài gặp sự cố.
+[Heading2] 2.3. Các chế độ truy vấn dữ liệu trong BioLab
+Nhằm đáp ứng các nhu cầu sử dụng khác nhau trong quá trình khai thác dữ liệu di truyền, BioLab xây dựng ba chế độ truy vấn dữ liệu gồm local_first, local_only và external_refresh.
+Việc phân chia các chế độ truy vấn giúp hệ thống linh hoạt hơn trong quá trình vận hành, cho phép người dùng lựa chọn giữa tốc độ truy xuất, khả năng làm việc ngoại tuyến và nhu cầu cập nhật dữ liệu mới nhất từ các nguồn dữ liệu sinh học bên ngoài.
+2.3.1. Chế độ Local First
+Local First là chế độ truy vấn mặc định của hệ thống. Trong chế độ này, BioLab ưu tiên sử dụng dữ liệu đã được lưu trữ nội bộ trước khi thực hiện truy vấn tới các nguồn dữ liệu bên ngoài.
+Luồng xử lý của cơ chế Local First được thực hiện qua các bước như sau:
+[ListParagraph] Bước 1: Kiểm tra dữ liệu trong bộ nhớ đệm (Cache Layer)
+Khi nhận được yêu cầu truy vấn từ người dùng, hệ thống trước tiên kiểm tra bộ nhớ đệm nhằm xác định dữ liệu tương ứng đã được truy cập và lưu trữ trước đó hay chưa. Nếu dữ liệu tồn tại trong cache, kết quả sẽ được trả về trực tiếp, giúp giảm đáng kể thời gian phản hồi do không cần thực hiện thêm các bước truy xuất dữ liệu phía sau.
+[ListParagraph] Bước 2: Kiểm tra dữ liệu trong cơ sở dữ liệu nội bộ (Local Database)
+Trong trường hợp dữ liệu không tồn tại trong bộ nhớ đệm, hệ thống tiếp tục tìm kiếm trong cơ sở dữ liệu nội bộ. Các dữ liệu đã từng được thu thập từ các nguồn sinh học bên ngoài sẽ được lưu trữ tại đây nhằm phục vụ quá trình khai thác lâu dài và hạn chế việc truy vấn lặp lại.
+[ListParagraph] Bước 3: Truy vấn dữ liệu từ các nguồn bên ngoài thông qua Provider Orchestrator
+Nếu dữ liệu chưa tồn tại trong hệ thống nội bộ, yêu cầu sẽ được chuyển tới lớp điều phối dữ liệu Provider Orchestrator. Thành phần này chịu trách nhiệm quản lý quá trình giao tiếp với các nguồn dữ liệu sinh học bên ngoài như NCBI, Ensembl, UniProt, BV-BRC và Phytozome, đồng thời lựa chọn provider phù hợp để thực hiện truy vấn.
+[ListParagraph] Bước 4: Chuẩn hóa và lưu trữ dữ liệu
+Sau khi nhận được dữ liệu trả về từ các nguồn bên ngoài, hệ thống thực hiện quá trình chuẩn hóa nhằm đưa dữ liệu về cùng một cấu trúc thống nhất trước khi lưu trữ. Dữ liệu sau đó được cập nhật vào cơ sở dữ liệu nội bộ và bộ nhớ đệm để phục vụ các lần truy cập tiếp theo.
+Mô hình Local First giúp BioLab giảm số lượng yêu cầu trực tiếp tới các hệ thống dữ liệu bên ngoài, cải thiện thời gian phản hồi đối với các dữ liệu đã được khai thác trước đó và nâng cao tính ổn định của nền tảng trong quá trình vận hành. Đồng thời, cơ chế này còn giúp hệ thống duy trì khả năng khai thác dữ liệu trong các trường hợp nguồn dữ liệu trực tuyến tạm thời không khả dụng. Cách tiếp cận Local First đặc biệt phù hợp với các bài toán tra cứu dữ liệu sinh học có tần suất truy cập cao, trong đó người dùng thường xuyên khai thác lại các thông tin gene, trình tự nucleotide hoặc protein đã được hệ thống xử lý trước đó.
+2.3.2. Chế độ Local Only
+Bên cạnh chế độ Local First, BioLab cung cấp chế độ hoạt động Local Only, cho phép hệ thống vận hành hoàn toàn dựa trên nguồn dữ liệu được lưu trữ nội bộ mà không thực hiện bất kỳ yêu cầu kết nối nào tới các nguồn dữ liệu sinh học bên ngoài.
+Chế độ Local Only được thiết kế nhằm đáp ứng các yêu cầu triển khai trong những môi trường có giới hạn về khả năng truy cập mạng, yêu cầu kiểm soát dữ liệu nghiêm ngặt hoặc cần đảm bảo hệ thống có thể hoạt động độc lập với các dịch vụ trực tuyến. Một số trường hợp sử dụng bao gồm:
+Hệ thống được triển khai trong môi trường không có kết nối Internet;
+Các môi trường yêu cầu hạn chế truy cập tới dịch vụ bên ngoài nhằm đảm bảo an toàn và kiểm soát dữ liệu;
+Các tổ chức hoặc phòng nghiên cứu sử dụng nguồn dữ liệu sinh học nội bộ đã được thu thập và quản lý trước đó.
+Trong chế độ Local Only, toàn bộ quá trình xử lý truy vấn được giới hạn trong phạm vi cơ sở dữ liệu nội bộ của BioLab. Luồng xử lý được thực hiện như sau:
+[ListParagraph] Bước 1: Tiếp nhận yêu cầu truy vấn
+Người dùng gửi yêu cầu tìm kiếm thông tin gene, trình tự sinh học hoặc các dữ liệu liên quan thông qua giao diện hệ thống.
+[ListParagraph] Bước 2: Truy vấn cơ sở dữ liệu nội bộ
+Hệ thống thực hiện tìm kiếm trong cơ sở dữ liệu cục bộ để xác định sự tồn tại của dữ liệu tương ứng.
+[ListParagraph] Bước 3: Trả về kết quả hoặc thông báo không tìm thấy
+Nếu dữ liệu tồn tại trong hệ thống nội bộ, kết quả được trả về trực tiếp cho người dùng.
+Nếu dữ liệu không tồn tại, hệ thống thông báo không tìm thấy dữ liệu và kết thúc quá trình xử lý mà không thực hiện truy vấn tới bất kỳ provider bên ngoài nào.
+Việc triển khai chế độ Local Only giúp nâng cao tính linh hoạt trong quá trình triển khai BioLab trên nhiều môi trường khác nhau. Đồng thời, cơ chế này đảm bảo khả năng vận hành độc lập của hệ thống, giảm sự phụ thuộc vào hạ tầng bên ngoài và phù hợp với các môi trường nghiên cứu yêu cầu kiểm soát chặt chẽ nguồn dữ liệu được khai thác.
+2.3.3. Chế độ External Refresh
+External Refresh được thiết kế nhằm phục vụ nhu cầu cập nhật dữ liệu mới nhất từ các nguồn dữ liệu sinh học bên ngoài. Khác với Local First, chế độ này không ưu tiên sử dụng dữ liệu đã lưu trữ mà thực hiện truy vấn trực tiếp tới provider để lấy thông tin mới. Quy trình hoạt động gồm:
+[ListParagraph] Hệ thống tiếp nhận yêu cầu từ người dùng.
+[ListParagraph] Bỏ qua dữ liệu hiện có trong cache hoặc dữ liệu nội bộ.
+[ListParagraph] Gửi yêu cầu trực tiếp tới nguồn dữ liệu được lựa chọn thông qua Provider Orchestrator.
+Sau khi nhận được dữ liệu mới, hệ thống cập nhật lại dữ liệu lưu trữ nội bộ. Chế độ External Refresh phù hợp trong các trường hợp cần đồng bộ dữ liệu mới nhất từ các cơ sở dữ liệu sinh học, đặc biệt khi thông tin gene hoặc chú giải có thể được cập nhật theo thời gian.
+2.3.4. So sánh các chế độ truy vấn dữ liệu
+[Caption] Bảng 2.1. So sánh các chế độ truy xuất dữ liệu trong BioLab
+
+--- TABLE (4 rows) ---
+Chế độ | Cơ chế hoạt động | Ưu điểm | Trường hợp sử dụng
+Local First | Kiểm tra cache, database nội bộ trước khi truy vấn nguồn ngoài | Tốc độ cao, giảm truy vấn bên ngoài | Tra cứu dữ liệu thường xuyên
+Local Only | Chỉ sử dụng dữ liệu nội bộ | Hoạt động độc lập với Internet | Môi trường offline hoặc giới hạn kết nối
+External Refresh | Luôn lấy dữ liệu mới từ nguồn bên ngoài | Đảm bảo dữ liệu cập nhật | Đồng bộ dữ liệu mới nhất
+--- END TABLE ---
+
+Ba chế độ truy vấn trên giúp BioLab cân bằng giữa hiệu năng, khả năng cập nhật và tính linh hoạt trong quá trình khai thác dữ liệu di truyền.
+[Heading2] 2.4. Quản lý nguồn gốc dữ liệu theo định hướng FAIR
+Trong nghiên cứu sinh học, dữ liệu không chỉ cần được lưu trữ mà còn cần đảm bảo khả năng tìm kiếm, truy cập, trao đổi và tái sử dụng. Vì vậy, BioLab áp dụng một số nguyên tắc trong quản lý dữ liệu theo định hướng FAIR (Findable, Accessible, Interoperable, Reusable). FAIR không được xem là một chức năng độc lập của hệ thống mà được áp dụng như một nguyên tắc thiết kế nhằm nâng cao khả năng quản lý và khai thác dữ liệu.
+2.4.1. Findable – Khả năng tìm kiếm dữ liệu
+Nguyên tắc Findable tập trung vào việc đảm bảo dữ liệu có thể được xác định và truy xuất thông qua các thông tin định danh rõ ràng. Trong BioLab, mỗi bản ghi dữ liệu được gắn với các thông tin mô tả như: tên gene, mã định danh, loài sinh vật, nguồn dữ liệu, thông tin accession.
+Việc lưu trữ các thông tin định danh giúp hạn chế sự nhầm lẫn giữa các đối tượng có tên tương tự, đồng thời hỗ trợ quá trình tìm kiếm và quản lý dữ liệu trong hệ thống.
+2.4.2. Accessible – Khả năng truy cập dữ liệu
+BioLab xây dựng hệ thống API theo kiến trúc RESTful API nhằm cung cấp cơ chế giao tiếp giữa Frontend và các thành phần xử lý dữ liệu phía Backend. Việc tách biệt lớp giao diện và lớp xử lý thông qua API giúp hệ thống có cấu trúc linh hoạt, dễ bảo trì và thuận lợi trong việc mở rộng thêm các ứng dụng hoặc dịch vụ khác trong tương lai.
+Thông qua các API endpoint, hệ thống hỗ trợ các nhóm chức năng chính như:
+Tra cứu dữ liệu gene: tìm kiếm và lấy thông tin định danh, chú giải liên quan đến gene.
+Truy xuất dữ liệu trình tự: cung cấp các trình tự nucleotide/protein phục vụ phân tích.
+Phân tích dữ liệu sinh học: thực hiện các module xử lý trình tự và tính toán đặc trưng sinh học.
+Xuất kết quả: cung cấp dữ liệu đầu ra dưới các định dạng phù hợp cho quá trình lưu trữ và nghiên cứu.
+Việc triển khai RESTful API đóng vai trò là cầu nối giữa giao diện người dùng và các module xử lý bên trong, giúp BioLab duy trì sự phân tách rõ ràng giữa các thành phần hệ thống, đồng thời tạo nền tảng cho khả năng tích hợp và phát triển mở rộng trong tương lai.
+2.4.3. Interoperable – Khả năng tương tác dữ liệu
+Trong lĩnh vực tin sinh học, dữ liệu thường được khai thác và xử lý thông qua nhiều công cụ chuyên biệt khác nhau. Do đó, khả năng trao đổi dữ liệu giữa các hệ thống đóng vai trò quan trọng nhằm đảm bảo tính liên kết và khả năng tái sử dụng kết quả phân tích. Xuất phát từ yêu cầu này, BioLab hỗ trợ xử lý, lưu trữ và xuất dữ liệu dưới nhiều định dạng phổ biến trong lĩnh vực sinh học tính toán.
+Các định dạng dữ liệu được hệ thống hỗ trợ bao gồm:
+FASTA: định dạng phổ biến dùng để biểu diễn trình tự nucleotide DNA/RNA và trình tự protein;
+GenBank: định dạng lưu trữ trình tự sinh học kèm theo các thông tin chú giải (annotation) liên quan;
+BED: định dạng biểu diễn vị trí các vùng trên hệ gen, thường được sử dụng trong các công cụ phân tích và trực quan hóa genome;
+JSON: định dạng trao đổi dữ liệu giữa các thành phần trong hệ thống và các ứng dụng bên ngoài thông qua API;
+CSV: định dạng bảng phục vụ lưu trữ, xử lý và phân tích dữ liệu bằng các công cụ phổ biến;
+BibTeX: định dạng hỗ trợ lưu trữ thông tin tài liệu tham khảo phục vụ nghiên cứu khoa học;
+RIS: định dạng trao đổi dữ liệu thư mục được sử dụng trong các phần mềm quản lý tài liệu tham khảo.
+Việc hỗ trợ nhiều định dạng dữ liệu giúp BioLab nâng cao khả năng tương tác với các công cụ phân tích sinh học khác trong quy trình nghiên cứu. Các dữ liệu trình tự được xuất từ hệ thống có thể tiếp tục được sử dụng trong các công cụ phân tích trình tự chuyên dụng, trong khi dữ liệu vị trí gene và thông tin chú giải hệ gen có thể được khai thác trong các nền tảng trực quan hóa genome.
+Bên cạnh đó, khả năng xuất dữ liệu theo nhiều chuẩn khác nhau giúp người dùng dễ dàng lưu trữ, chia sẻ và tái sử dụng kết quả phân tích, đồng thời tăng tính linh hoạt của BioLab khi được tích hợp vào các quy trình nghiên cứu sinh học tính toán khác nhau.
+2.4.4. Reusable – Khả năng tái sử dụng dữ liệu
+Trong các hệ thống khai thác dữ liệu sinh học, khả năng tái sử dụng dữ liệu phụ thuộc lớn vào việc quản lý đầy đủ thông tin về nguồn gốc và quá trình xử lý dữ liệu (data provenance). Vì vậy, BioLab triển khai cơ chế lưu trữ các thông tin đi kèm nhằm đảm bảo khả năng truy xuất, kiểm chứng và sử dụng lại kết quả phân tích.
+Các thông tin metadata được quản lý bao gồm nguồn cung cấp dữ liệu, thông tin định danh bản ghi, thời điểm truy xuất và phiên bản dữ liệu khi có sẵn.
+Việc lưu trữ các thông tin này giúp người dùng nắm được bối cảnh và độ tin cậy của dữ liệu, đồng thời hỗ trợ quá trình chia sẻ, tái sử dụng kết quả trong các nghiên cứu và quy trình phân tích tiếp theo.
+[Heading2] 2.5. Thiết kế cơ sở dữ liệu và cơ chế lưu trữ dữ liệu
+BioLab sử dụng cơ sở dữ liệu quan hệ để quản lý và lưu trữ các dữ liệu nội bộ phục vụ quá trình tra cứu, phân tích và tối ưu khả năng truy xuất. Cơ sở dữ liệu đóng vai trò trung gian giúp hệ thống duy trì dữ liệu đã khai thác, quản lý trạng thái xử lý và hỗ trợ cơ chế lưu trữ đệm trong quá trình vận hành.
+Hệ thống áp dụng mô hình ORM (Object-Relational Mapping) thông qua SQLAlchemy, cho phép ánh xạ giữa các bảng dữ liệu trong cơ sở dữ liệu quan hệ và các đối tượng trong chương trình. Cách tiếp cận này giúp đơn giản hóa quá trình thao tác dữ liệu, đồng thời tăng khả năng bảo trì và mở rộng hệ thống.
+Các nhóm dữ liệu chính được quản lý trong cơ sở dữ liệu bao gồm:
+Thông tin gene: lưu trữ dữ liệu định danh và thông tin liên quan đến gene được khai thác.
+Dữ liệu trình tự: quản lý các trình tự nucleotide/protein phục vụ quá trình phân tích.
+Dữ liệu cache: lưu trữ tạm thời các kết quả truy vấn nhằm giảm thời gian phản hồi và hạn chế truy cập lặp tới nguồn dữ liệu bên ngoài.
+Lịch sử truy vấn: theo dõi các yêu cầu khai thác dữ liệu nhằm hỗ trợ quản lý và đánh giá hoạt động hệ thống.
+Thông tin đo lường vận hành: lưu trữ các dữ liệu phục vụ giám sát và đánh giá hiệu năng hệ thống.
+Việc tổ chức cơ sở dữ liệu theo hướng phân nhóm chức năng giúp BioLab quản lý dữ liệu hiệu quả, đồng thời tạo nền tảng cho việc mở rộng thêm các module phân tích và nguồn dữ liệu mới trong tương lai.
+2.5.1. Thiết kế bảng dữ liệu Gene
+Bảng Gene được thiết kế để lưu trữ các thông tin định danh và metadata liên quan đến các đối tượng gene được khai thác trong hệ thống BioLab.
+Các trường dữ liệu chính bao gồm Gene ID, Symbol, Organism, Provider và các thông tin metadata liên quan đến nguồn dữ liệu.
+Bảng Gene đóng vai trò là thực thể trung tâm trong mô hình dữ liệu, chịu trách nhiệm liên kết thông tin gene với các thành phần liên quan như dữ liệu trình tự, thông tin chú giải và kết quả phân tích. Việc tổ chức dữ liệu theo mô hình này giúp hệ thống quản lý thống nhất các đối tượng gene từ nhiều nguồn khác nhau và hỗ trợ quá trình truy xuất, mở rộng dữ liệu trong tương lai.
+2.5.2. Thiết kế bảng dữ liệu Sequence
+Bảng Sequence được thiết kế để lưu trữ các dữ liệu trình tự sinh học, bao gồm trình tự nucleotide và protein được khai thác trong hệ thống BioLab.
+Các thông tin chính được quản lý bao gồm chuỗi trình tự, loại trình tự, mối liên kết với gene tương ứng và các kết quả phân tích liên quan.
+Việc tách biệt dữ liệu trình tự thành một thực thể riêng giúp hệ thống quản lý hiệu quả các chuỗi dữ liệu có kích thước lớn, đồng thời tạo điều kiện thuận lợi cho quá trình xử lý, phân tích và tái sử dụng dữ liệu trong các module sinh học.
+2.5.3. Thiết kế bảng Cache
+Bảng Cache được thiết kế để lưu trữ các kết quả truy vấn đã được xử lý, giúp hệ thống có thể tái sử dụng dữ liệu trong các lần truy cập tiếp theo và giảm thời gian phản hồi.
+Cơ chế cache hỗ trợ BioLab trong việc giảm số lượng yêu cầu gửi tới các nguồn dữ liệu bên ngoài, cải thiện tốc độ truy xuất và hạn chế tải cho các hệ thống provider sinh học.
+Mỗi bản ghi cache được quản lý kèm theo các thông tin về thời điểm lưu trữ và trạng thái dữ liệu, giúp hệ thống kiểm soát thời hạn sử dụng, cập nhật dữ liệu khi cần thiết và đảm bảo tính nhất quán trong quá trình khai thác.
+Việc tổ chức bảng Cache là thành phần quan trọng trong kiến trúc Local First, cho phép BioLab ưu tiên khai thác dữ liệu nội bộ trước khi thực hiện truy vấn tới các nguồn dữ liệu trực tuyến.
+[Heading2] 2.6. Cơ chế lưu trữ đệm trong BioLab
+Để nâng cao hiệu năng truy xuất, BioLab áp dụng cơ chế kết hợp giữa bộ nhớ tạm thời và cơ sở dữ liệu nội bộ.
+Cơ chế này gồm hai mức:
+2.6.1. Cache trên bộ nhớ
+Lớp cache trên bộ nhớ giúp truy cập nhanh các dữ liệu thường xuyên được sử dụng. Khi người dùng gửi yêu cầu, hệ thống ưu tiên kiểm tra dữ liệu trong bộ nhớ trước. Nếu dữ liệu tồn tại, kết quả được trả về ngay mà không cần thực hiện truy vấn database hoặc gọi API bên ngoài. Ưu điểm của phương pháp này là tốc độ phản hồi nhanh và giảm số lượng thao tác đọc dữ liệu.
+2.6.2. Cache trong cơ sở dữ liệu
+Trong trường hợp dữ liệu không còn tồn tại trong bộ nhớ, hệ thống tiếp tục kiểm tra dữ liệu lưu trữ trong database. Lớp lưu trữ này có khả năng duy trì dữ liệu lâu dài hơn và cho phép hệ thống phục hồi thông tin sau khi khởi động lại. Sự kết hợp giữa cache bộ nhớ và cache cơ sở dữ liệu giúp BioLab đạt được sự cân bằng giữa tốc độ truy xuất và khả năng duy trì dữ liệu.
+[Heading2] 2.7. Kết luận chương
+Chương 2 đã trình bày quá trình phân tích và thiết kế kiến trúc nền tảng BioLab, bao gồm kiến trúc tổng thể, công nghệ sử dụng, cơ chế tích hợp dữ liệu nhiều nguồn, các chế độ truy vấn, phương pháp quản lý dữ liệu theo định hướng FAIR và thiết kế cơ sở dữ liệu.
+Hệ thống được xây dựng theo hướng phân lớp với sự tách biệt giữa giao diện người dùng, xử lý nghiệp vụ, lưu trữ dữ liệu và kết nối các nguồn dữ liệu sinh học bên ngoài. Bên cạnh đó, cơ chế cache và quản lý dữ liệu nội bộ giúp nâng cao hiệu quả truy xuất, giảm sự phụ thuộc vào các dịch vụ bên ngoài.
+[Heading1] CHƯƠNG 3: NẮM BẮT THUẬT TOÁN TIN SINH HỌC VÀ THỰC THI GIAO DIỆN
+[Heading2] 3.1. Thuật toán xử lý chuỗi Multi FASTA và mã IUPAC
+Trong các nghiên cứu sinh học phân tử, dữ liệu trình tự nucleotide và protein thường được lưu trữ dưới nhiều định dạng khác nhau, trong đó FASTA là một trong những định dạng văn bản phẳng phổ biến nhất. Định dạng FASTA có cấu trúc đơn giản nhưng có khả năng lưu trữ đồng thời nhiều bản ghi trình tự trong cùng một tệp, được gọi là Multi FASTA.
+Trong nền tảng BioLab, module xử lý Multi FASTA được xây dựng nhằm hỗ trợ quá trình tiếp nhận, phân tích và chuẩn hóa dữ liệu trình tự từ người dùng hoặc từ các nguồn dữ liệu sinh học bên ngoài.
+Thuật toán xử lý bao gồm các bước chính:
+Đọc dữ liệu đầu vào dưới dạng chuỗi văn bản.
+Phân tách các bản ghi FASTA dựa trên ký tự nhận diện header (>).
+Trích xuất thông tin định danh và mô tả của từng bản ghi.
+Chuẩn hóa chuỗi nucleotide hoặc amino acid.
+Lưu trữ dữ liệu dưới dạng cấu trúc đối tượng phục vụ cho các module phân tích tiếp theo.
+Hình 3.1. Quy trình xử lý dữ liệu Multi FASTA trong BioLab
+3.1.1. Cấu trúc bản ghi Multi FASTA và cơ chế phân tách dữ liệu
+Một bản ghi FASTA bao gồm hai thành phần chính:
+Thành phần thứ nhất là dòng tiêu đề (Header Line) bắt đầu bằng ký tự ">", chứa thông tin định danh và mô tả của trình tự.
+Thành phần thứ hai là chuỗi dữ liệu sinh học tương ứng, bao gồm các ký tự nucleotide hoặc amino acid.
+Ví dụ:
+>NM_007294.4 Homo sapiens BRCA1 DNA repair associated, mRNA
+GATGAACTACAGGCTTCTTCTGGATTTTCC...
+Trong trường hợp một file chứa nhiều trình tự, mỗi bản ghi sẽ được phân biệt thông qua dòng header mới bắt đầu bằng ký tự ">". Thuật toán phân tích Multi FASTA trong BioLab thực hiện quá trình phân tách bằng cách nhận diện các dòng header và nhóm các dòng trình tự tương ứng.
+Biểu thức chính quy được sử dụng để nhận diện cấu trúc header:
+^>(\S+)\s*(.*)$
+Trong đó:
+> biểu thị điểm bắt đầu của một bản ghi FASTA.
+\S+ dùng để xác định mã định danh không chứa khoảng trắng.
+.* dùng để lấy phần mô tả còn lại của bản ghi.
+Sau khi phân tách, mỗi trình tự được chuyển đổi thành một đối tượng dữ liệu độc lập bao gồm các thuộc tính: header, accession_id, description, raw_sequence, length. Cấu trúc này giúp các module phân tích phía sau có thể truy cập trực tiếp vào dữ liệu mà không cần thực hiện lại quá trình xử lý ban đầu.
+3.1.2. Chuẩn hóa mã suy biến IUPAC và thuật toán tạo chuỗi bổ sung đảo ngược
+Trong dữ liệu giải trình tự thực tế, các nucleotide không phải lúc nào cũng được xác định hoàn toàn chính xác. Một số vị trí có thể tồn tại nhiều khả năng nucleotide khác nhau do giới hạn của công nghệ giải trình tự hoặc sự tồn tại của biến dị di truyền.
+Để biểu diễn các trường hợp không chắc chắn này, sinh học phân tử sử dụng hệ thống mã nucleotide suy biến IUPAC (International Union of Pure and Applied Chemistry). BioLab tích hợp bảng ánh xạ mã IUPAC nhằm đảm bảo các thuật toán xử lý trình tự có thể hoạt động chính xác với dữ liệu thực tế.
+Bảng 3.1. Bảng mã nucleotide suy biến IUPAC và ký tự bổ sung tương ứng
+
+--- TABLE (17 rows) ---
+Ký tự IUPAC | Nucleotide đại diện | Ý nghĩa | Ký tự bổ sung
+A | A | Adenine | T
+T | T | Thymine | A
+G | G | Guanine | C
+C | C | Cytosine | G
+R | A hoặc G | Purine | Y
+Y | C hoặc T | Pyrimidine | R
+S | G hoặc C | Strong interaction | S
+W | A hoặc T | Weak interaction | W
+K | G hoặc T | Keto | M
+M | A hoặc C | Amino | K
+B | C, G hoặc T | Không phải A | V
+V | A, C hoặc G | Không phải T/U | B
+D | A, G hoặc T | Không phải C | H
+H | A, C hoặc T | Không phải G | D
+N | A, C, G hoặc T | Nucleotide chưa xác định | N
+- | Gap | Ký tự khuyết | -
+--- END TABLE ---
+
+Hình 3.2. Sơ đồ ánh xạ nucleotide IUPAC và phép bổ sung trong BioLab
+Dựa trên bảng ánh xạ này, thuật toán Reverse Complement thực hiện hai bước:
+[ListParagraph] Bước thứ nhất là thay thế từng nucleotide bằng nucleotide bổ sung tương ứng.
+[ListParagraph] Bước thứ hai là đảo ngược thứ tự chuỗi sau khi hoàn thành quá trình bổ sung.
+Ví dụ:
+Chuỗi ban đầu:
+5' - ATGCRN - 3'
+Chuỗi bổ sung:
+TACGYN
+Chuỗi Reverse Complement:
+NYGCAT
+Thuật toán được triển khai thông qua bảng ánh xạ ký tự (Translation Table Mapping) nhằm giảm số lượng phép kiểm tra điều kiện trong quá trình xử lý.
+Độ phức tạp của thuật toán:
+On
+với:
+n là độ dài chuỗi nucleotide đầu vào.
+Điều này đảm bảo thuật toán có thể xử lý hiệu quả các trình tự có kích thước lớn.
+[Heading2] 3.2. Thuật toán phân tích lý hóa protein (Physicochemical Profiler)
+Bên cạnh xử lý dữ liệu nucleotide, BioLab cung cấp module phân tích đặc tính lý hóa của protein nhằm đánh giá các thuộc tính cơ bản của chuỗi polypeptide.
+Module này được xây dựng dựa trên các thông số sinh học phổ biến trong nghiên cứu protein, bao gồm:
+• Theoretical Molecular Weight (MW).
+• Isoelectric Point (pI).
+• Grand Average of Hydropathicity (GRAVY).
+• Extinction Coefficient.
+Trước khi thực hiện phân tích, hệ thống cần xác định loại trình tự đầu vào nhằm lựa chọn phương pháp xử lý phù hợp.
+3.2.1. Bộ nhận diện loại trình tự tự động (Sequence Type Detector)
+BioLab tích hợp bộ phân loại trình tự tự động (Heuristic Sequence Classifier) nhằm xác định dữ liệu đầu vào thuộc nhóm: DNA, RNA, Protein, Thuật toán dựa trên việc kiểm tra tập ký tự xuất hiện trong chuỗi.
+Đối với protein, hệ thống kiểm tra sự xuất hiện của các amino acid không tồn tại trong DNA/RNA chuẩn như: E, F, I, L, P, Q, Z. Ngoài ra, hệ thống hỗ trợ các amino acid mở rộng như: Selenocysteine (U), Pyrrolysine (O). Nếu tỷ lệ xuất hiện các ký tự amino acid vượt quá ngưỡng xác định, chuỗi được phân loại sequence_type = Protein. Ngược lại, hệ thống tiếp tục kiểm tra tập nucleotide để xác định DNA hoặc RNA.
+Hình 3.3. Sơ đồ phân loại tự động DNA/RNA/Protein trong BioLab
+3.2.2. Phương pháp tính toán các thông số lý hóa cốt lõi của protein
+Sau khi xác định chuỗi đầu vào thuộc loại protein, BioLab thực hiện quá trình phân tích các đặc tính lý hóa dựa trên thành phần amino acid của chuỗi polypeptide. Các thông số được tính toán bao gồm trọng lượng phân tử lý thuyết (Theoretical Molecular Weight – MW), điểm đẳng điện (Isoelectric Point – pI), chỉ số kỵ nước trung bình toàn thể (Grand Average of Hydropathicity – GRAVY) và hệ số hấp thụ quang (Extinction Coefficient). Các thông số này là những đại lượng quan trọng thường được sử dụng trong quá trình đánh giá đặc điểm cấu trúc và tính chất của protein.
+1. Trọng lượng phân tử lý thuyết (Theoretical Molecular Weight – MW)
+Trọng lượng phân tử lý thuyết của protein được xác định dựa trên tổng khối lượng của các amino acid cấu thành chuỗi polypeptide sau khi tính đến sự mất đi của các phân tử nước trong quá trình hình thành liên kết peptide.
+Công thức tổng quát:
+MW=i=1nmi-n-1×MH2O
+Trong đó:
+MWlà trọng lượng phân tử lý thuyết của protein.
+nlà tổng số amino acid trong chuỗi polypeptide.
+milà khối lượng phân tử trung bình của amino acid thứ i.
+MH2Olà khối lượng phân tử của nước, có giá trị xấp xỉ:
+MH2O=18.0153 Da
+Do mỗi liên kết peptide hình thành giữa hai amino acid làm mất đi một phân tử nước, số lượng phân tử nước bị loại bỏ bằng:
+n-1
+Trong BioLab, thuật toán thực hiện việc duyệt qua toàn bộ chuỗi amino acid, tra cứu bảng khối lượng tương ứng của từng amino acid và cộng dồn giá trị để thu được trọng lượng phân tử cuối cùng.
+Hình 3.4. Quy trình tính toán các thông số lý hóa protein trong BioLab
+2. Điểm đẳng điện (Isoelectric Point – pI)
+Điểm đẳng điện (Isoelectric Point – pI) là giá trị pH tại đó tổng điện tích của phân tử protein bằng 0. Tại giá trị pH này, protein tồn tại ở trạng thái trung hòa điện tích và thường có độ hòa tan thấp nhất. BioLab tính toán pI dựa trên phương pháp Bjellqvist, trong đó điện tích tổng của protein tại một giá trị pH xác định được tính dựa trên phương trình Henderson-Hasselbalch.
+Điện tích tổng của protein được xác định bởi:
+QpH=10pKN-term-pH1+10pKN-term-pH-10pH-pKC-term1+10pH-pKC-term+i10pKi-pH1+10pKi-pH-j10pH-pKj1+10pH-pKj
+Trong đó:
+pKN-termlà hằng số phân ly của nhóm amino đầu N.
+pKC-termlà hằng số phân ly của nhóm carboxyl đầu C.
+pKilà giá trị pKa của các nhóm amino acid có khả năng nhận proton.
+pKjlà giá trị pKa của các nhóm amino acid có khả năng nhường proton.
+Điểm đẳng điện được xác định khi:
+QpH=0
+Để tìm nghiệm, BioLab sử dụng phương pháp tìm kiếm nhị phân (Binary Search / Bisection Method) trên khoảng pH xác định:
+0≤pH≤14
+Thuật toán lặp cho đến khi sai số đạt ngưỡng:
+∣QpH∣<ϵ
+Trong đó:
+ϵlà sai số cho phép của quá trình hội tụ.
+Phương pháp tìm kiếm nhị phân giúp đảm bảo tốc độ hội tụ ổn định và phù hợp với bài toán tìm nghiệm đơn biến.
+Hình 3.5. Sơ đồ thuật toán tìm điểm đẳng điện pI bằng phương pháp Binary Search
+3. Chỉ số kỵ nước trung bình toàn thể (Grand Average of Hydropathicity – GRAVY)
+GRAVY (Grand Average of Hydropathicity) là chỉ số đánh giá mức độ kỵ nước hoặc ưa nước của một chuỗi protein.
+Giá trị GRAVY được tính dựa trên thang đo hydropathy Kyte-Doolittle.
+Công thức:
+GRAVY=i=1nHin
+Trong đó:
+Hilà giá trị hydropathy của amino acid thứ itheo bảng Kyte-Doolittle.
+nlà tổng số amino acid trong chuỗi.
+Ý nghĩa sinh học:
+Giá trị:
+GRAVY>0
+cho thấy protein có xu hướng kỵ nước cao, thường xuất hiện trong các protein màng hoặc vùng xuyên màng.
+Ngược lại:
+GRAVY<0
+cho thấy protein có tính ưa nước cao hơn, thường gặp ở các protein hòa tan trong môi trường tế bào.
+Trong BioLab, thuật toán tính GRAVY bằng cách duyệt toàn bộ chuỗi protein, lấy giá trị hydropathy tương ứng của từng amino acid và tính giá trị trung bình.
+4. Hệ số hấp thụ quang (Extinction Coefficient)
+Extinction Coefficient biểu diễn khả năng hấp thụ ánh sáng của protein tại bước sóng 280nm. Thông số này thường được sử dụng trong thực nghiệm nhằm ước lượng nồng độ protein thông qua phương pháp đo quang phổ UV.
+Giá trị hấp thụ chủ yếu phụ thuộc vào các amino acid thơm:
+Tyrosine (Y).
+Tryptophan (W).
+Cysteine trong trạng thái tạo cầu disulfide.
+Công thức tổng quát:
+EC=nW×ϵW+nY×ϵY+nC×ϵC
+Trong đó:
+nWlà số lượng Tryptophan.
+nYlà số lượng Tyrosine.
+nClà số lượng Cysteine tham gia hình thành cầu disulfide.
+ϵlà hệ số hấp thụ mol tương ứng.
+BioLab thực hiện việc đếm số lượng các amino acid đặc trưng trong chuỗi protein và áp dụng hệ số tương ứng để tính toán giá trị Extinction Coefficient.
+[Heading2] 3.3. Thuật toán tìm khung đọc mở 6-Frame ORF Finder
+3.3.1. Khái niệm khung đọc mở ORF
+Khung đọc mở (Open Reading Frame – ORF) là một đoạn trình tự nucleotide có khả năng mã hóa protein, bắt đầu bằng một codon mở đầu (Start Codon) và kết thúc bằng một codon kết thúc (Stop Codon) trong cùng một khung đọc. Trong sinh học phân tử, quá trình dịch mã diễn ra theo từng nhóm ba nucleotide liên tiếp gọi là codon. Do đó, vị trí bắt đầu đọc chuỗi sẽ quyết định cách phân chia nucleotide thành các codon khác nhau.
+Một trình tự DNA bất kỳ có thể tồn tại nhiều khả năng đọc khác nhau do:
+DNA gồm hai mạch bổ sung.
+Mỗi mạch có ba vị trí bắt đầu đọc khác nhau.
+Vì vậy, một chuỗi DNA cần được khảo sát trên tổng cộng sáu khung đọc:
+Ba khung đọc trên mạch thuận (Forward Strand).
+Ba khung đọc trên mạch nghịch thông qua chuỗi bổ sung đảo ngược (Reverse Complement).
+Hình 3.6. Nguyên lý phân tích sáu khung đọc mở trên chuỗi DNA
+3.3.2. Thuật toán quét và giải mã codon
+BioLab triển khai thuật toán 6-Frame ORF Finder nhằm xác định các vùng mã hóa tiềm năng (Open Reading Frame – ORF) trên trình tự nucleotide. Thuật toán thực hiện phân tích trên cả hai chiều của DNA, bao gồm mạch xuôi và mạch bổ sung đảo ngược, qua đó mở rộng khả năng phát hiện các vùng mã hóa trong nhiều loại trình tự khác nhau.
+Quy trình xử lý gồm các bước chính:
+Bước 1. Chuẩn bị hai chiều trình tự DNA
+Với trình tự nucleotide đầu vào, hệ thống tạo thêm chuỗi reverse complement để thực hiện phân tích trên cả hai chiều DNA.
+Thuật toán sau đó tiến hành quét tổng cộng sáu khung đọc, bao gồm ba khung đọc trên mạch xuôi và ba khung đọc trên mạch bổ sung đảo ngược.
+Bước 2. Xác định codon mở đầu và kết thúc
+Trong quá trình quét, hệ thống tìm kiếm các codon mở đầu hợp lệ để xác định vị trí bắt đầu của vùng mã hóa. Ngoài codon mở đầu phổ biến, thuật toán hỗ trợ thêm các codon thay thế nhằm tăng khả năng phát hiện ORF trên nhiều nhóm sinh vật khác nhau.
+Sau khi xác định codon mở đầu, thuật toán tiếp tục duyệt trình tự theo từng bộ ba nucleotide cho đến khi gặp codon kết thúc phù hợp trong cùng khung đọc. Khi đó, vùng trình tự được xác định là một ORF tiềm năng.
+Bước 3. Quét sáu khung đọc
+Đối với mỗi chiều DNA, thuật toán thực hiện ba lần quét tương ứng với các vị trí bắt đầu khác nhau (reading frame offset).
+Trong mỗi lần quét, hệ thống:
+Duyệt trình tự theo từng nhóm ba nucleotide (codon).
+Ghi nhận vị trí codon mở đầu.
+Tiếp tục dịch mã cho đến khi gặp codon kết thúc.
+Tính toán độ dài vùng mã hóa.
+Các ORF có độ dài vượt qua ngưỡng tối thiểu được cấu hình sẽ được ghi nhận là kết quả hợp lệ.
+Bước 4. Dịch mã và trả về kết quả
+Sau khi xác định ORF, hệ thống thực hiện dịch mã trình tự nucleotide thành chuỗi amino acid tương ứng dựa trên bảng mã di truyền.
+Kết quả trả về bao gồm các thông tin:
+Vị trí bắt đầu và kết thúc của ORF.
+Khung đọc tương ứng.
+Chuỗi nucleotide của vùng mã hóa.
+Chuỗi amino acid được dịch mã.
+Việc triển khai thuật toán 6-Frame ORF Finder giúp BioLab cung cấp khả năng phân tích vùng mã hóa trực tiếp trên nền tảng, hỗ trợ người dùng đánh giá tiềm năng chức năng của các trình tự nucleotide mà không cần sử dụng thêm công cụ phân tích bên ngoài.
+Hình 3.7. Luồng xử lý thuật toán 6-Frame ORF Finder trong BioLab
+[Heading2] 3.4. Dynamic FASTA Slicing Engine và tích hợp trực quan hóa hệ gen với IGV.js
+Trong các nghiên cứu hệ gen, việc trực quan hóa vị trí gene và các vùng trình tự liên quan đóng vai trò quan trọng trong quá trình phân tích dữ liệu di truyền. Tuy nhiên, đối với các bộ genome có kích thước lớn, việc tải toàn bộ trình tự về trình duyệt là không hiệu quả do yêu cầu lớn về bộ nhớ và thời gian truyền tải dữ liệu.
+Để giải quyết vấn đề này, BioLab triển khai cơ chế Dynamic FASTA Slicing Engine, cho phép hệ thống chỉ truy xuất và cung cấp đoạn trình tự cần thiết dựa trên vùng genome mà người dùng đang quan tâm.
+Cách tiếp cận này phù hợp với nguyên tắc xử lý dữ liệu theo nhu cầu (on-demand data retrieval), trong đó dữ liệu chỉ được tải khi thực sự cần thiết thay vì truyền tải toàn bộ genome.
+Module này được sử dụng kết hợp với thư viện IGV.js (Integrative Genomics Viewer JavaScript) nhằm cung cấp khả năng trực quan hóa dữ liệu hệ gen trực tiếp trên trình duyệt web.
+Hình 3.8. Kiến trúc tích hợp Dynamic FASTA Slicing Engine và IGV.js trong BioLab
+3.4.1. Nguyên lý hoạt động của Dynamic FASTA Slicing Engine
+Trong các genome browser truyền thống, dữ liệu thường được tổ chức dưới dạng các file genome lớn kèm theo thông tin chỉ mục (index) để cho phép truy xuất từng vùng nhỏ. Thay vì tải toàn bộ file FASTA, BioLab sử dụng cơ chế cắt động (dynamic slicing) dựa trên thông tin vùng genome được yêu cầu. Khi người dùng truy cập một vùng genome cụ thể, IGV.js gửi yêu cầu tới backend thông qua API endpoint.
+Thông tin yêu cầu bao gồm:
+Tên nhiễm sắc thể hoặc contig.
+Vị trí bắt đầu (start position).
+Vị trí kết thúc (end position).
+Chiều của trình tự (strand).
+Backend tiếp nhận yêu cầu và thực hiện các bước:
+Kiểm tra thông tin genome tương ứng.
+Xác định vùng trình tự cần lấy.
+Đọc đoạn dữ liệu nucleotide tương ứng.
+Tạo FASTA response theo đúng định dạng.
+Trả dữ liệu về cho IGV.js để hiển thị.
+Quy trình này giúp giảm lượng dữ liệu truyền tải và tăng khả năng phản hồi khi người dùng thay đổi vùng quan sát.
+Hình 3.9. Quy trình truy xuất một vùng genome bằng Dynamic FASTA Slicing
+3.4.2. Cơ chế mở rộng vùng truy xuất (Locus Padding)
+Trong quá trình hiển thị genome, nếu chỉ lấy đúng khoảng nucleotide được yêu cầu, vùng hiển thị có thể quá nhỏ và gây khó khăn cho việc quan sát bối cảnh xung quanh gene. Do đó, BioLab áp dụng cơ chế mở rộng vùng truy xuất bằng tham số LOCUS_PADDING=5000bp. Giá trị padding cho phép hệ thống mở rộng phạm vi lấy dữ liệu về hai phía của vùng gene cần quan sát.
+Công thức xác định vùng truy xuất mới:
+Startnew=max0Start-PaddingEndnew=End+Padding
+Trong đó:
+Start là vị trí bắt đầu vùng cần xem.
+End là vị trí kết thúc vùng cần xem.
+Padding là khoảng mở rộng thêm.
+Việc bổ sung vùng lân cận giúp người dùng quan sát được mối quan hệ giữa gene mục tiêu và các vùng trình tự xung quanh.
+3.4.3. Xử lý chiều của trình tự (Strand Handling)
+Genome có thể được biểu diễn trên hai chiều:
+Forward strand.
+Reverse strand.
+Trong trường hợp gene nằm trên mạch nghịch, trình tự cần được đảo chiều và tạo chuỗi bổ sung trước khi hiển thị. BioLab xử lý thông tin strand thông qua tham số strand=-1 / reverse để xác định trường hợp cần thực hiện phép biến đổi Sequence→Reverse Complement. Việc xử lý đúng chiều trình tự đảm bảo dữ liệu hiển thị phù hợp với hướng sinh học của gene.
+3.4.4. Tích hợp IGV.js trong giao diện BioLab
+Một trong những mục tiêu quan trọng của BioLab là cung cấp khả năng quan sát trực quan dữ liệu hệ gen ngay trong cùng một môi trường với các chức năng tra cứu và phân tích trình tự. Để thực hiện mục tiêu này, hệ thống tích hợp thư viện IGV.js (Integrative Genomics Viewer JavaScript) vào tầng giao diện người dùng (Frontend), cho phép xây dựng thành phần genome browser trực tiếp trên nền tảng web mà không yêu cầu người dùng sử dụng thêm các công cụ trực quan hóa bên ngoài.
+Thông qua IGV.js, BioLab có khả năng hiển thị trực quan các thông tin liên quan đến hệ gen, bao gồm:
+Genome reference: thông tin bộ gen tham chiếu được sử dụng làm cơ sở hiển thị;
+Vị trí chromosome: vị trí và phạm vi của vùng gene trên nhiễm sắc thể;
+Gene annotation: các thông tin chú giải liên quan đến gene như vị trí, vùng mã hóa và các đặc điểm sinh học liên quan;
+Vùng trình tự đang được quan sát: đoạn trình tự nucleotide tương ứng với khu vực genome mà người dùng lựa chọn.
+Quá trình tích hợp IGV.js được thiết kế theo mô hình phối hợp giữa Frontend và Backend. Khi người dùng lựa chọn một gene hoặc một vùng genome cần quan sát, hệ thống thực hiện các bước xử lý như sau:
+Bước 1: Khởi tạo genome viewer
+Frontend tiếp nhận lựa chọn của người dùng và khởi tạo thành phần IGV.js viewer với các tham số cấu hình tương ứng, bao gồm genome reference, chromosome và vùng tọa độ cần hiển thị.
+Bước 2: Gửi yêu cầu truy xuất dữ liệu genome
+Sau khi được khởi tạo, IGV.js gửi yêu cầu tới Backend để lấy dữ liệu trình tự nucleotide tương ứng với vùng genome đang được quan sát.
+Bước 3: Xử lý yêu cầu tại Backend
+Backend tiếp nhận yêu cầu và thực hiện cơ chế Dynamic FASTA Slicing, trong đó hệ thống truy xuất chính xác đoạn trình tự cần thiết từ nguồn dữ liệu FASTA thay vì tải toàn bộ bộ gen. Cách tiếp cận này giúp giảm lượng dữ liệu truyền tải, tối ưu thời gian phản hồi và nâng cao hiệu quả khi xử lý các bộ gen có kích thước lớn.
+Bước 4: Trả dữ liệu và hiển thị trực quan
+Sau khi hoàn tất quá trình trích xuất, dữ liệu FASTA được trả về cho IGV.js và hiển thị trực tiếp trên genome browser, cho phép người dùng quan sát mối liên hệ giữa vị trí gene, vùng trình tự và thông tin chú giải hệ gen.
+Việc tích hợp IGV.js giúp BioLab hợp nhất ba nhóm chức năng quan trọng trong nghiên cứu dữ liệu di truyền:
+Tra cứu dữ liệu gene: tìm kiếm và khai thác thông tin gene từ nhiều nguồn dữ liệu sinh học;
+Phân tích trình tự: thực hiện các phép phân tích trên DNA/RNA/protein;
+Trực quan hóa hệ gen: quan sát trực tiếp vị trí gene và các đặc điểm liên quan trên genome browser.
+Sự kết hợp này giúp BioLab trở thành một nền tảng tích hợp, hỗ trợ toàn bộ quy trình từ khai thác dữ liệu, xử lý phân tích đến quan sát trực quan thông tin di truyền trong cùng một môi trường thống nhất.
+Hình 3.10. Giao diện trực quan hóa genome bằng IGV.js trong BioLab
+[Heading2] 3.5. Module khai phá tài liệu khoa học PubMed và xuất dữ liệu học thuật
+Bên cạnh dữ liệu trình tự, quá trình nghiên cứu sinh học thường yêu cầu truy xuất các công trình khoa học liên quan đến gene hoặc protein đang được khảo sát. BioLab tích hợp module PubMed nhằm hỗ trợ người dùng tìm kiếm các bài báo khoa học liên quan thông qua hệ thống NCBI PubMed E-Utilities. Module này giúp kết nối thông tin giữa dữ liệu di truyền và nguồn tài liệu nghiên cứu, hỗ trợ quá trình tham khảo và xây dựng báo cáo khoa học.
+3.5.1. Quy trình tìm kiếm tài liệu PubMed
+Quy trình tìm kiếm tài liệu khoa học trong BioLab được xây dựng thông qua cơ chế kết nối với PubMed API, cho phép người dùng truy xuất các công trình nghiên cứu liên quan đến đối tượng sinh học đang quan tâm.
+Quy trình xử lý gồm các bước chính:
+Tiếp nhận truy vấn từ người dùng:Người dùng nhập từ khóa tìm kiếm liên quan đến gene, protein, bệnh lý hoặc các chủ đề nghiên cứu sinh học.
+Truy vấn dữ liệu từ PubMed API:Hệ thống gửi yêu cầu tới PubMed để tìm kiếm các bản ghi phù hợp và nhận về danh sách định danh bài báo (PMID).
+Thu thập thông tin chi tiết bài báo:Dựa trên các PMID thu được, BioLab tiếp tục truy xuất metadata của từng công trình, bao gồm tiêu đề, danh sách tác giả, tạp chí xuất bản, năm công bố, phần tóm tắt (abstract) và mã định danh PMID.
+Quy trình này giúp BioLab kết nối dữ liệu di truyền với nguồn tài liệu khoa học, hỗ trợ người dùng tiếp cận các bằng chứng nghiên cứu liên quan một cách thuận tiện trong cùng một nền tảng.
+Hình 3.11. Luồng xử lý tìm kiếm tài liệu PubMed trong BioLab
+3.5.2. Liên kết dữ liệu gene với tài liệu khoa học
+Module PubMed trong BioLab được xây dựng nhằm hỗ trợ người dùng mở rộng thông tin nghiên cứu liên quan đến các đối tượng di truyền đang được khai thác trong hệ thống.
+Sau khi tra cứu một gene hoặc đối tượng sinh học cụ thể, người dùng có thể tiếp tục tìm kiếm các công trình khoa học liên quan đến chức năng gene, vai trò của protein, các bệnh lý liên quan và các nghiên cứu thực nghiệm đã công bố.
+Việc kết hợp dữ liệu gene với nguồn tài liệu khoa học giúp BioLab tạo ra một quy trình khai thác thông tin liền mạch, trong đó người dùng không chỉ tiếp cận được dữ liệu trình tự và chú giải sinh học mà còn có thể tham khảo các bằng chứng nghiên cứu liên quan để phục vụ quá trình phân tích và tìm hiểu chuyên sâu.
+3.5.3. Xuất tài liệu tham khảo theo định dạng BibTeX và RIS
+Nhằm hỗ trợ quá trình quản lý tài liệu và viết báo cáo nghiên cứu, BioLab cung cấp chức năng xuất thông tin bài báo khoa học dưới các định dạng phổ biến trong lĩnh vực học thuật.
+Hệ thống hỗ trợ hai định dạng chính:
+BibTeX: định dạng được sử dụng phổ biến trong các hệ thống soạn thảo khoa học dựa trên LaTeX.
+RIS: định dạng trao đổi dữ liệu được hỗ trợ bởi nhiều phần mềm quản lý tài liệu tham khảo như EndNote, Zotero và Mendeley.
+Thông tin tài liệu được xuất bao gồm các trường dữ liệu chính như tác giả, tiêu đề bài báo, tên tạp chí, năm xuất bản, DOI và PMID.
+Việc hỗ trợ xuất dữ liệu theo các định dạng chuẩn giúp người dùng dễ dàng tái sử dụng kết quả tìm kiếm trong các công cụ quản lý tài liệu, phục vụ quá trình trích dẫn, viết báo cáo và thực hiện các nghiên cứu tiếp theo.
+[Heading2] 3.6. Thiết kế giao diện người dùng nền tảng BioLab
+Bên cạnh các module xử lý dữ liệu phía Backend, giao diện người dùng đóng vai trò là thành phần trung gian giúp người dùng tương tác và khai thác dữ liệu di truyền trên nền tảng BioLab.
+Giao diện hệ thống được thiết kế theo hướng trực quan, tổ chức các chức năng thành các khu vực riêng biệt nhằm hỗ trợ toàn bộ quy trình từ tra cứu dữ liệu gene, phân tích trình tự đến trực quan hóa thông tin hệ gen. Cách thiết kế này giúp đơn giản hóa quá trình sử dụng, đồng thời nâng cao khả năng tiếp cận và khai thác dữ liệu sinh học trên một môi trường thống nhất.
+3.6.1. Thiết kế giao diện theo mô hình Bento Grid
+BioLab áp dụng phong cách bố cục Bento Grid Layout, trong đó các chức năng chính được tổ chức thành các khu vực giao diện độc lập nhưng có sự liên kết trong cùng một không gian hiển thị.
+Cách tiếp cận này giúp tối ưu việc sử dụng diện tích màn hình, phân nhóm rõ ràng các chức năng theo từng mục đích sử dụng và cho phép người dùng đồng thời theo dõi nhiều loại thông tin trong quá trình tra cứu, phân tích dữ liệu di truyền.
+Các khu vực chức năng chính của giao diện bao gồm:
+Gene Search Panel: hỗ trợ tìm kiếm và tra cứu thông tin gene.
+Sequence Analysis Panel: thực hiện các chức năng phân tích trình tự nucleotide.
+Protein Analysis Panel: phân tích các đặc trưng của trình tự protein.
+PubMed Search Panel: tra cứu các công trình nghiên cứu liên quan.
+Genome Viewer: trực quan hóa thông tin hệ gen và vị trí gene.
+Export Panel: hỗ trợ xuất dữ liệu và kết quả phân tích.
+Việc tổ chức giao diện theo mô hình Bento Grid giúp BioLab cung cấp một môi trường làm việc thống nhất, trong đó người dùng có thể thực hiện toàn bộ quy trình từ tra cứu dữ liệu, phân tích trình tự đến trực quan hóa và xuất kết quả trên cùng một nền tảng.
+Hình 3.12. Bố cục giao diện Bento Grid của BioLab
+3.6.2. Hệ thống giao diện song ngữ Việt – Anh
+Nhằm nâng cao khả năng tiếp cận và phù hợp với môi trường học tập, nghiên cứu sinh học, BioLab được thiết kế với khả năng hỗ trợ giao diện song ngữ, cho phép người dùng chuyển đổi linh hoạt giữa Tiếng Việt và Tiếng Anh.
+Cơ chế quản lý ngôn ngữ được áp dụng cho các thành phần giao diện chính, bao gồm tên chức năng, nhãn hiển thị, thông báo hệ thống và hướng dẫn thao tác.
+Việc hỗ trợ song ngữ giúp BioLab đáp ứng tốt hơn nhu cầu sử dụng của nhiều nhóm người dùng khác nhau, đồng thời đảm bảo tính nhất quán khi hiển thị các thuật ngữ chuyên ngành sinh học vốn thường được sử dụng bằng tiếng Anh trong các cơ sở dữ liệu và tài liệu nghiên cứu quốc tế.
+3.6.3. Thiết kế trải nghiệm người dùng
+Giao diện BioLab được xây dựng dựa trên nguyên tắc giảm sự phức tạp trong quá trình thao tác.
+Thay vì yêu cầu người dùng sử dụng nhiều công cụ độc lập, hệ thống cung cấp một quy trình thống nhất:
+Tra cứu gene → Lấy trình tự → Phân tích → Trực quan hóa → Xuất kết quả.
+Cách tổ chức này giúp người dùng dễ dàng theo dõi quá trình xử lý dữ liệu và giảm thời gian chuyển đổi giữa các công cụ khác nhau.
+Hình 3.13. Luồng thao tác người dùng trong nền tảng BioLab
+[Heading2] 3.7. Kết luận chương
+Chương 3 đã trình bày quá trình hiện thực hóa các thuật toán xử lý dữ liệu sinh học và thiết kế giao diện người dùng trong nền tảng BioLab.
+Các module phân tích được xây dựng tập trung vào việc hỗ trợ người dùng khai thác dữ liệu di truyền từ bước tiếp nhận dữ liệu đầu vào, xử lý trình tự, phân tích đặc điểm sinh học đến trực quan hóa kết quả.
+Đối với dữ liệu nucleotide, hệ thống triển khai bộ xử lý Multi FASTA nhằm hỗ trợ đọc, phân tách và chuẩn hóa nhiều trình tự trong cùng một tập dữ liệu. Việc tích hợp bảng mã suy biến IUPAC giúp hệ thống có khả năng xử lý các trường hợp nucleotide chưa được xác định hoàn toàn, phù hợp với đặc điểm của dữ liệu giải trình tự thực tế.
+Đối với dữ liệu protein, BioLab xây dựng module Physicochemical Profiler nhằm tính toán các đặc tính lý hóa quan trọng bao gồm Theoretical Molecular Weight (MW), Isoelectric Point (pI), Grand Average of Hydropathicity (GRAVY) và Extinction Coefficient. Các thuật toán được triển khai dựa trên các công thức sinh học phổ biến, giúp chuyển đổi chuỗi amino acid đầu vào thành các thông tin định lượng phục vụ quá trình phân tích.
+Bên cạnh đó, thuật toán 6-Frame ORF Finder được xây dựng nhằm xác định các vùng có khả năng mã hóa protein trên cả hai chiều của chuỗi DNA. Việc phân tích đồng thời ba khung đọc trên mạch thuận và ba khung đọc trên mạch nghịch giúp hệ thống có khả năng khảo sát toàn diện khả năng tồn tại của các ORF trong trình tự đầu vào.
+Đối với quá trình trực quan hóa dữ liệu hệ gen, BioLab triển khai Dynamic FASTA Slicing Engine kết hợp với thư viện IGV.js. Giải pháp này cho phép hệ thống truy xuất từng vùng trình tự theo nhu cầu thay vì tải toàn bộ genome, từ đó giảm lượng dữ liệu cần xử lý và cải thiện khả năng tương tác của giao diện.
+Ngoài các chức năng phân tích dữ liệu di truyền, hệ thống còn tích hợp module PubMed nhằm hỗ trợ người dùng tìm kiếm tài liệu khoa học liên quan và xuất kết quả theo các định dạng tham khảo phổ biến như BibTeX và RIS.
+Về mặt giao diện, BioLab được thiết kế theo hướng trực quan với bố cục Bento Grid, trong đó các nhóm chức năng được tổ chức thành các khu vực riêng biệt như Gene Search, Sequence Analysis, Protein Analysis, Genome Visualization và PubMed Search. Hệ thống hỗ trợ giao diện song ngữ Việt – Anh nhằm tăng khả năng tiếp cận đối với người dùng trong môi trường học tập và nghiên cứu.
+Các kết quả triển khai trong chương này là cơ sở để tiến hành quá trình kiểm thử, đo lường hiệu năng và đánh giá khả năng hoạt động thực tế của nền tảng BioLab. Nội dung này sẽ được trình bày trong Chương 4.
+[Heading1] CHƯƠNG 4: THỰC NGHIỆM, KẾT QUẢ ĐO KIỂM VÀ ĐÁNH GIÁ
+[Heading2] 4.1. Môi trường thực nghiệm và kịch bản kiểm thử
+Toàn bộ quá trình kiểm thử chức năng, đo lường hiệu năng và thu thập dữ liệu vận hành được thực hiện trên môi trường phát triển được cấu hình nhằm mô phỏng điều kiện triển khai thực tế của hệ thống.
+Môi trường thực nghiệm bao gồm backend FastAPI, frontend Next.js, cơ sở dữ liệu SQLite và các thành phần hỗ trợ như bộ nhớ đệm nội bộ, hệ thống kiểm thử tự động pytest và các kết nối tới nguồn dữ liệu sinh học bên ngoài.
+Hình 4.1. Mô hình môi trường thực nghiệm nền tảng BioLab
+Bảng 4.1. Cấu hình môi trường máy chủ thực nghiệm
+
+--- TABLE (7 rows) ---
+Thành phần | Cấu hình thực nghiệm
+Hệ điều hành | Microsoft Windows 11 Pro 64-bit / Ubuntu 22.04 LTS (Docker context)
+Vi xử lý (CPU) | Intel Core i7 / AMD Ryzen 7 (8 Cores, 16 Threads)
+Bộ nhớ RAM | 16 GB DDR4 3200 MHz
+Python Runtime | Python 3.10.8 (Environment: pytest 8.3.3, anyio 4.12.1)
+Node.js Runtime | Node.js v20.18.0, Next.js 15.5.x
+Cơ sở dữ liệu | SQLite 3.39.4 / In-Memory Cache Repositories
+--- END TABLE ---
+
+Trong quá trình thực nghiệm, hệ thống được kiểm thử thông qua các kịch bản chính:
+Kịch bản 1: Kiểm thử các module xử lý dữ liệu sinh học.
+Kịch bản 2: Kiểm thử khả năng truy vấn và tích hợp dữ liệu từ nhiều nguồn.
+Kịch bản 3: Đo lường hiệu năng giữa truy vấn dữ liệu trực tiếp và truy vấn thông qua cache.
+Kịch bản 4: Mô phỏng lỗi từ các dịch vụ bên ngoài nhằm đánh giá cơ chế fallback.
+Kịch bản 5: Phân tích log vận hành thực tế của hệ thống.
+[Heading2] 4.2. Kết quả bộ kiểm thử tự động
+4.2.1. Tổng quan kết quả kiểm thử
+Nhằm đảm bảo độ tin cậy và tính ổn định của phần mềm, BioLab được xây dựng bộ kiểm thử tự động nhằm đánh giá các module xử lý quan trọng trong Backend.
+Bộ kiểm thử tập trung vào các nhóm chức năng chính, bao gồm độ chính xác của các thuật toán tin sinh học, khả năng xử lý dữ liệu đầu vào, hiệu quả của cơ chế lưu trữ đệm (cache), khả năng kết nối với các nguồn dữ liệu bên ngoài (provider), cơ chế xác thực API và khả năng xử lý lỗi thông qua các phản hồi HTTP.
+Việc kiểm thử tự động giúp phát hiện sớm các vấn đề trong quá trình phát triển, đồng thời xác nhận rằng các thành phần cốt lõi của BioLab hoạt động đúng theo thiết kế và đáp ứng các yêu cầu đặt ra trước khi triển khai thực tế.
+4.2.2. Phân bổ chi tiết các bài kiểm thử
+Bảng 4.2. Phân bổ 78 bài test tự động theo module
+
+--- TABLE (13 rows) ---
+Tệp kiểm thử | Số bài test | Trạng thái | Nội dung kiểm thử
+test_bioinformatics_upgrade.py | 14 | PASSED | Multi-FASTA, mã IUPAC, Protein MW/pI/GRAVY, 6-Frame ORF
+test_research_features.py | 14 | PASSED | FAIR Provenance, Export FASTA, GB, BED, CSV, BibTeX, RIS
+test_search_services.py | 7 | PASSED | Cache hits, Stale cache fallback, Provider Orchestration
+test_sequence.py | 9 | PASSED | Dynamic IGV Slicing, GC/AT ratio, Local sequence lookup
+test_ncbi_client.py | 5 | PASSED | Entrez E-Utilities, PubMed DOI parsing, Retries
+test_security.py | 5 | PASSED | API Key authentication, Dev/Prod security policy
+test_rate_limit.py | 2 | PASSED | SlowAPI IP & Key-based rate limiting
+test_exceptions.py | 4 | PASSED | Exception hierarchy, 500 error sanitization
+test_system.py | 4 | PASSED | Health check endpoints, system stats calculation
+test_validators.py | 10 | PASSED | DNA/RNA & Protein sequence validation
+test_health.py | 4 | PASSED | Health check endpoints, API Key verification
+Tổng cộng | 78 | 100% PASS | 
+--- END TABLE ---
+
+4.2.3. Đánh giá kết quả kiểm thử
+Kết quả kiểm thử cho thấy các nhóm chức năng chính của nền tảng BioLab đều được triển khai và hoạt động đúng theo yêu cầu thiết kế. Quá trình đánh giá được thực hiện trên các nhóm chức năng cốt lõi của hệ thống, bao gồm xử lý dữ liệu sinh học, quản lý dữ liệu, tích hợp hệ thống và bảo mật.
+Đối với nhóm chức năng phân tích dữ liệu sinh học, hệ thống đã kiểm thử thành công các module xử lý trình tự như hỗ trợ dữ liệu Multi-FASTA, xử lý ký hiệu nucleotide theo chuẩn IUPAC, tính toán các đặc trưng lý hóa của protein và xác định khung đọc mở (Open Reading Frame – ORF).
+Đối với nhóm chức năng quản lý và khai thác dữ liệu, các cơ chế quản lý nguồn gốc dữ liệu (data provenance), xuất dữ liệu theo nhiều định dạng và hỗ trợ xuất thông tin trích dẫn học thuật đã được kiểm tra nhằm đảm bảo khả năng lưu trữ, truy xuất và tái sử dụng dữ liệu trong quá trình nghiên cứu.
+Đối với nhóm chức năng tích hợp hệ thống, các thành phần quan trọng như cơ chế lưu trữ đệm (cache), lớp điều phối nguồn dữ liệu (Provider Orchestrator), cơ chế thử lại (retry mechanism) và xử lý lỗi từ các dịch vụ bên ngoài đã được kiểm thử nhằm đánh giá khả năng vận hành ổn định của hệ thống trong các trường hợp khác nhau.
+Đối với nhóm chức năng bảo mật, hệ thống đã được đánh giá thông qua các kịch bản xác thực API Key, kiểm soát giới hạn truy cập (rate limiting) và cơ chế xử lý lỗi an toàn, góp phần đảm bảo tính tin cậy và an toàn trong quá trình khai thác nền tảng.
+Nhìn chung, kết quả kiểm thử cho thấy BioLab đáp ứng được các yêu cầu chức năng chính đặt ra, đồng thời chứng minh khả năng tích hợp, xử lý và quản lý dữ liệu di truyền trong một nền tảng thống nhất.
+[Heading2] 4.3. Đánh giá hiệu năng phản hồi và khả năng tăng tốc của cơ chế Caching
+Một trong những mục tiêu quan trọng của BioLab là giảm sự phụ thuộc vào việc truy vấn trực tiếp các nguồn dữ liệu bên ngoài, đồng thời cải thiện khả năng phản hồi của hệ thống thông qua việc kết hợp Local-First Architecture và Caching Strategy.
+Để đánh giá hiệu quả của cơ chế này, hệ thống tiến hành đo lường và so sánh thời gian phản hồi giữa các phương thức truy xuất dữ liệu khác nhau, bao gồm:
+Cache Hit từ In-Memory Cache: truy xuất dữ liệu trực tiếp từ bộ nhớ đệm.
+Local SQLite Database: khai thác dữ liệu đã được lưu trữ trong cơ sở dữ liệu nội bộ.
+System Stats Endpoint: đánh giá khả năng phản hồi của các dịch vụ hệ thống có áp dụng cơ chế cache.
+NCBI Live Network Query: truy vấn trực tiếp tới nguồn dữ liệu bên ngoài thông qua Internet.
+Bảng 4.3. Kết quả đo thời gian phản hồi
+
+--- TABLE (5 rows) ---
+Phương thức truy vấn | Thời gian phản hồi | Hệ số tăng tốc | Ghi chú
+Cache Hit (In-Memory RAM) | 0,46 – 0,95 ms | > 3000 lần | Truy xuất trực tiếp từ bộ nhớ
+Local SQLite Database | 1,20 – 3,50 ms | > 800 lần | Truy vấn dữ liệu lưu trữ nội bộ
+System Stats Endpoint | < 500 ms | ~6 lần | Cache TTL 120s kết hợp bounded async pings
+NCBI Live Network Query | 2500 – 3500 ms | 1 lần | Truy vấn trực tiếp qua mạng Internet
+--- END TABLE ---
+
+Kết quả thực nghiệm cho thấy sự khác biệt đáng kể giữa các phương thức khai thác dữ liệu nội bộ và truy vấn trực tiếp từ nguồn dữ liệu bên ngoài. Đối với các dữ liệu đã tồn tại trong bộ nhớ đệm, thời gian phản hồi chỉ đạt khoảng 0,46–0,95 ms, trong khi truy vấn trực tiếp tới NCBI thông qua mạng Internet mất khoảng 2500–3500 ms.
+Sự chênh lệch này cho thấy việc áp dụng Local-First Architecture kết hợp với Caching Strategy giúp giảm đáng kể độ trễ truy xuất, hạn chế số lượng yêu cầu gửi tới các provider bên ngoài và nâng cao hiệu quả vận hành của nền tảng BioLab.
+Hình 4.2. Biểu đồ so sánh thời gian phản hồi giữa Cache, Database và truy vấn trực tuyến
+[Heading2] 4.4. Phân tích nhật ký trạng thái Request và đánh giá khả năng xử lý lỗi
+Bên cạnh việc đánh giá tính chính xác của chức năng và hiệu năng truy xuất dữ liệu, BioLab thực hiện thu thập và phân tích nhật ký hoạt động thông qua bảng request_metrics nhằm theo dõi quá trình vận hành và đánh giá khả năng xử lý yêu cầu của hệ thống.
+Dữ liệu được ghi nhận trong quá trình vận hành thử nghiệm và thực hiện kiểm thử tự động, bao gồm các thông tin chính như thời gian xử lý request, API endpoint, phương thức HTTP, mã trạng thái phản hồi và các thông tin phục vụ phân tích hiệu năng, phát hiện lỗi.
+Trong quá trình đánh giá, hệ thống đã ghi nhận 821 request, bao gồm cả các yêu cầu xử lý thành công và các yêu cầu được tạo ra trong quá trình kiểm thử lỗi. Việc thu thập dữ liệu này giúp đánh giá khả năng phản hồi của BioLab trong nhiều tình huống khác nhau, đồng thời hỗ trợ phân tích hiệu quả của các cơ chế xử lý lỗi và duy trì hoạt động của hệ thống.
+Hình 4.3. Quy trình thu thập và phân tích request metrics trong BioLab
+4.4.1. Thống kê mã trạng thái HTTP
+Bảng 4.4. Thống kê mã trạng thái HTTP từ 821 request ghi nhận
+
+--- TABLE (10 rows) ---
+Mã trạng thái HTTP | Số lượng | Tỷ lệ (%) | Phân tích nguyên nhân / mục đích kỹ thuật
+200 OK | 771 | 93.9% | Xử lý request thành công hoàn toàn
+401 Unauthorized | 16 | 1.9% | Kiểm thử từ chối khi thiếu hoặc sai API Key
+404 Not Found | 9 | 1.1% | Kiểm thử truy vấn ID gene hoặc route không tồn tại
+500 Internal Error | 9 | 1.1% | Kiểm thử cơ chế làm sạch lỗi, không để lộ traceback
+502 Bad Gateway | 8 | 1.0% | Giả lập sự cố kết nối tới nguồn dữ liệu NCBI
+503 Service Unavailable | 4 | 0.5% | Giả lập trường hợp các provider tạm thời không khả dụng
+429 Rate Limit | 2 | 0.2% | Kiểm thử giới hạn tần suất truy cập
+405 Method Not Allowed | 2 | 0.2% | Kiểm thử phương thức HTTP không hợp lệ
+Tổng cộng | 821 | 100% | 
+--- END TABLE ---
+
+4.4.2. Phân tích kết quả request metrics
+Kết quả thống kê trong quá trình vận hành thử nghiệm cho thấy phần lớn các yêu cầu gửi tới BioLab được xử lý thành công, với 93,9% request trả về mã trạng thái 200 OK. Kết quả này cho thấy các chức năng chính của hệ thống có khả năng hoạt động ổn định trong điều kiện sử dụng thông thường, đáp ứng được yêu cầu xử lý truy vấn và khai thác dữ liệu của người dùng.
+Bên cạnh các trường hợp xử lý thành công, hệ thống được kiểm thử với nhiều nhóm lỗi khác nhau nhằm đánh giá khả năng phát hiện, kiểm soát và phản hồi khi xảy ra sự cố.
+Đối với nhóm lỗi xác thực (401 Unauthorized), các kịch bản sử dụng API Key không hợp lệ được thực hiện để kiểm tra cơ chế bảo vệ truy cập. Kết quả cho thấy hệ thống có khả năng phát hiện và từ chối các yêu cầu không đáp ứng điều kiện xác thực, đảm bảo tính an toàn trong quá trình khai thác dịch vụ.
+Đối với nhóm lỗi dữ liệu (404 Not Found), hệ thống được kiểm thử với các trường hợp truy vấn tới tài nguyên không tồn tại. Kết quả cho thấy BioLab có khả năng xử lý phù hợp các yêu cầu không hợp lệ và trả về phản hồi rõ ràng thay vì phát sinh lỗi ngoài kiểm soát.
+Đối với nhóm lỗi hệ thống (500 Internal Server Error), các tình huống lỗi trong quá trình xử lý nội bộ được mô phỏng nhằm đánh giá cơ chế quản lý ngoại lệ (exception handling). Hệ thống đảm bảo thông tin phản hồi tới người dùng không làm lộ các chi tiết xử lý nội bộ hoặc thông tin nhạy cảm như traceback.
+Đối với nhóm lỗi từ nguồn dữ liệu bên ngoài (502 Bad Gateway, 503 Service Unavailable), các kịch bản giả lập sự cố kết nối tới các provider sinh học được thực hiện nhằm đánh giá khả năng phản ứng của lớp tích hợp dữ liệu. Kết quả kiểm thử là cơ sở để đánh giá hiệu quả của các cơ chế xử lý lỗi, retry và fallback khi làm việc với các dịch vụ bên ngoài.
+Nhìn chung, kết quả đánh giá cho thấy BioLab không chỉ đáp ứng tốt các yêu cầu xử lý trong điều kiện bình thường mà còn có khả năng kiểm soát các tình huống lỗi phát sinh, góp phần nâng cao tính ổn định, an toàn và độ tin cậy của hệ thống trong quá trình triển khai thực tế.
+Hình 4.4. Biểu đồ phân bố các mã trạng thái HTTP trong 821 request
+[Heading2] 4.5. Thống kê dữ liệu lưu trữ trong cơ sở dữ liệu nội bộ
+Bên cạnh việc phân tích hoạt động của các request, BioLab tiến hành kiểm tra trạng thái dữ liệu được lưu trữ trong cơ sở dữ liệu SQLite nhằm đánh giá khả năng quản lý dữ liệu nội bộ và hiệu quả của cơ chế lưu trữ.
+Các nhóm dữ liệu chính được quản lý trong hệ thống bao gồm:
+genes: lưu trữ thông tin định danh và metadata liên quan đến gene.
+sequences: quản lý dữ liệu trình tự nucleotide/protein phục vụ phân tích.
+cache_entries: lưu trữ các kết quả truy vấn nhằm tối ưu tốc độ truy xuất và giảm yêu cầu tới nguồn dữ liệu bên ngoài.
+search_history: theo dõi lịch sử khai thác dữ liệu của người dùng.
+request_metrics: lưu trữ thông tin phục vụ giám sát và đánh giá hoạt động hệ thống.
+Việc thống kê và kiểm tra dữ liệu trong các bảng này giúp đánh giá khả năng lưu trữ nội bộ, mức độ hiệu quả của cơ chế cache và khả năng phục vụ các truy vấn lặp lại trong kiến trúc Local-First Architecture của BioLab.
+Bảng 4.5. Thống kê bản ghi cơ sở dữ liệu nội bộ
+
+--- TABLE (8 rows) ---
+Bảng cơ sở dữ liệu | Số lượng bản ghi | Mô tả dữ liệu lưu trữ
+genes | 37 | Các bản ghi gene chuẩn (BRCA1, TP53,...) kèm FAIR provenance
+sequences | 3 | Các trình tự DNA/Protein nguyên bản do người dùng phân tích
+cache_entries | 45 | Các đối tượng JSON payload được lưu đệm
+search_history | 42 | Nhật ký từ khóa truy vấn của người dùng
+request_metrics | 821 | Nhật ký đo lường thời gian phản hồi và mã HTTP
+research_papers | 1 | Bài báo nghiên cứu PubMed liên kết với dữ liệu gene
+system_logs | 0 | Nhật ký hoạt động hệ thống (schema đã định nghĩa, chưa có dữ liệu)
+--- END TABLE ---
+
+4.5.1. Đánh giá dữ liệu bảng genes
+Bảng genes lưu trữ các bản ghi gene được BioLab khai thác từ các nguồn dữ liệu sinh học bên ngoài và quản lý trong cơ sở dữ liệu nội bộ.
+Các thông tin chính của mỗi bản ghi bao gồm Gene identifier, tên gene, loài sinh vật, nguồn cung cấp dữ liệu (provider source) và các metadata liên quan đến nguồn gốc dữ liệu.
+Việc lưu trữ đầy đủ các thông tin định danh và metadata giúp hệ thống đảm bảo khả năng truy xuất, kiểm chứng nguồn dữ liệu và hỗ trợ quản lý provenance theo định hướng FAIR Data.
+Trong quá trình kiểm thử chức năng, các gene chuẩn như BRCA1 và TP53 được sử dụng để đánh giá khả năng tra cứu, lưu trữ và xử lý dữ liệu gene của hệ thống.
+4.5.2. Đánh giá cơ chế Cache thông qua bảng cache_entries
+Trong kiến trúc lưu trữ dữ liệu của BioLab, bảng cache_entries được sử dụng để lưu trữ các kết quả truy vấn đã được xử lý từ các nguồn dữ liệu sinh học bên ngoài dưới dạng JSON payload.
+Trong quá trình thực nghiệm, bảng cache_entries ghi nhận tổng cộng 45 bản ghi dữ liệu được lưu trữ. Các dữ liệu này được tạo ra sau khi hệ thống thực hiện thành công các truy vấn tới các provider bên ngoài như NCBI, Ensembl hoặc các nguồn dữ liệu sinh học khác. Sau khi nhận được kết quả, hệ thống tiến hành chuẩn hóa dữ liệu và lưu lại trong cache nhằm phục vụ các lần truy vấn tiếp theo.
+Cơ chế lưu trữ đệm đóng vai trò quan trọng trong việc tối ưu hiệu năng của hệ thống thông qua các tác động chính:
+Thứ nhất, cache giúp giảm số lượng yêu cầu gửi trực tiếp tới các API bên ngoài. Khi người dùng thực hiện lại một truy vấn đã tồn tại trong hệ thống, BioLab có thể trả về kết quả từ dữ liệu đã lưu trữ thay vì phải thực hiện lại quá trình truy vấn qua mạng.
+Thứ hai, việc khai thác dữ liệu từ cache giúp giảm đáng kể độ trễ trong quá trình phản hồi. Dữ liệu được lưu trữ nội bộ có tốc độ truy xuất cao hơn so với việc chờ phản hồi từ các máy chủ dữ liệu sinh học bên ngoài.
+Thứ ba, cơ chế cache góp phần nâng cao tính ổn định của hệ thống trong trường hợp các provider bên ngoài gặp vấn đề như chậm phản hồi, giới hạn truy cập hoặc tạm thời không khả dụng. Trong những trường hợp này, các dữ liệu đã được lưu trước đó vẫn có thể tiếp tục được khai thác.
+Kết quả đo hiệu năng tại mục 4.3. Đánh giá hiệu năng phản hồi và khả năng tăng tốc của cơ chế Caching cho thấy thời gian phản hồi khi truy xuất dữ liệu từ In-Memory Cache đạt 0.46ms-0.95ms.
+Trong khi đó, truy vấn trực tiếp tới nguồn dữ liệu NCBI thông qua mạng Internet có thời gian phản hồi 2500ms-3500ms.
+Sự khác biệt này cho thấy việc áp dụng cơ chế lưu trữ đệm giúp giảm đáng kể thời gian chờ của người dùng, đồng thời giảm tải cho các nguồn dữ liệu bên ngoài và nâng cao hiệu quả vận hành của nền tảng BioLab.
+Hình 4.5. Luồng xử lý dữ liệu khi sử dụng cache trong BioLab
+[Heading2] 4.6. Kiểm chứng khả năng dung lỗi của cơ chế Provider Fallback
+Một trong những mục tiêu thiết kế quan trọng của BioLab là giảm sự phụ thuộc vào một nguồn dữ liệu sinh học duy nhất, đồng thời đảm bảo khả năng duy trì hoạt động khi các dịch vụ bên ngoài gặp sự cố.
+Trong thực tế, các nguồn dữ liệu trực tuyến có thể phát sinh các vấn đề như gián đoạn kết nối, giới hạn truy cập, quá tải hệ thống hoặc thời gian phản hồi cao. Vì vậy, BioLab triển khai cơ chế Provider Orchestrator kết hợp với Fallback Mechanism nhằm quản lý quá trình truy vấn và duy trì khả năng xử lý yêu cầu khi một provider không khả dụng.
+Cơ chế này cho phép hệ thống điều phối yêu cầu tới các nguồn dữ liệu phù hợp, kiểm soát trạng thái phản hồi và chuyển sang phương án dự phòng khi xảy ra lỗi, qua đó nâng cao tính ổn định, khả năng mở rộng và độ tin cậy của nền tảng.
+4.6.1. Kịch bản kiểm thử lỗi provider
+Kịch bản thực nghiệm được xây dựng như sau:
+Bước 1: Giả lập tình trạng NCBI không phản hồi hoặc trả về lỗi 503 Service Unavailable
+Bước 2: Yêu cầu truy vấn gene được gửi tới hệ thống.
+Bước 3: Provider Orchestrator phát hiện lỗi từ nguồn dữ liệu ban đầu.
+Bước 4: Hệ thống thực hiện chuyển hướng truy vấn sang provider thay thế.
+Bước 5: Kết quả được trả về cho người dùng.
+Hình 4.6. Luồng xử lý Fallback khi provider chính gặp sự cố
+4.6.2. Kết quả kiểm thử cơ chế Fallback
+Để đánh giá khả năng duy trì hoạt động khi nguồn dữ liệu bên ngoài gặp sự cố, BioLab được kiểm thử trong kịch bản giả lập lỗi kết nối tới NCBI. Kết quả thực nghiệm cho thấy cơ chế Provider Orchestrator và Fallback Mechanism hoạt động đúng theo thiết kế.
+Khi nguồn dữ liệu chính không phản hồi, hệ thống có khả năng phát hiện lỗi, tự động chuyển hướng yêu cầu sang nguồn dữ liệu thay thế trong thời gian [thời gian chuyển đổi], đồng thời duy trì cấu trúc dữ liệu trả về bao gồm các thông tin quan trọng như thông tin gene, tọa độ nhiễm sắc thể và metadata nguồn dữ liệu.
+Ngoài dữ liệu kết quả, hệ thống bổ sung trường trạng thái:
+{
+"fallback_used": true
+}
+giúp Frontend nhận biết dữ liệu được trả về thông qua cơ chế chuyển đổi nguồn, từ đó đảm bảo tính minh bạch trong quá trình khai thác dữ liệu.
+Trong quá trình chuyển đổi provider, giao diện người dùng vẫn duy trì hoạt động bình thường. Frontend sử dụng Next.js tiếp tục nhận dữ liệu hợp lệ và hiển thị kết quả mà không xảy ra lỗi gián đoạn.
+Kết quả kiểm thử cho thấy kiến trúc tích hợp nhiều provider giúp BioLab nâng cao khả năng chịu lỗi (fault tolerance), giảm sự phụ thuộc vào một nguồn dữ liệu duy nhất và đảm bảo tính ổn định khi khai thác dữ liệu sinh học từ các dịch vụ bên ngoài.
+[Heading2] 4.7. Tổng kết chương
+Chương 4 đã trình bày quá trình thực nghiệm, đo kiểm và đánh giá nền tảng BioLab dựa trên các tiêu chí về độ chính xác chức năng, hiệu năng xử lý và khả năng vận hành ổn định.
+Kết quả kiểm thử tự động cho thấy toàn bộ 78/78 bài kiểm thử đều đạt trạng thái PASSED với thời gian thực thi 7,95s.
+Các phép đo hiệu năng chứng minh hiệu quả của cơ chế Local-First và Caching khi thời gian phản hồi từ In-Memory Cache chỉ dao động 0.46ms-0.95ms so với 2500ms-3500ms khi truy vấn trực tiếp qua mạng tới NCBI.
+Phân tích 821 request ghi nhận trong quá trình vận hành cho thấy hệ thống xử lý thành công 93.9% yêu cầu thông thường, đồng thời kiểm soát được các nhóm lỗi liên quan đến xác thực, giới hạn truy cập, lỗi provider và lỗi hệ thống.
+Bên cạnh đó, kịch bản kiểm thử Fallback chứng minh khả năng chuyển đổi nguồn dữ liệu khi provider chính gặp sự cố, giúp duy trì tính liên tục trong quá trình khai thác dữ liệu di truyền.
+Các kết quả thực nghiệm trên cho thấy nền tảng BioLab đáp ứng được mục tiêu xây dựng một hệ thống hỗ trợ tra cứu, phân tích và trực quan hóa dữ liệu di truyền với khả năng xử lý dữ liệu linh hoạt, hiệu quả và ổn định.
+[Heading1] KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
+[Heading2] 1. Các kết quả chính đạt được
+Sau quá trình nghiên cứu, thiết kế và triển khai, đồ án “Xây dựng nền tảng BioLab hỗ trợ tra cứu, phân tích và trực quan hóa dữ liệu di truyền” đã hoàn thành các mục tiêu đề ra ban đầu, bao gồm xây dựng một hệ thống web tích hợp phục vụ khai thác dữ liệu sinh học, phát triển các module phân tích trình tự và đánh giá khả năng vận hành thông qua các kịch bản kiểm thử thực tế.
+Các kết quả chính đạt được của đồ án bao gồm:
+1.1. Xây dựng nền tảng tin sinh học Full-Stack
+Đồ án đã xây dựng hoàn chỉnh một nền tảng web Full-Stack với kiến trúc tách biệt giữa giao diện người dùng và tầng xử lý nghiệp vụ.
+Backend của hệ thống được phát triển trên nền tảng FastAPI 0.115, đảm nhiệm vai trò cung cấp RESTful API, xử lý logic nghiệp vụ, quản lý dữ liệu và kết nối với các nguồn dữ liệu sinh học bên ngoài.
+Frontend được xây dựng bằng Next.js 15.5, kết hợp với React và TypeScript, cung cấp giao diện trực quan phục vụ các chức năng tra cứu gene, phân tích trình tự, phân tích protein, tìm kiếm tài liệu khoa học và trực quan hóa dữ liệu hệ gen.
+Hệ thống được đóng gói thông qua Docker, giúp chuẩn hóa môi trường triển khai và tạo điều kiện thuận lợi cho việc cài đặt, kiểm thử và mở rộng trong các môi trường khác nhau.
+1.2. Xây dựng cơ chế tích hợp và điều phối dữ liệu đa nguồn
+BioLab đã triển khai cơ chế Multi-Provider Orchestrator nhằm hỗ trợ kết nối, khai thác và quản lý dữ liệu từ nhiều cơ sở dữ liệu sinh học khác nhau, bao gồm NCBI, Ensembl, UniProt, BV-BRC và Phytozome.
+Cơ chế điều phối này đóng vai trò là lớp trung gian giữa hệ thống và các nguồn dữ liệu bên ngoài, giúp xử lý sự khác biệt về cấu trúc dữ liệu, chuẩn hóa kết quả trả về và cung cấp dữ liệu theo một định dạng thống nhất cho các thành phần phía trên.
+Bên cạnh khả năng tích hợp đa nguồn, BioLab triển khai Fallback Mechanism nhằm duy trì khả năng xử lý yêu cầu khi một provider gặp sự cố như lỗi kết nối hoặc không khả dụng tạm thời. Cơ chế này góp phần giảm sự phụ thuộc vào một nguồn dữ liệu duy nhất, đồng thời nâng cao tính ổn định, khả năng mở rộng và độ tin cậy của hệ thống trong quá trình khai thác dữ liệu di truyền.
+1.3. Áp dụng cơ chế quản lý nguồn gốc dữ liệu theo định hướng FAIR
+BioLab triển khai cơ chế quản lý metadata nhằm đảm bảo khả năng truy xuất, kiểm chứng và tái sử dụng dữ liệu theo định hướng FAIR (Findable, Accessible, Interoperable, Reusable).
+Các thông tin nguồn gốc dữ liệu được lưu trữ bao gồm genome assembly, taxonomy ID (taxid), accession version, nguồn cung cấp (provider source) và thông tin định danh bản ghi. Việc quản lý các thông tin này giúp duy trì khả năng truy xuất nguồn gốc và đảm bảo tính nhất quán của dữ liệu trong quá trình khai thác.
+Bên cạnh đó, hệ thống hỗ trợ xuất dữ liệu sinh học dưới các định dạng phổ biến như FASTA, GenBank, BED và CSV, đồng thời cung cấp khả năng xuất thông tin tài liệu khoa học theo định dạng BibTeX và RIS.
+Các cơ chế trên giúp dữ liệu và kết quả phân tích từ BioLab có thể dễ dàng được chia sẻ, tích hợp với các công cụ khác và tiếp tục sử dụng trong các quy trình nghiên cứu khoa học.
+1.4. Phát triển các thuật toán xử lý và phân tích dữ liệu sinh học
+Một trong những đóng góp chính của đồ án là xây dựng các module phân tích dữ liệu sinh học được tích hợp trực tiếp trong nền tảng BioLab, cho phép người dùng thực hiện các bước xử lý trình tự DNA, RNA và protein mà không cần sử dụng thêm các công cụ bên ngoài.
+Các chức năng phân tích chính bao gồm:
+Xử lý trình tự nucleotide: hỗ trợ dữ liệu Multi-FASTA, mã nucleotide suy biến IUPAC, tạo trình tự bổ sung ngược (Reverse Complement) và tính toán các đặc trưng như GC Content, AT Ratio.
+Phân tích protein: tính toán các thông số lý hóa quan trọng như trọng lượng phân tử lý thuyết (Theoretical Molecular Weight), điểm đẳng điện (Isoelectric Point – pI), chỉ số kỵ nước trung bình (GRAVY) và hệ số hấp thụ quang (Extinction Coefficient).
+Phân tích vùng mã hóa: triển khai thuật toán tìm kiếm khung đọc mở trên sáu khung đọc (6-Frame ORF Finder), hỗ trợ phân tích cả hai chiều DNA và các codon mở đầu thay thế.
+Trực quan hóa dữ liệu hệ gen: xây dựng cơ chế Dynamic FASTA Slicing và tích hợp IGV.js nhằm cho phép truy xuất, hiển thị trực quan các vùng genome theo nhu cầu người dùng.
+Các module trên tạo thành chuỗi xử lý dữ liệu tương đối hoàn chỉnh trong BioLab, từ tiếp nhận dữ liệu trình tự, thực hiện phân tích chuyên biệt đến trực quan hóa kết quả. Điều này giúp nền tảng không chỉ đóng vai trò là công cụ tra cứu dữ liệu mà còn hỗ trợ một phần quy trình phân tích trong các bài toán tin sinh học.
+1.5. Đánh giá chất lượng phần mềm và hiệu năng hệ thống
+Chất lượng hoạt động của BioLab được đánh giá thông qua bộ kiểm thử tự động trên các module backend quan trọng, bao gồm các thành phần xử lý dữ liệu sinh học, quản lý dữ liệu và tích hợp với các nguồn dữ liệu bên ngoài.
+Kết quả thực nghiệm cho thấy hệ thống đạt 78/78 bài kiểm thử thành công, tương ứng tỷ lệ 100% PASS, với tổng thời gian thực thi 7,95 giây. Kết quả này cho thấy các chức năng cốt lõi của backend hoạt động ổn định và đáp ứng đúng các yêu cầu thiết kế.
+Bên cạnh đánh giá chức năng, hiệu năng hệ thống được kiểm chứng thông qua việc so sánh thời gian truy xuất dữ liệu giữa cơ chế lưu trữ nội bộ và truy vấn trực tiếp tới nguồn dữ liệu bên ngoài. Kết quả cho thấy thời gian phản hồi từ In-Memory Cache đạt khoảng 0,46–0,95 ms, trong khi truy vấn trực tiếp tới NCBI thông qua kết nối Internet mất khoảng 2500–3500 ms.
+Sự khác biệt này cho thấy kiến trúc Local-First Architecture kết hợp với Caching Strategy giúp giảm đáng kể độ trễ truy xuất, hạn chế số lượng yêu cầu tới các dịch vụ bên ngoài và nâng cao hiệu quả khai thác dữ liệu trong BioLab.
+Ngoài ra, trong quá trình vận hành thử nghiệm, hệ thống đã ghi nhận và phân tích 821 request, với tỷ lệ xử lý thành công đạt 93,9%. Kết quả này cho thấy BioLab có khả năng hoạt động ổn định trong môi trường thực tế, đồng thời chứng minh hiệu quả của các cơ chế quản lý dữ liệu, tối ưu truy xuất và xử lý yêu cầu.
+[Heading2] 2. Đánh giá đóng góp của đồ án
+Đồ án đã xây dựng thành công nền tảng BioLab hỗ trợ khai thác dữ liệu di truyền theo hướng tích hợp, kết hợp khả năng truy xuất dữ liệu từ nhiều nguồn sinh học với các module phân tích được triển khai trực tiếp trên hệ thống.
+Thay vì phải sử dụng nhiều công cụ riêng biệt cho từng giai đoạn trong quá trình nghiên cứu, BioLab cung cấp một môi trường thống nhất hỗ trợ toàn bộ quy trình từ tra cứu thông tin gene, phân tích trình tự nucleotide và protein, tìm kiếm tài liệu khoa học, trực quan hóa dữ liệu hệ gen đến xuất dữ liệu phục vụ nghiên cứu.
+Bên cạnh giá trị về mặt kỹ thuật, BioLab còn có ý nghĩa trong đào tạo và nghiên cứu tin sinh học khi cung cấp một nền tảng trực quan, giúp người học và nhà nghiên cứu tiếp cận các quy trình xử lý dữ liệu di truyền một cách thuận tiện và có hệ thống hơn.
+Việc kết hợp kiến trúc phần mềm phân lớp, cơ chế lưu trữ đệm, khả năng tích hợp dữ liệu đa nguồn và các thuật toán phân tích sinh học đã tạo nền tảng cho một hệ thống có tính ổn định, khả năng mở rộng và tiềm năng phát triển thêm các chức năng phân tích chuyên sâu trong tương lai.
+[Heading2] 3. Hạn chế tồn tại và hướng phát triển tiếp theo
+Mặc dù đã đạt được các mục tiêu chính đề ra, hệ thống BioLab vẫn tồn tại một số giới hạn do phạm vi nghiên cứu và thời gian thực hiện đồ án.
+3.1. Hạn chế hiện tại
+Hạn chế về khả năng mở rộng cơ sở dữ liệu
+Trong phiên bản hiện tại, BioLab sử dụng SQLite làm hệ quản trị cơ sở dữ liệu nhằm phù hợp với phạm vi triển khai và đánh giá của đồ án. Tuy nhiên, khi hệ thống mở rộng với khối lượng dữ liệu lớn, đặc biệt trong các bài toán quản lý số lượng lớn bản ghi genome, sequence hoặc nhiều người dùng truy cập đồng thời, SQLite có thể gặp giới hạn về khả năng mở rộng và hiệu năng xử lý.
+Trong tương lai, hệ thống có thể được chuyển đổi sang các giải pháp cơ sở dữ liệu có khả năng mở rộng cao hơn như PostgreSQL, PostgreSQL Cluster hoặc các mô hình lưu trữ phân tán nhằm đáp ứng nhu cầu quản lý dữ liệu lớn.
+Hạn chế về phạm vi phân tích sinh học
+Các module phân tích hiện tại của BioLab tập trung vào những chức năng nền tảng phục vụ khai thác dữ liệu di truyền, bao gồm phân tích trình tự nucleotide/protein, tính toán đặc tính lý hóa protein, tìm kiếm ORF và trực quan hóa dữ liệu hệ gen.
+Một số bài toán chuyên sâu trong tin sinh học như dự đoán cấu trúc protein, phân tích biến dị gene, dự đoán chức năng sinh học hoặc các mô hình phân tích dựa trên học máy chưa được triển khai trong phạm vi của đồ án. Đây là những hướng phát triển tiềm năng nhằm mở rộng khả năng ứng dụng của BioLab trong các bài toán nghiên cứu chuyên sâu hơn.
+3.2. Hướng phát triển trong tương lai
+Dựa trên kiến trúc hiện tại, BioLab có khả năng tiếp tục được mở rộng theo nhiều hướng nhằm nâng cao phạm vi ứng dụng và đáp ứng các nhu cầu phân tích dữ liệu sinh học chuyên sâu hơn.
+Tích hợp các mô hình dự đoán cấu trúc protein
+Hệ thống có thể được mở rộng bằng cách tích hợp các mô hình dự đoán cấu trúc protein hiện đại như AlphaFold API hoặc ESMFold. Hướng phát triển này cho phép BioLab mở rộng từ phân tích trình tự protein sang khảo sát cấu trúc không gian ba chiều, hỗ trợ thêm các bài toán nghiên cứu liên quan đến chức năng và tương tác protein.
+Mở rộng khả năng phân tích biến dị gene
+BioLab có thể tích hợp thêm các công cụ phân tích biến dị như Variant Effect Predictor (VEP) nhằm hỗ trợ đánh giá ảnh hưởng của các biến thể nucleotide tới cấu trúc gene, trình tự protein và chức năng sinh học. Điều này giúp mở rộng phạm vi ứng dụng của hệ thống trong các bài toán nghiên cứu di truyền và y sinh.
+Triển khai trên nền tảng điện toán đám mây
+Trong trường hợp mở rộng quy mô sử dụng, BioLab có thể được triển khai trên hạ tầng điện toán đám mây kết hợp với các công nghệ như container orchestration, Kubernetes và auto-scaling. Giải pháp này giúp hệ thống có khả năng tự động điều chỉnh tài nguyên theo nhu cầu sử dụng, nâng cao khả năng mở rộng khi số lượng người dùng hoặc khối lượng dữ liệu tăng lên.
+Những hướng phát triển trên là cơ sở để BioLab tiếp tục hoàn thiện thành một nền tảng phân tích dữ liệu sinh học toàn diện hơn, hỗ trợ nhiều hơn các quy trình nghiên cứu trong lĩnh vực tin sinh học và sinh học tính toán.
+Kết luận chung
+Đồ án “Xây dựng nền tảng BioLab hỗ trợ tra cứu, phân tích và trực quan hóa dữ liệu di truyền” đã hoàn thành mục tiêu xây dựng một hệ thống tin sinh học tích hợp, kết hợp giữa khả năng khai thác dữ liệu từ nhiều nguồn, các thuật toán phân tích trình tự và giao diện trực quan trên nền tảng web.
+Các kết quả thực nghiệm cho thấy hệ thống có khả năng hoạt động ổn định, xử lý hiệu quả các tác vụ phân tích dữ liệu di truyền và đáp ứng được yêu cầu về hiệu năng, khả năng mở rộng cũng như quản lý nguồn gốc dữ liệu.
+Trong tương lai, với việc mở rộng cơ sở dữ liệu, tích hợp thêm các mô hình trí tuệ nhân tạo và triển khai trên hạ tầng điện toán đám mây, BioLab có tiềm năng phát triển thành một nền tảng hỗ trợ nghiên cứu tin sinh học toàn diện hơn.
+[Heading1] TÀI LIỆU THAM KHẢO
+Tiếng Việt
+[1] Bộ Khoa học và Công nghệ, Quy chuẩn Kỹ thuật Quốc gia về Dữ liệu Y tế và Dữ liệu Sinh học Phân tử, Nhà xuất bản Khoa học và Kỹ thuật, Hà Nội, 2022.
+[2] Nguyễn Văn Quyền, Trịnh Đình Đạt, Cơ sở Tin sinh học và Công nghệ Hệ gen, Nhà xuất bản Đại học Quốc gia Hà Nội, 2020, tr. 45-89.
+[3] Phạm Thị Ngọc, Xây dựng Hệ thống Trực quan hóa Dữ liệu Trình tự DNA trên Nền tảng Web, Luận văn Thạc sĩ, Trường Đại học Công nghệ, Đại học Quốc gia Hà Nội, 2023.
+Tiếng Anh
+[4] S. Altschul, W. Gish, W. Miller, E.W. Myers, and D.J. Lipman, "Basic local alignment search tool," Journal of Molecular Biology, Vol. 215, No. 3, 1990, pp. 403-410.
+[5] M.D. Wilkinson et al., "The FAIR Guiding Principles for scientific data management and stewardship," Scientific Data, Vol. 3, Article No. 160018, 2016, pp. 1-9.
+[6] J.T. Robinson et al., "Integrative Genomics Viewer," Nature Biotechnology, Vol. 29, No. 1, 2011, pp. 24-26.
+[7] The UniProt Consortium, "UniProt: the Universal Protein Knowledgebase in 2023," Nucleic Acids Research, Vol. 51, No. D1, 2023, pp. D523-D531.
+[8] F. Yates, P. Flicek et al., "Ensembl 2024," Nucleic Acids Research, Vol. 52, No. D1, 2024, pp. D868-D874.
+[9] E.W. Sayers et al., "Database resources of the National Center for Biotechnology Information," Nucleic Acids Research, Vol. 50, No. D1, 2022, pp. D20-D26.
+[Heading1] PHỤ LỤC
+Phụ lục A: Hướng dẫn Cài đặt & Chạy Hệ thống (Quick Start)
+1. Khởi chạy bằng Docker (Khuyên dùng - 1 lệnh duy nhất)
+git clone https://github.com/pst2/BioLab-.gitcd BioLab-docker compose up --build
+• Giao diện Người dùng: http://localhost:3000• Tài liệu Interactive Swagger API: http://localhost:8000/docs
+2. Khởi chạy Trực tiếp trên Máy (Local Development)
+Khởi động Backend (FastAPI):cd backend_scaffoldpy -m venv .venv.\.venv\Scripts\Activate.ps1pip install -r requirements.txtalembic upgrade headpy -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+Khởi động Frontend (Next.js):cd bio_frontendnpm installnpm run dev
+Phụ lục B: Danh mục các Endpoint API Cốt lõi (REST API Catalog)
+
+--- TABLE (13 rows) ---
+Nhóm chức năng | Phương thức HTTP | Đường dẫn API Endpoint | Mô tả chức năng
+Hệ thống | GET | /api/v1/health | Kiểm tra trạng thái kết nối DB và NCBI
+Hệ thống | GET | /api/v1/system/stats | Thống kê số bản ghi, provider và tỷ lệ thành công
+Khám phá Gen | GET | /api/v1/genes/search | Tìm kiếm gen đa nguồn với cờ provider & fallback
+Chi tiết Gen | GET | /api/v1/genes/{id} | Lấy thông tin gen, tọa độ nhiễm sắc thể, transcript
+Trình duyệt IGV | GET | /api/v1/sequence/igv/fasta | Cắt trình tự FASTA động theo tọa độ cho IGV.js
+Phân tích Chuỗi | POST | /api/v1/sequence/analyze | Phân tích DNA/Protein, tính pI/GRAVY, 6-Frame ORF
+Khai phá Y văn | GET | /api/v1/pubmed/search | Tìm kiếm bài báo khoa học PubMed và tách DOI
+Xuất dữ liệu | GET | /api/v1/export/gene/{id}/fasta | Tải file trình tự FASTA chuẩn
+Xuất dữ liệu | GET | /api/v1/export/gene/{id}/genbank | Tải file GenBank flatfile (.gb) đầy đủ chú giải
+Xuất dữ liệu | GET | /api/v1/export/gene/{id}/bed | Tải file tọa độ BED track cho IGV/UCSC
+Trích dẫn | GET | /api/v1/export/citation/bibtex | Xuất trích dẫn bài báo PubMed định dạng BibTeX
+Trích dẫn | GET | /api/v1/export/citation/ris | Xuất trích dẫn bài báo PubMed định dạng RIS
+--- END TABLE ---
+
