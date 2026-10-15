@@ -271,20 +271,6 @@ GET  /api/v1/workspace/overview                    # Tổng quan tỷ lệ độ
 ```
 
 ---
-
-## 🎓 Tài liệu Bảo vệ Đồ án / Thesis Defense Guide
-
-Để chuẩn bị tốt nhất cho buổi bảo vệ đồ án tốt nghiệp / hội đồng khoa học, vui lòng xem tài liệu chi tiết:
-👉 **[Xem Hướng dẫn Bảo vệ Đồ án Chi tiết (DO_AN_BAO_VE_GUIDE.md)](./DO_AN_BAO_VE_GUIDE.md)**
-
-Nội dung bao gồm:
-1. Đánh giá tính khoa học & tính thực tiễn theo chuẩn công cụ nghiên cứu tin sinh học.
-2. Kịch bản thuyết trình & Live Demo từng phút (7 - 10 phút).
-3. Các ca kiểm thử thực tế với gen ung thư (`BRCA1`, `TP53`), protein UniProt (`P38398`), và trình tự virus.
-4. Bộ câu hỏi phản biện chuyên sâu từ Hội đồng và hướng dẫn trả lời kỹ thuật.
-
----
-
 ## 📄 Bản quyền / License
 Dự án được phân phối dưới giấy phép **MIT License**.
 Mọi thông tin đóng góp và phản hồi xin vui lòng tạo Issue hoặc Pull Request trên kho mã nguồn [GitHub BioLab](https://github.com/pst2/BioLab-).
