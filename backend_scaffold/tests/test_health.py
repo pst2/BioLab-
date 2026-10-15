@@ -28,6 +28,8 @@ def test_health(monkeypatch) -> None:
 
 
 def test_system_status_requires_api_key(monkeypatch) -> None:
+    monkeypatch.setattr("app.core.security.settings.API_KEYS", "dev-key-1")
+
     async def fake_ping(self):
         return True
 
@@ -38,6 +40,8 @@ def test_system_status_requires_api_key(monkeypatch) -> None:
 
 
 def test_system_status_accepts_api_key(monkeypatch) -> None:
+    monkeypatch.setattr("app.core.security.settings.API_KEYS", "dev-key-1")
+
     async def fake_ping(self):
         return True
 
