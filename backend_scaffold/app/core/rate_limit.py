@@ -1,3 +1,5 @@
+import secrets
+
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from starlette.requests import Request
@@ -7,7 +9,9 @@ from app.core.config import settings
 
 def get_rate_limit_key(request: Request) -> str:
     api_key = request.headers.get("X-API-Key")
-    if api_key:
+    if api_key and any(
+        secrets.compare_digest(api_key, valid) for valid in settings.api_keys_list
+    ):
         return f"key:{api_key}"
     return get_remote_address(request)
 

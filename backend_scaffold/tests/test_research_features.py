@@ -100,6 +100,14 @@ def test_export_search_csv(db_session, sample_gene):
     assert "Homo sapiens" in content
 
 
+def test_export_search_csv_vietnamese_query(db_session):
+    resp = export_search_csv("ung thư vú", db=db_session)
+    assert resp.status_code == 200
+    cd = resp.headers["Content-Disposition"]
+    assert "filename*=UTF-8''" in cd
+    assert "ung_th__v_" in cd
+
+
 def test_export_bibtex():
     resp = export_bibtex(
         pmid="38123456",
@@ -114,6 +122,25 @@ def test_export_bibtex():
     assert "@article{Doudna2024_38123456" in content
     assert "title     = {Comprehensive CRISPR Screen in Cancer Cells}" in content
     assert "pmid      = {38123456}" in content
+
+
+def test_export_bibtex_escaping_special_chars():
+    resp = export_bibtex(
+        pmid="12345",
+        title="Study of {p53} & BRCA1: 100% efficiency in $cells$ #1 _novel_",
+        authors="Smith J",
+        journal="Nature & Genetics",
+        year="2023",
+        doi="10.1038/test",
+    )
+    assert resp.status_code == 200
+    content = resp.body.decode("utf-8")
+    assert r"\{p53\}" in content
+    assert r"\&" in content
+    assert r"\%" in content
+    assert r"\$" in content
+    assert r"\#" in content
+    assert r"\_" in content
 
 
 def test_export_ris():

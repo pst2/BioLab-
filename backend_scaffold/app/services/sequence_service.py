@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import logging
 from collections import Counter
 from typing import Any
@@ -431,28 +432,34 @@ class SequenceService:
         max_orfs = 50 if seq_length > 10_000 else 100
         orfs: list[dict[str, Any]] = []
 
-        # Build reverse complement for the minus strand
         rev_comp = self._reverse_complement_fast(sequence)
+        strand_len = len(sequence)
 
         for strand_label, strand_seq in [('+', sequence), ('-', rev_comp)]:
-            strand_len = len(strand_seq)
+            s_len = len(strand_seq)
             for frame_offset in range(3):
                 frame_num = frame_offset + 1 if strand_label == '+' else -(frame_offset + 1)
                 i = frame_offset
-                while i <= strand_len - 3:
+                while i <= s_len - 3:
                     codon = strand_seq[i : i + 3]
                     if codon in start_codons:
                         j = i + 3
-                        while j <= strand_len - 3:
+                        while j <= s_len - 3:
                             stop = strand_seq[j : j + 3]
                             if stop in stop_codons:
                                 orf_len = j + 3 - i
                                 if orf_len >= min_orf_length:
+                                    if strand_label == '+':
+                                        orf_start, orf_end = i, j + 3
+                                    else:
+                                        # chuyển tọa độ từ rev_comp về chuỗi gốc (forward coords)
+                                        orf_start = strand_len - (j + 3)
+                                        orf_end = strand_len - i
                                     orfs.append({
                                         "frame": frame_num,
                                         "strand": strand_label,
-                                        "start": i,
-                                        "end": j + 3,
+                                        "start": orf_start,
+                                        "end": orf_end,
                                         "length": orf_len,
                                         "start_codon": codon,
                                         "stop_codon": stop,
@@ -592,25 +599,27 @@ class SequenceService:
             logger.warning("BLAST submission failed (%s). Checking mock fallback for sequence...", submit_err)
             mock_hits = get_mock_blast_hits(raw_seq, seq_type)
             if mock_hits is not None:
-                mock_job_id = f"mock-blast-{abs(hash(raw_seq)) % 10000000}"
+                mock_job_id = f"mock-blast-{hashlib.sha256(raw_seq.encode()).hexdigest()[:12]}"
                 result_data = {
                     "job_id": mock_job_id,
                     "status": "FINISHED",
                     "provider": "local_mock",
+                    "is_synthetic": True,          # cờ rõ ràng, không nằm sâu trong meta
                     "sequence_type": seq_type,
                     "database": database,
                     "cache_key": cache_key,
                     "query_len": len(clean_for_len),
                     "hits": mock_hits,
                 }
+                # KHÔNG cache mock trong blast_cache ở TTL dài — hoặc cache riêng namespace "mock:"
                 if self.blast_cache:
-                    self.blast_cache.set(cache_key, result_data, ttl_seconds=settings.BLAST_CACHE_TTL_SECONDS)
-                    self.blast_cache.set(f"blast:job:{mock_job_id}", result_data, ttl_seconds=7200)
+                    self.blast_cache.set(f"blast:mock:{mock_job_id}", result_data, ttl_seconds=600)
+                    self.blast_cache.set(f"blast:job:{mock_job_id}", result_data, ttl_seconds=600)
                 return ApiResponse(
                     success=True,
-                    message="External BLAST service unavailable. Showing bundled reference alignments.",
+                    message="⚠️ External BLAST unavailable — showing SYNTHETIC/bundled reference data, NOT a real alignment result.",
                     data=result_data,
-                    meta=MetaInfo(source="local_mock", cached=False, stale=False, count=len(mock_hits)),
+                    meta=MetaInfo(source="local_mock", cached=False, stale=True, count=len(mock_hits)),
                 )
 
             return ApiResponse(
@@ -659,6 +668,14 @@ class SequenceService:
                 success=False,
                 message="Job not found or expired (jobs are retained for 2 hours).",
                 data={"job_id": job_id, "status": "NOT_FOUND"},
+            )
+
+        if job_meta.get("is_synthetic") or job_meta.get("provider") == "local_mock":
+            return ApiResponse(
+                success=True,
+                message="⚠️ External BLAST unavailable — showing SYNTHETIC/bundled reference data, NOT a real alignment result.",
+                data=job_meta,
+                meta=MetaInfo(source="local_mock", cached=False, stale=True, count=len(job_meta.get("hits", []))),
             )
 
         provider = job_meta.get("provider", "ebi")

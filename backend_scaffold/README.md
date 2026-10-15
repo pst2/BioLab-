@@ -22,8 +22,8 @@ FastAPI backend for multi-provider gene discovery, PubMed literature mining, bio
 - **Asynchronous BLAST Integration**: Integration with EBI/NCBI BLAST APIs with job dispatching, status polling, and visual alignment string parsing (`Query`, `Subject`, `Match`).
 - **Dynamic IGV.js FASTA Slicing**: On-the-fly genomic sequence slicing (`/api/v1/sequence/igv/fasta`) with coordinate normalization for minus strands and customizable locus padding.
 - **High-Performance System Stats**: Real-time stats (`/api/v1/system/stats`) with bounded asynchronous timeout (3.0s for external health pings) and 120s TTL caching, responding in < 0.5s.
-- **Security & Reliability**: Timing-safe `X-API-Key` authentication, SlowAPI rate-limiting, and sanitized 500 error responses preventing internal traceback leaks.
-- **Testing Suite**: **75 automated tests** across all modules with 100% pass rate.
+- **Security & Reliability**: Timing-safe `X-API-Key` authentication enforced globally across all routers (`RequireApiKey` at `include_router`), IP fallback for unauthenticated rate-limiting against key forgery, and sanitized 500 error responses preventing internal traceback leaks.
+- **Testing Suite**: **83 automated tests** across all modules with 100% pass rate.
 
 ---
 
@@ -79,18 +79,18 @@ Interactive documentation:
 ## 🧪 Running Automated Tests
 
 ```bash
-# Run the full 75-test suite
+# Run the full 83-test suite
 pytest -v
 ```
 
-All 75 tests cover:
+All 83 tests cover:
 - `test_bioinformatics_upgrade.py`: Multi-FASTA, IUPAC, Protein physicochemical properties, 6-frame ORF
-- `test_research_features.py`: FAIR provenance columns, data export (FASTA, GenBank, BED, CSV, BibTeX, RIS), BLAST alignment parsing
+- `test_research_features.py`: FAIR provenance columns, data export (FASTA, GenBank, BED, CSV, BibTeX, RIS with RFC 5987 Unicode and LaTeX escaping), BLAST alignment parsing, synthetic mock BLAST flagging
 - `test_search_services.py`: Multi-provider fallback, cache hits, stale fallback, mock fallbacks
 - `test_ncbi_client.py`: Entrez E-Utilities parsing, DOI extraction, retries
-- `test_sequence.py`: IGV subregion slicing, FASTA parser, GenBank parser
+- `test_sequence.py`: IGV subregion slicing, FASTA parser, GenBank parser, minus-strand forward coordinate mapping
 - `test_system.py`: Health checks, system status, real-time stats
-- `test_security.py` & `test_rate_limit.py`: API key validation, dev/prod enforcement, rate limits
+- `test_security.py` & `test_rate_limit.py`: Global API key verification on all routes, dev/prod enforcement, forged API key rate-limit fallback
 - `test_exceptions.py`: Provider error hierarchy, sanitization of 500 error responses
 - `test_validators.py`: DNA, Protein, and sequence length validations
 

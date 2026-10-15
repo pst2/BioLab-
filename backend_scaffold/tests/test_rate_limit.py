@@ -7,10 +7,18 @@ class DummyRequest:
         self.client = type("Client", (), {"host": client_host})()
 
 
-def test_get_rate_limit_key_with_api_key():
+def test_get_rate_limit_key_with_api_key(monkeypatch):
+    monkeypatch.setattr("app.core.rate_limit.settings.API_KEYS", "test-secret-key")
     req = DummyRequest(headers={"X-API-Key": "test-secret-key"})
     key = get_rate_limit_key(req)
     assert key == "key:test-secret-key"
+
+
+def test_get_rate_limit_key_with_fake_api_key_falls_back_to_ip(monkeypatch):
+    monkeypatch.setattr("app.core.rate_limit.settings.API_KEYS", "test-secret-key")
+    req = DummyRequest(headers={"X-API-Key": "fake-key"})
+    key = get_rate_limit_key(req)
+    assert key == "127.0.0.1"
 
 
 def test_get_rate_limit_key_fallback_ip():

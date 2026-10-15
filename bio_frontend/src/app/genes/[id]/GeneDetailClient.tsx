@@ -561,7 +561,7 @@ function GeneHero({ gene, geneId, external, loading, usingBrowserCache }: { gene
                   onMouseLeave={() => setExportOpen(false)}
                 >
                   <a
-                    href={`/api/v1/export/gene/${geneId}/fasta`}
+                    href={`/api/backend/api/v1/export/gene/${geneId}/fasta`}
                     download
                     className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-slate-300 hover:bg-cyan-500/20 hover:text-cyan-300 transition"
                   >
@@ -569,7 +569,7 @@ function GeneHero({ gene, geneId, external, loading, usingBrowserCache }: { gene
                     <span>{t("export.downloadFasta")}</span>
                   </a>
                   <a
-                    href={`/api/v1/export/gene/${geneId}/genbank`}
+                    href={`/api/backend/api/v1/export/gene/${geneId}/genbank`}
                     download
                     className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-slate-300 hover:bg-emerald-500/20 hover:text-emerald-300 transition"
                   >
@@ -577,7 +577,7 @@ function GeneHero({ gene, geneId, external, loading, usingBrowserCache }: { gene
                     <span>{t("export.downloadGenbank")}</span>
                   </a>
                   <a
-                    href={`/api/v1/export/gene/${geneId}/bed`}
+                    href={`/api/backend/api/v1/export/gene/${geneId}/bed`}
                     download
                     className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-slate-300 hover:bg-amber-500/20 hover:text-amber-300 transition"
                   >
@@ -585,7 +585,7 @@ function GeneHero({ gene, geneId, external, loading, usingBrowserCache }: { gene
                     <span>{t("export.downloadBed")}</span>
                   </a>
                   <a
-                    href={`/api/v1/export/gene/${geneId}/json`}
+                    href={`/api/backend/api/v1/export/gene/${geneId}/json`}
                     download
                     className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-slate-300 hover:bg-indigo-500/20 hover:text-indigo-300 transition"
                   >

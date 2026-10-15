@@ -133,3 +133,15 @@ async def test_fetch_raw_fasta_for_igv_subregion_slicing(db_session):
     # 1-based start=2, end=5: "AGGC"
     fasta = await service.fetch_raw_fasta_for_igv("TEST_GENE", start=2, end=5)
     assert fasta == ">TEST_GENE\nAGGC\n"
+
+
+def test_orf_minus_strand_coordinates_map_to_forward_sequence():
+    svc = SequenceService.__new__(SequenceService)
+    # ATG AAA TAA nằm trên mạch âm, ở forward-coords [5, 14)
+    seq = "GGGGG" + "TTATTTCAT" + "GG"
+    orfs = svc._find_orfs(seq, len(seq))
+    minus_orfs = [o for o in orfs if o["strand"] == "-"]
+    assert minus_orfs
+    assert minus_orfs[0]["start"] == 5
+    assert minus_orfs[0]["end"] == 14
+

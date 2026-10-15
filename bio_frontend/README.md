@@ -41,5 +41,5 @@ Configuration in `.env.local`:
 ```env
 BACKEND_INTERNAL_URL=http://127.0.0.1:8000
 NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
-NEXT_PUBLIC_API_KEY=dev-key-1
+API_SECRET_KEY=dev-key-1
 ```

@@ -605,6 +605,21 @@ export function SequenceAnalysisPanel({
           {/* 4. BLAST RESULTS LIST */}
           {!blast.loading && blast.hits.length > 0 && (
             <div className="space-y-4">
+              {blast.isSynthetic && (
+                <div className="rounded-xl border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/40 p-4 text-xs shadow-sm">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
+                    <div>
+                      <h4 className="font-bold text-red-900 dark:text-red-200">
+                        ⚠️ Dữ liệu tham chiếu mô phỏng (Synthetic Reference Data)
+                      </h4>
+                      <p className="mt-1 leading-5 text-red-800 dark:text-red-300">
+                        Dịch vụ BLAST bên ngoài (EBI / UniProt) hiện không khả dụng. Kết quả bên dưới được lấy từ bộ dữ liệu tham chiếu offline nội bộ, KHÔNG PHẢI là kết quả căn hàng BLAST thực tế. Vui lòng không trích dẫn làm số liệu thực nghiệm.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
               <h3 className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 {t("blast.alignmentsFound")} ({blast.hits.length})
               </h3>

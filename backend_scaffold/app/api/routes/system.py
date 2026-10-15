@@ -26,7 +26,7 @@ async def system_status(request: Request, db: Session = Depends(get_db)) -> ApiR
     return await service.system_status()
 
 
-@router.get("/system/stats", response_model=ApiResponse)
+@router.get("/system/stats", response_model=ApiResponse, dependencies=[RequireApiKey])
 @limiter.limit(settings.RATE_LIMIT_SYSTEM)
 async def system_stats(request: Request, db: Session = Depends(get_db)) -> ApiResponse:
     service = SystemService(db)
@@ -34,7 +34,7 @@ async def system_stats(request: Request, db: Session = Depends(get_db)) -> ApiRe
 
 
 
-@router.get("/workspace/overview", response_model=ApiResponse)
+@router.get("/workspace/overview", response_model=ApiResponse, dependencies=[RequireApiKey])
 @limiter.limit(settings.RATE_LIMIT_SYSTEM)
 async def workspace_overview(
     request: Request,

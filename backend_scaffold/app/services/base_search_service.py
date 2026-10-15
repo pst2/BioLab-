@@ -287,11 +287,6 @@ class BaseSearchService:
         external_used: bool = False,
     ) -> dict[str, Any]:
         count = len(data) if isinstance(data, list) else None
-        external_sources = {"ncbi", "ensembl", "uniprot", "bvbrc", "phytozome"}
-        external_share = 35 if source in external_sources else 0
-        ncbi_share = 35 if source == "ncbi" else 0
-        fallback_provider_share = 35 if source in external_sources and source != "ncbi" else 0
-        internal_share = 100 - external_share
         return {
             "success": True,
             "message": message,
@@ -306,20 +301,10 @@ class BaseSearchService:
                 "count": count,
                 "mode": mode,
                 "external_used": external_used,
-                "dependency_policy": "local-first; NCBI is primary, Ensembl/UniProt/BV-BRC can be used as fallback providers",
-                "estimated_dependency_ratio": {
-                    "internal_percent": internal_share,
-                    "ncbi_percent": ncbi_share,
-                    "fallback_provider_percent": fallback_provider_share,
-                },
                 "provenance": {
                     "source_provider": source,
                     "is_synthetic": source == "local_mock",
                     "retrieved_at": utc_now().isoformat(),
-                    "cached": cached,
-                    "stale": stale,
-                    "cached_at": cached_at,
-                    "expires_at": expires_at,
                     "data_integrity": "verified" if source != "local_mock" else "synthetic_mock",
                 },
             },

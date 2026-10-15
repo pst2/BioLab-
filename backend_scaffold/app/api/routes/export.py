@@ -14,6 +14,7 @@ import csv
 import io
 import re
 from typing import Any
+from urllib.parse import quote
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy.orm import Session
@@ -22,6 +23,31 @@ from app.db.session import get_db
 from app.repositories.gene_repository import GeneRepository
 
 router = APIRouter()
+
+_PMID_RE = re.compile(r"^\d{1,9}$")
+
+
+def _safe_filename(raw: str, fallback: str = "export") -> str:
+    ascii_name = re.sub(r"[^A-Za-z0-9_-]", "_", raw)[:60] or fallback
+    return ascii_name
+
+
+def _escape_bibtex(value: str) -> str:
+    if not value:
+        return value
+    replacements = {
+        "\\": r"\textbackslash{}",
+        "{": r"\{",
+        "}": r"\}",
+        "%": r"\%",
+        "&": r"\&",
+        "$": r"\$",
+        "#": r"\#",
+        "_": r"\_",
+    }
+    for ch, esc in replacements.items():
+        value = value.replace(ch, esc)
+    return value
 
 
 # ── Sequence Exports ──────────────────────────────────────────────────────────
@@ -48,12 +74,13 @@ def export_gene_fasta(gene_id: str, db: Session = Depends(get_db)) -> Response:
     wrapped = "\n".join(sequence[i:i + 70] for i in range(0, len(sequence), 70))
     fasta_content = f"{header}\n{wrapped}\n"
 
-    filename = f"{symbol}_{gene_id}.fasta"
+    ascii_name = _safe_filename(f"{symbol}_{gene_id}")
+    utf8_name = quote(f"{symbol}_{gene_id}.fasta")
     return Response(
         content=fasta_content,
         media_type="text/plain",
         headers={
-            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Disposition": f'attachment; filename="{ascii_name}.fasta"; filename*=UTF-8\'\'{utf8_name}',
             "Cache-Control": "public, max-age=3600",
         },
     )
@@ -70,12 +97,13 @@ def export_gene_json(gene_id: str, db: Session = Depends(get_db)) -> Response:
 
     symbol = record.get("symbol", gene_id)
     json_content = json.dumps(record, indent=2, ensure_ascii=False, default=str)
-    filename = f"{symbol}_{gene_id}.json"
+    ascii_name = _safe_filename(f"{symbol}_{gene_id}")
+    utf8_name = quote(f"{symbol}_{gene_id}.json")
     return Response(
         content=json_content,
         media_type="application/json",
         headers={
-            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Disposition": f'attachment; filename="{ascii_name}.json"; filename*=UTF-8\'\'{utf8_name}',
         },
     )
 
@@ -127,12 +155,13 @@ ORIGIN
 {origin_block}
 //
 """
-    filename = f"{symbol}_{gene_id}.gb"
+    ascii_name = _safe_filename(f"{symbol}_{gene_id}")
+    utf8_name = quote(f"{symbol}_{gene_id}.gb")
     return Response(
         content=gb_content,
         media_type="text/plain",
         headers={
-            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Disposition": f'attachment; filename="{ascii_name}.gb"; filename*=UTF-8\'\'{utf8_name}',
             "Cache-Control": "public, max-age=3600",
         },
     )
@@ -175,12 +204,13 @@ def export_gene_bed(gene_id: str, db: Session = Depends(get_db)) -> Response:
         lines.append(f"{chrom}\t{bed_start}\t{bed_end}\t{symbol}\t1000\t{strand}")
 
     bed_content = "\n".join(lines) + "\n"
-    filename = f"{symbol}_{gene_id}.bed"
+    ascii_name = _safe_filename(f"{symbol}_{gene_id}")
+    utf8_name = quote(f"{symbol}_{gene_id}.bed")
     return Response(
         content=bed_content,
         media_type="text/tab-separated-values",
         headers={
-            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Disposition": f'attachment; filename="{ascii_name}.bed"; filename*=UTF-8\'\'{utf8_name}',
             "Cache-Control": "public, max-age=3600",
         },
     )
@@ -211,12 +241,16 @@ def export_search_csv(
             rec.get("source", ""),
         ])
 
-    filename = f"search_results_{q}.csv"
+    ascii_name = _safe_filename(f"search_results_{q}")
+    utf8_name = quote(f"search_results_{q}.csv")
     return Response(
         content=output.getvalue(),
         media_type="text/csv",
         headers={
-            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Disposition": (
+                f'attachment; filename="{ascii_name}.csv"; '
+                f"filename*=UTF-8''{utf8_name}"
+            ),
         },
     )
 
@@ -225,7 +259,7 @@ def export_search_csv(
 
 @router.get("/citation/bibtex")
 def export_bibtex(
-    pmid: str = Query(..., description="PubMed ID"),
+    pmid: str = Query(..., pattern=r"^\d{1,9}$", description="PubMed ID (numeric)"),
     title: str = Query(default="", description="Article title"),
     authors: str = Query(default="", description="Comma-separated author list"),
     journal: str = Query(default="", description="Journal name"),
@@ -233,24 +267,29 @@ def export_bibtex(
     doi: str = Query(default="", description="DOI"),
 ) -> Response:
     """Generate a BibTeX citation entry for a PubMed article."""
+    title_e = _escape_bibtex(title)
+    authors_e = _escape_bibtex(authors)
+    journal_e = _escape_bibtex(journal)
+
     # Extract year from pubdate if needed
     year_match = re.search(r"\b(19|20)\d{2}\b", year)
-    cite_year = year_match.group(0) if year_match else "n.d."
+    cite_year = year_match.group(0) if year_match else "nd"
 
     # Build citation key
     author_tokens = authors.split(",")[0].strip().split() if authors else []
-    if not author_tokens:
-        first_author = "Unknown"
-    elif len(author_tokens) > 1 and len(author_tokens[-1]) <= 2:
-        first_author = author_tokens[0]
-    else:
-        first_author = author_tokens[-1]
+    first_author = "Unknown"
+    if author_tokens:
+        first_author = (
+            author_tokens[0] if len(author_tokens) > 1 and len(author_tokens[-1]) <= 2
+            else author_tokens[-1]
+        )
+    first_author = re.sub(r"[^A-Za-z]", "", first_author) or "Unknown"
     cite_key = f"{first_author}{cite_year}_{pmid}"
 
     bibtex = f"""@article{{{cite_key},
-  title     = {{{title}}},
-  author    = {{{authors}}},
-  journal   = {{{journal}}},
+  title     = {{{title_e}}},
+  author    = {{{authors_e}}},
+  journal   = {{{journal_e}}},
   year      = {{{cite_year}}},
   pmid      = {{{pmid}}},
   doi       = {{{doi}}},
@@ -268,7 +307,7 @@ def export_bibtex(
 
 @router.get("/citation/ris")
 def export_ris(
-    pmid: str = Query(..., description="PubMed ID"),
+    pmid: str = Query(..., pattern=r"^\d{1,9}$", description="PubMed ID (numeric)"),
     title: str = Query(default="", description="Article title"),
     authors: str = Query(default="", description="Comma-separated author list"),
     journal: str = Query(default="", description="Journal name"),

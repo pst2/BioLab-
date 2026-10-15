@@ -107,7 +107,7 @@ function buildFastaUrl(accession: string, start: number, end: number, sequenceLe
     start: String(paddedStart),
     end: String(paddedEnd),
   });
-  return `/api/v1/sequence/igv/fasta?${params.toString()}`;
+  return `/api/backend/api/v1/sequence/igv/fasta?${params.toString()}`;
 }
 
 /**

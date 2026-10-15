@@ -40,6 +40,7 @@ export function useBlastSearch(t?: Translate) {
   const [jobId, setJobId] = useState<string | null>(null);
   const [status, setStatus] = useState<string>("idle");
   const [hits, setHits] = useState<BlastHit[]>([]);
+  const [isSynthetic, setIsSynthetic] = useState(false);
   const [error, setError] = useState("");
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
@@ -214,6 +215,7 @@ export function useBlastSearch(t?: Translate) {
         if (job) {
           if (job.status === "FINISHED") {
             setStatus("FINISHED");
+            setIsSynthetic(Boolean(job.is_synthetic));
             const hitResults = job.hits || [];
             setHits(hitResults);
             setLoading(false);
@@ -280,6 +282,7 @@ export function useBlastSearch(t?: Translate) {
     setLoading(true);
     setError("");
     setHits([]);
+    setIsSynthetic(false);
     setJobId(null);
     setStatus("SUBMITTING");
 
@@ -311,6 +314,7 @@ export function useBlastSearch(t?: Translate) {
       // If already finished (e.g. cached or instant mock)
       if (job.status === "FINISHED") {
         setStatus("FINISHED");
+        setIsSynthetic(Boolean(job.is_synthetic));
         const hitResults = job.hits || [];
         setHits(hitResults);
         setLoading(false);
@@ -352,6 +356,7 @@ export function useBlastSearch(t?: Translate) {
     setJobId(null);
     setStatus("idle");
     setHits([]);
+    setIsSynthetic(false);
     setError("");
     setElapsedSeconds(0);
     if (typeof window !== "undefined") {
@@ -433,6 +438,7 @@ export function useBlastSearch(t?: Translate) {
     jobId,
     status,
     hits,
+    isSynthetic,
     error,
     elapsedSeconds,
     pollCount: pollCount.current,

@@ -198,6 +198,7 @@ export interface SequenceSearchJob {
   database: string;
   hits?: BlastHit[];
   error?: string;
+  is_synthetic?: boolean;
 }
 
 export interface HealthData {

@@ -30,12 +30,13 @@ services:
     build:
       context: ./bio_frontend
       args:
-        # Khi chạy docker compose, frontend gọi backend qua tên service (không phải localhost)
         NEXT_PUBLIC_API_URL: http://localhost:8000
-        NEXT_PUBLIC_API_KEY: dev-key-1
     container_name: biolab-frontend
     ports:
       - "3000:3000"
+    environment:
+      - BACKEND_INTERNAL_URL=http://backend:8000
+      - API_SECRET_KEY=dev-key-1
     depends_on:
       backend:
         condition: service_healthy

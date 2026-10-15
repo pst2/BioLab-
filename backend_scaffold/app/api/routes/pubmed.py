@@ -27,7 +27,7 @@ async def search_pubmed(
 
 @router.get("/export")
 async def export_pubmed_citation(
-    pmid: str = Query(..., description="PubMed ID"),
+    pmid: str = Query(..., pattern=r"^\d{1,9}$", description="PubMed ID (numeric)"),
     format: str = Query("bibtex", pattern="^(bibtex|ris)$", description="Export format: bibtex or ris"),
     title: str = Query(default="", description="Article title"),
     authors: str = Query(default="", description="Comma-separated author list"),

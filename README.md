@@ -6,7 +6,7 @@
 
 <p>
   <a href="https://github.com/pst2/BioLab-/actions">
-    <img src="https://img.shields.io/badge/CI-75%2F75%20Passed-22c55e?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI Passed" />
+    <img src="https://img.shields.io/badge/CI-83%2F83%20Passed-22c55e?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI Passed" />
   </a>
   <a href="https://www.python.org/downloads/">
     <img src="https://img.shields.io/badge/Python-3.10%2B-3776ab?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.10+" />
@@ -204,7 +204,7 @@ Truy cập hệ thống tại: **[http://localhost:3000](http://localhost:3000)*
 
 ## 🧪 Kiểm thử Tự động / Testing Suite
 
-Dự án được kiểm soát chất lượng nghiêm ngặt bởi bộ kiểm thử tự động toàn diện **75 bài test**:
+Dự án được kiểm soát chất lượng nghiêm ngặt bởi bộ kiểm thử tự động toàn diện **83 bài test**:
 
 ```bash
 # Chạy toàn bộ kiểm thử Backend
@@ -216,21 +216,21 @@ pytest -v
 ============================= test session starts =============================
 platform win32 -- Python 3.10.8, pytest-8.3.3
 plugins: anyio-4.12.1, asyncio-0.24.0
-collected 75 items
+collected 83 items
 
-tests/test_bioinformatics_upgrade.py ..............                      [ 18%]
-tests/test_exceptions.py ....                                            [ 24%]
-tests/test_health.py ....                                                [ 29%]
-tests/test_ncbi_client.py .....                                          [ 36%]
-tests/test_rate_limit.py ..                                              [ 38%]
-tests/test_research_features.py ...........                              [ 53%]
-tests/test_search_services.py .......                                    [ 62%]
-tests/test_security.py .....                                             [ 69%]
-tests/test_sequence.py .........                                         [ 81%]
-tests/test_system.py ....                                                [ 86%]
+tests/test_bioinformatics_upgrade.py ..............                      [ 16%]
+tests/test_exceptions.py ....                                            [ 21%]
+tests/test_health.py ....                                                [ 26%]
+tests/test_ncbi_client.py .....                                          [ 32%]
+tests/test_rate_limit.py ...                                             [ 36%]
+tests/test_research_features.py ................                         [ 55%]
+tests/test_search_services.py .......                                    [ 63%]
+tests/test_security.py ......                                            [ 71%]
+tests/test_sequence.py ..........                                        [ 83%]
+tests/test_system.py ....                                                [ 87%]
 tests/test_validators.py ..........                                      [100%]
 
-============================= 75 passed in 10.41s =============================
+============================= 83 passed in 9.27s ==============================
 ```
 
 ---

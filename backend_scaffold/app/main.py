@@ -14,6 +14,7 @@ from app.core.config import settings
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import configure_logging
 from app.core.rate_limit import limiter
+from app.core.security import RequireApiKey
 
 configure_logging()
 logger = logging.getLogger(__name__)
@@ -71,10 +72,30 @@ app.add_middleware(
 register_exception_handlers(app)
 
 app.include_router(system.router, prefix=settings.API_V1_PREFIX, tags=["system"])
-app.include_router(genes.router, prefix=f"{settings.API_V1_PREFIX}/genes", tags=["genes"])
-app.include_router(pubmed.router, prefix=f"{settings.API_V1_PREFIX}/pubmed", tags=["pubmed"])
-app.include_router(sequence.router, prefix=f"{settings.API_V1_PREFIX}/sequence", tags=["sequence"])
-app.include_router(export.router, prefix=f"{settings.API_V1_PREFIX}/export", tags=["export"])
+app.include_router(
+    genes.router,
+    prefix=f"{settings.API_V1_PREFIX}/genes",
+    tags=["genes"],
+    dependencies=[RequireApiKey],
+)
+app.include_router(
+    pubmed.router,
+    prefix=f"{settings.API_V1_PREFIX}/pubmed",
+    tags=["pubmed"],
+    dependencies=[RequireApiKey],
+)
+app.include_router(
+    sequence.router,
+    prefix=f"{settings.API_V1_PREFIX}/sequence",
+    tags=["sequence"],
+    dependencies=[RequireApiKey],
+)
+app.include_router(
+    export.router,
+    prefix=f"{settings.API_V1_PREFIX}/export",
+    tags=["export"],
+    dependencies=[RequireApiKey],
+)
 
 
 @app.get("/")
