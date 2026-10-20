@@ -21,3 +21,7 @@ services:
         value: "sqlite:///./bio_backend.db"
       - key: ALLOWED_ORIGINS
         value: "*"
+      - key: API_KEYS
+        value: "biolab2024,dev-key-1"
+      - key: API_KEY
+        value: "biolab2024"

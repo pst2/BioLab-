@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
 
     API_KEYS: str = ""
+    API_KEY: str = ""
 
     NCBI_BASE_URL: str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
     NCBI_API_KEY: str | None = None
@@ -48,7 +49,8 @@ class Settings(BaseSettings):
 
     @property
     def api_keys_list(self) -> list[str]:
-        return [item.strip() for item in self.API_KEYS.split(",") if item.strip()]
+        combined = f"{self.API_KEYS},{self.API_KEY}".strip(",")
+        return [item.strip() for item in combined.split(",") if item.strip()]
 
     @property
     def has_api_keys(self) -> bool:
