@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./bio_backend.db"
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
 
-    API_KEYS: str = ""
+    API_KEYS: str = "biolab2024,dev-key-1"
     API_KEY: str = ""
 
     NCBI_BASE_URL: str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
