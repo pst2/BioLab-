@@ -52,17 +52,18 @@ export function useBlastSearch(t?: Translate) {
   const [history, setHistory] = useState<BlastHistoryItem[]>([]);
 
   const pollCount = useRef(0);
-  const timerRef = useRef<any>(null);
+  const pollTimerRef = useRef<any>(null);
+  const elapsedTimerRef = useRef<any>(null);
   const abortRef = useRef<AbortController | null>(null);
   const submittingRef = useRef(false);
   const toast = useToast();
 
-  // Adaptive polling: start fast, slow down as job runs longer
+  // Adaptive polling: starts prompt to catch fast/cached completions, low overhead
   function getPollingInterval(polls: number): number {
-    if (polls <= 5) return 3000;   // First 15s: poll every 3s
-    if (polls <= 15) return 4000;  // Next 40s:  poll every 4s
-    if (polls <= 30) return 6000;  // Next 90s:  poll every 6s
-    return 8000;                   // After ~2.5min: poll every 8s
+    if (polls <= 3) return 2000;   // First ~6s: poll every 2s
+    if (polls <= 12) return 3000;  // Next ~27s: poll every 3s (optimal for EBI queue)
+    if (polls <= 25) return 5000;  // Next ~65s: poll every 5s
+    return 7000;                   // After ~1.5m: poll every 7s
   }
 
   // Restore history and active session state on mount
@@ -97,6 +98,9 @@ export function useBlastSearch(t?: Translate) {
     } catch {
       // ignore session parsing error
     }
+
+    // Pre-warm backend in background so cold-start delay is eliminated
+    api.health().catch(() => {});
   }, []);
 
   // Save active session state whenever search inputs or hits change
@@ -129,14 +133,14 @@ export function useBlastSearch(t?: Translate) {
   useEffect(() => {
     if (loading) {
       setElapsedSeconds(0);
-      timerRef.current = setInterval(() => {
+      elapsedTimerRef.current = setInterval(() => {
         setElapsedSeconds((prev) => prev + 1);
       }, 1000);
     } else {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (elapsedTimerRef.current) clearInterval(elapsedTimerRef.current);
     }
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (elapsedTimerRef.current) clearInterval(elapsedTimerRef.current);
     };
   }, [loading]);
 
@@ -247,17 +251,17 @@ export function useBlastSearch(t?: Translate) {
       }
       // Schedule next poll with adaptive interval
       if (!cancelled && !controller.signal.aborted) {
-        timerRef.current = setTimeout(poll, getPollingInterval(pollCount.current));
+        pollTimerRef.current = setTimeout(poll, getPollingInterval(pollCount.current));
       }
     }
 
-    // Start first poll after initial delay
-    timerRef.current = setTimeout(poll, getPollingInterval(0));
+    // Start first poll after initial delay (2s)
+    pollTimerRef.current = setTimeout(poll, getPollingInterval(0));
 
     return () => {
       cancelled = true;
       controller.abort();
-      if (timerRef.current) clearTimeout(timerRef.current);
+      if (pollTimerRef.current) clearTimeout(pollTimerRef.current);
     };
   }, [jobId, status, toast, t, seq, seqType, provider, database]);
 
@@ -274,9 +278,9 @@ export function useBlastSearch(t?: Translate) {
       abortRef.current.abort();
       abortRef.current = null;
     }
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
+    if (pollTimerRef.current) {
+      clearTimeout(pollTimerRef.current);
+      pollTimerRef.current = null;
     }
 
     setLoading(true);
@@ -348,9 +352,13 @@ export function useBlastSearch(t?: Translate) {
       abortRef.current.abort();
       abortRef.current = null;
     }
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
+    if (pollTimerRef.current) {
+      clearTimeout(pollTimerRef.current);
+      pollTimerRef.current = null;
+    }
+    if (elapsedTimerRef.current) {
+      clearInterval(elapsedTimerRef.current);
+      elapsedTimerRef.current = null;
     }
     setLoading(false);
     setJobId(null);

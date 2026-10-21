@@ -535,35 +535,60 @@ export function SequenceAnalysisPanel({
 
           {/* 1. BLAST LOADING STATE */}
           {blast.loading && (
-            <div className="rounded-xl border border-cyan-200 dark:border-cyan-900/50 bg-cyan-50/40 dark:bg-cyan-950/20 p-6 shadow-sm animate-pulse">
-              <div className="flex items-center justify-between">
+            <div className="rounded-xl border border-cyan-200 dark:border-cyan-900/50 bg-cyan-50/40 dark:bg-cyan-950/20 p-6 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-cyan-500 text-slate-950">
+                  <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/20">
                     <Loader2 className="h-4 w-4 animate-spin" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
-                      {t("blast.inProgress")} ({blast.elapsedSeconds}s)
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                      <span>{t("blast.inProgress")}</span>
+                      <span className="font-mono text-cyan-600 dark:text-cyan-400 bg-cyan-100 dark:bg-cyan-900/60 text-xs px-2 py-0.5 rounded-full font-semibold">
+                        {blast.elapsedSeconds}s
+                      </span>
                     </h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {t("blast.jobId")}: <span className="font-mono">{blast.jobId || "Initialising"}</span> | {t("blast.status")}:{" "}
-                      <span className="font-semibold text-cyan-600 dark:text-cyan-400">{blast.status}</span>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      {t("blast.jobId")}: <span className="font-mono font-medium text-slate-700 dark:text-slate-300">{blast.jobId || "Initialising..."}</span>
+                      {" • "}
+                      {t("blast.status")}: <span className="font-semibold text-cyan-600 dark:text-cyan-400 uppercase">{blast.status}</span>
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
-                  </span>
-                  <span className="text-xs font-mono text-slate-400 dark:text-slate-500">
-                    {t("blast.polling")} ({blast.elapsedSeconds}s)
-                  </span>
+                <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                    </span>
+                    <span className="font-mono text-[11px]">{t("blast.polling")}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={blast.reset}
+                    className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+                  >
+                    {t("blast.reset")}
+                  </button>
                 </div>
               </div>
+
               {/* Progress bar animation */}
               <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-cyan-100 dark:bg-cyan-950">
-                <div className="h-full bg-cyan-500 rounded-full animate-pulse w-3/4" />
+                <div className="h-full bg-cyan-500 rounded-full animate-pulse w-3/4 transition-all duration-500" />
+              </div>
+
+              <div className="mt-3 flex flex-wrap items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 gap-2">
+                <span>
+                  {blast.elapsedSeconds < 15
+                    ? "Đang gửi truy vấn & xếp hàng trên cụm máy tính EBI NCBI..."
+                    : blast.elapsedSeconds < 35
+                    ? "Cụm máy tính EBI đang tính toán ma trận căn hàng sinh học (thường mất 15-35s)..."
+                    : "Đang truy xuất kết quả căn hàng chi tiết từ máy chủ EMBL-EBI..."}
+                </span>
+                <span className="text-[10px] text-slate-400">
+                  {blast.seqType.toUpperCase()} • {blast.database || "Swiss-Prot / UniProt"}
+                </span>
               </div>
             </div>
           )}

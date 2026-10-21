@@ -8,17 +8,17 @@
 
 import { NextResponse } from "next/server";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-const API_KEY     = process.env.API_SECRET_KEY || "";
+const BACKEND_URL =
+  process.env.BACKEND_INTERNAL_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://biolab-1kvo.onrender.com";
+const API_KEY =
+  process.env.API_SECRET_KEY ||
+  process.env.API_KEY ||
+  process.env.API_KEYS ||
+  "biolab2024";
 
 export async function GET() {
-  if (!API_KEY) {
-    return NextResponse.json(
-      { success: false, message: "API_SECRET_KEY is not configured on the server." },
-      { status: 503 }
-    );
-  }
-
   try {
     const res = await fetch(`${BACKEND_URL}/api/v1/system/status`, {
       cache: "no-store",

@@ -8,7 +8,11 @@ type RouteContext = {
   params: Promise<{ path?: string[] }>;
 };
 
-const DEFAULT_BACKEND = "http://127.0.0.1:8000";
+const RENDER_BACKEND = "https://biolab-1kvo.onrender.com";
+const DEFAULT_BACKEND =
+  process.env.NODE_ENV === "production"
+    ? RENDER_BACKEND
+    : "http://127.0.0.1:8000";
 
 function unique(values: string[]) {
   return Array.from(new Set(values.filter(Boolean)));
@@ -28,9 +32,9 @@ function backendCandidates() {
 
   return unique([
     normalized,
+    RENDER_BACKEND,
     normalized.replace("http://localhost:", "http://127.0.0.1:"),
     normalized.replace("http://127.0.0.1:", "http://localhost:"),
-    DEFAULT_BACKEND,
     "http://127.0.0.1:8000",
     "http://localhost:8000",
     "http://host.docker.internal:8000",
