@@ -372,26 +372,32 @@ export default function GeneDetailClient({ id }: { id: string }) {
   }
 
   return (
-    <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)] antialiased transition-colors duration-200 dna-pattern">
-      <header className="sticky top-0 z-40 border-b border-slate-200/70 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 px-4 py-4 backdrop-blur-md md:px-8" style={{ boxShadow: "0 1px 0 rgba(148,163,184,0.15)" }}>
+    <main className="relative min-h-screen bg-[var(--background)] text-[var(--foreground)] antialiased transition-colors duration-200 dna-pattern overflow-x-hidden">
+      {/* Ambient background glow orbs */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div className="absolute -top-32 left-1/4 h-96 w-96 rounded-full bg-cyan-500/[0.06] dark:bg-cyan-500/[0.09] blur-[100px]" />
+        <div className="absolute top-1/3 -right-32 h-96 w-96 rounded-full bg-indigo-500/[0.06] dark:bg-indigo-500/[0.09] blur-[100px]" />
+      </div>
+
+      <header className="sticky top-0 z-40 border-b border-slate-200/70 dark:border-slate-800/80 bg-white/75 dark:bg-slate-950/75 px-4 py-3.5 backdrop-blur-xl md:px-8" style={{ boxShadow: "0 4px 24px -4px rgba(15, 23, 42, 0.04)" }}>
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link
               href={fromBlast ? "/?tab=sequence&subtab=blast" : "/"}
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700"
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 shadow-2xs hover:border-cyan-400/50 hover:text-cyan-600 dark:hover:text-cyan-400 transition"
             >
               <ArrowLeft className="h-4 w-4" /> {fromBlast ? t("blast.backToBlast") : t("detail.back")}
             </Link>
-            <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.22em] text-slate-400 dark:text-slate-500 sm:block">
+            <div className="hidden items-center gap-2 rounded-full border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 sm:flex">
               <span>{fromBlast ? t("blast.title") : t("detail.breadcrumbSearch")}</span>
-              <span className="text-slate-300 dark:text-slate-600">›</span>
+              <span className="text-cyan-500">›</span>
               <span className="text-slate-900 dark:text-slate-100">{t("detail.breadcrumbDetail")}</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <LanguageToggle compact />
-            <button onClick={() => fetchGeneDetail()} className="inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-400 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700">
+            <button onClick={() => fetchGeneDetail()} className="inline-flex items-center gap-2 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 shadow-2xs hover:border-cyan-400/50 hover:text-cyan-600 dark:hover:text-cyan-400 transition">
               {loading ? <Loader2 className="h-4 w-4 animate-spin text-cyan-500" /> : <RefreshCw className="h-4 w-4 text-cyan-500" />}
               {t("detail.refresh")}
             </button>
@@ -399,7 +405,7 @@ export default function GeneDetailClient({ id }: { id: string }) {
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-4 py-8 md:px-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 py-8 md:px-8">
         {error && <Notice title={t("detail.providerWarning")} message={error} onRetry={() => fetchGeneDetail()} loading={loading} />}
 
         {loading && !gene && (
@@ -508,56 +514,54 @@ function GeneHero({ gene, geneId, external, loading, usingBrowserCache }: { gene
   const gcVal = Number(gene.gc_content || 0);
 
   return (
-    <section
-      className="overflow-hidden rounded-xl animate-fadeIn"
-      style={{ background: "linear-gradient(135deg, #020617 0%, #071827 60%, #0c2340 100%)" }}
-    >
-      <div className="flex flex-col gap-6 p-6 md:flex-row md:items-start md:justify-between md:p-8">
+    <section className="relative overflow-hidden rounded-3xl hero-gradient shadow-xl border border-white/10 animate-fadeIn">
+      <div className="absolute inset-0 hero-mesh" />
+      <div className="relative z-10 flex flex-col gap-6 p-6 md:flex-row md:items-start md:justify-between md:p-9">
         {/* Left: name + description */}
         <div className="min-w-0 flex-1">
-          <div className="mb-3 flex flex-wrap items-center gap-2">
+          <div className="mb-3.5 flex flex-wrap items-center gap-2">
             {usingBrowserCache
               ? <span className="tag-base tag-cached">{t("detail.cached")}</span>
               : <span className="tag-base tag-verified">✓ {t("detail.verified")}</span>}
             {loading && <span className="tag-base" style={{ background: "rgba(255,255,255,0.08)", color: "#94a3b8" }}>{t("detail.refreshing")}</span>}
-            <span className="tag-base" style={{ background: "rgba(34,211,238,0.08)", color: "#67e8f9", border: "1px solid rgba(34,211,238,0.15)" }}>
+            <span className="tag-base" style={{ background: "rgba(34,211,238,0.12)", color: "#67e8f9", border: "1px solid rgba(34,211,238,0.25)" }}>
               {gene.source || gene.database || "BioLab AI"}
             </span>
           </div>
 
-          <h1 className="text-3xl font-bold leading-tight tracking-tight text-white md:text-4xl">
+          <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-white md:text-4xl">
             {gene.symbol || gene.name || `Gene ${geneId}`}
           </h1>
           {gene.name && gene.symbol && gene.name !== gene.symbol && (
-            <p className="mt-1 text-sm italic text-slate-400">{gene.name}</p>
+            <p className="mt-1 text-sm italic font-medium text-cyan-200/80">{gene.name}</p>
           )}
 
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5">
-            <span className="inline-flex items-center gap-1.5 text-xs text-slate-400"><Fingerprint className="h-3 w-3" />{geneId}</span>
-            <span className="inline-flex items-center gap-1.5 text-xs text-slate-400"><Microscope className="h-3 w-3" />{gene.organism || t("common.unknown")}</span>
-            <span className="inline-flex items-center gap-1.5 text-xs text-slate-400"><Database className="h-3 w-3" />{gene.source || gene.database || t("common.unknown")}</span>
+          <div className="mt-3.5 flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 border border-white/10 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-slate-200"><Fingerprint className="h-3.5 w-3.5 text-cyan-300" />{geneId}</span>
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 border border-white/10 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-slate-200"><Microscope className="h-3.5 w-3.5 text-cyan-300" />{gene.organism || t("common.unknown")}</span>
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 border border-white/10 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-slate-200"><Database className="h-3.5 w-3.5 text-cyan-300" />{gene.source || gene.database || t("common.unknown")}</span>
           </div>
 
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-400">
+          <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-200/85">
             {gene.description || gene.summary || t("detail.descriptionUnavailable")}
           </p>
 
           {/* Action buttons */}
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className="mt-6 flex flex-wrap gap-2.5">
             {/* Real Research Export Dropdown */}
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setExportOpen((prev) => !prev)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-white/10 px-3.5 py-2 text-xs font-medium text-slate-200 transition hover:bg-white/18 hover:text-white"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md px-4 py-2.5 text-xs font-bold text-white transition hover:bg-white/18 hover:border-cyan-300/40"
               >
-                <Download className="h-3.5 w-3.5 text-cyan-400" /> {t("detail.export")}
+                <Download className="h-3.5 w-3.5 text-cyan-300" /> {t("detail.export")}
                 <ChevronDown className="h-3 w-3 opacity-70" />
               </button>
 
               {exportOpen && (
                 <div
-                  className="absolute left-0 top-full z-50 mt-1.5 w-56 rounded-xl border border-slate-700/80 bg-slate-900/95 p-1.5 shadow-2xl backdrop-blur-md animate-fadeIn"
+                  className="absolute left-0 top-full z-50 mt-1.5 w-56 rounded-2xl border border-slate-700/80 bg-slate-900/95 p-1.5 shadow-2xl backdrop-blur-xl animate-fadeIn"
                   onMouseLeave={() => setExportOpen(false)}
                 >
                   <a
@@ -613,7 +617,7 @@ function GeneHero({ gene, geneId, external, loading, usingBrowserCache }: { gene
                 href={external.href}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-cyan-400 px-3.5 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-300"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-400 via-cyan-500 to-sky-500 px-4 py-2.5 text-xs font-bold text-slate-950 shadow-lg shadow-cyan-500/25 transition hover:shadow-cyan-400/40 hover:scale-[1.01]"
               >
                 {t("detail.viewOn").replace("{provider}", external.provider)}<ExternalLink className="h-3.5 w-3.5" />
               </a>
@@ -621,9 +625,9 @@ function GeneHero({ gene, geneId, external, loading, usingBrowserCache }: { gene
           </div>
         </div>
 
-        {/* Right: Gene overview panel — no glassmorphism */}
-        <div className="shrink-0 rounded-lg p-5 md:w-56" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-          <p className="mb-3.5 text-[10px] font-medium uppercase tracking-[0.1em] text-slate-500">{t("detail.geneOverview")}</p>
+        {/* Right: Gene overview glass panel */}
+        <div className="shrink-0 rounded-2xl p-5 md:w-64 backdrop-blur-md" style={{ background: "rgba(15, 23, 42, 0.45)", border: "1px solid rgba(255,255,255,0.12)" }}>
+          <p className="mb-3.5 text-[10px] font-bold uppercase tracking-[0.12em] text-cyan-300">{t("detail.geneOverview")}</p>
           <div className="space-y-3">
             <OverviewRow label={t("detail.organism")} value={gene.organism || "—"} icon={Globe} />
             {seqLen > 0 && <OverviewRow label={t("detail.length")} value={`${seqLen.toLocaleString()} ${gene.data_type?.includes("protein") ? "aa" : "bp"}`} icon={FileText} />}
@@ -641,25 +645,28 @@ function OverviewRow({ label, value, icon: Icon, highlight }: { label: string; v
   return (
     <div className="flex items-center justify-between gap-3">
       <div className="flex items-center gap-2">
-        <Icon className="h-3 w-3 text-slate-600 dark:text-slate-400" />
-        <span className="text-[10px] font-medium uppercase tracking-[0.07em] text-slate-500 dark:text-slate-400">{label}</span>
+        <Icon className="h-3.5 w-3.5 text-cyan-400/80" />
+        <span className="text-[10px] font-semibold uppercase tracking-[0.07em] text-slate-300/80">{label}</span>
       </div>
-      <span className={`text-xs truncate ${highlight ? "font-medium text-emerald-500 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400"}`}>{value}</span>
+      <span className={`text-xs truncate ${highlight ? "font-bold text-emerald-400" : "font-medium text-white"}`}>{value}</span>
     </div>
   );
 }
 
 function MetricCard({ title, value, suffix, icon: Icon, sub }: { title: string; value: string; suffix?: string; icon: LucideIcon; sub?: string }) {
   return (
-    <section className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-5 shadow-sm">
+    <section className="relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-5 shadow-sm">
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-500" />
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">{title}</h3>
-        <Icon className="h-4 w-4 text-slate-300 dark:text-slate-600" />
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{title}</h3>
+        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-cyan-500/10 dark:bg-cyan-400/15 text-cyan-600 dark:text-cyan-400">
+          <Icon className="h-4 w-4" />
+        </div>
       </div>
-      <div className="text-3xl font-bold tracking-tight text-slate-950 dark:text-slate-100">
-        {value}{suffix && <span className="ml-1.5 text-sm font-normal text-slate-400 dark:text-slate-500">{suffix}</span>}
+      <div className="text-3xl font-extrabold tracking-tight text-slate-950 dark:text-slate-100">
+        {value}{suffix && <span className="ml-1.5 text-sm font-semibold text-slate-400 dark:text-slate-500">{suffix}</span>}
       </div>
-      {sub && <p className="mt-2.5 flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400"><CheckCircle2 className="h-3.5 w-3.5" />{sub}</p>}
+      {sub && <p className="mt-2.5 flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400"><CheckCircle2 className="h-3.5 w-3.5" />{sub}</p>}
     </section>
   );
 }

@@ -109,19 +109,17 @@ export function PubMedPanel({ t }: { t: Translate }) {
   return (
     <section className="space-y-6 animate-fadeIn">
       {/* Hero Header */}
-      <div
-        className="relative overflow-hidden rounded-2xl p-6 md:p-8 text-white shadow-xl"
-        style={{ background: "linear-gradient(135deg, #020617 0%, #082f49 60%, #0c4a6e 100%)" }}
-      >
+      <div className="relative overflow-hidden rounded-3xl hero-gradient p-6 md:p-9 text-white shadow-xl border border-white/10">
+        <div className="absolute inset-0 hero-mesh" />
         <div className="relative z-10 max-w-3xl">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-400/30 bg-cyan-950/60 px-3 py-1 text-xs font-semibold text-cyan-300 backdrop-blur-md">
-            <BookOpen className="h-3.5 w-3.5" />
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-400/30 bg-cyan-500/15 px-3.5 py-1 text-xs font-bold text-cyan-200 backdrop-blur-md">
+            <BookOpen className="h-3.5 w-3.5 text-cyan-300" />
             {t("pubmed.badge")}
           </span>
-          <h2 className="mt-4 text-2xl md:text-3xl font-bold tracking-tight text-white">
+          <h2 className="mt-4 text-2xl md:text-3xl font-extrabold tracking-tight text-white">
             {t("pubmed.title")}
           </h2>
-          <p className="mt-2 text-sm leading-relaxed text-slate-300">
+          <p className="mt-2 text-sm leading-relaxed text-slate-200/85">
             {t("pubmed.desc")}
           </p>
 
@@ -134,19 +132,19 @@ export function PubMedPanel({ t }: { t: Translate }) {
             className="mt-6 flex flex-col gap-3 sm:flex-row"
           >
             <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-cyan-300" />
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={t("pubmed.placeholder")}
-                className="w-full rounded-xl border border-slate-700 bg-slate-900/90 py-3 pl-10 pr-4 text-sm text-white placeholder-slate-400 backdrop-blur-sm transition focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                className="w-full rounded-xl border border-white/15 bg-slate-950/60 py-3 pl-10 pr-4 text-sm font-medium text-white placeholder-slate-400 backdrop-blur-md transition focus:border-cyan-400 focus:bg-slate-950/80 focus:outline-none focus:ring-4 focus:ring-cyan-400/20"
               />
             </div>
             <button
               type="submit"
               disabled={loading || query.trim().length < 2}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-500 px-6 py-3 text-sm font-semibold text-slate-950 shadow-md transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-400 via-cyan-500 to-sky-500 px-6 py-3 text-sm font-bold text-slate-950 shadow-lg shadow-cyan-500/25 transition-all hover:shadow-cyan-400/40 hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -164,13 +162,13 @@ export function PubMedPanel({ t }: { t: Translate }) {
 
           {/* Quick Query Pills */}
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium text-slate-400">{t("pubmed.quickExamples")}:</span>
+            <span className="text-xs font-semibold text-slate-300/80">{t("pubmed.quickExamples")}:</span>
             {SAMPLE_QUERIES.map((sample) => (
               <button
                 key={sample}
                 type="button"
                 onClick={() => handleSearch(sample)}
-                className="rounded-lg border border-slate-700/80 bg-slate-800/60 px-2.5 py-1 text-xs font-medium text-slate-300 transition hover:border-cyan-400/50 hover:bg-slate-700/80 hover:text-white"
+                className="rounded-lg border border-white/15 bg-white/10 backdrop-blur-sm px-3 py-1 text-xs font-semibold text-slate-200 transition hover:border-cyan-300/50 hover:bg-cyan-500/20 hover:text-white"
               >
                 {sample}
               </button>
@@ -181,7 +179,7 @@ export function PubMedPanel({ t }: { t: Translate }) {
 
       {/* Error display */}
       {error && (
-        <div className="flex items-center gap-3 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-4 text-sm text-red-600 dark:text-red-400">
+        <div className="flex items-center gap-3 rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-4 text-sm font-medium text-red-600 dark:text-red-400">
           <AlertCircle className="h-5 w-5 shrink-0" />
           <span>{error}</span>
         </div>
@@ -202,20 +200,20 @@ export function PubMedPanel({ t }: { t: Translate }) {
           {articles.length > 0 && (years.length > 1 || journals.length > 1) && (
             <div className="grid gap-6 md:grid-cols-2">
               {/* Publication Timeline */}
-              <div className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-5 shadow-sm">
+              <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-5 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
                   <Calendar className="h-4 w-4 text-cyan-500" />
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
                     {t("pubmed.timeline")}
                   </h3>
                 </div>
                 <div className="space-y-2.5">
                   {years.map((y) => (
                     <div key={y.label} className="flex items-center gap-3 text-xs">
-                      <span className="w-12 font-mono text-slate-500 dark:text-slate-400">{y.label}</span>
-                      <div className="flex-1 h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                      <span className="w-12 font-mono font-medium text-slate-500 dark:text-slate-400">{y.label}</span>
+                      <div className="flex-1 h-2.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500"
+                          className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-500"
                           style={{ width: `${(y.count / maxYearCount) * 100}%` }}
                         />
                       </div>
@@ -228,22 +226,22 @@ export function PubMedPanel({ t }: { t: Translate }) {
               </div>
 
               {/* Top Journals */}
-              <div className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-5 shadow-sm">
+              <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-5 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
-                  <BarChart3 className="h-4 w-4 text-cyan-500" />
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  <BarChart3 className="h-4 w-4 text-emerald-500" />
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
                     {t("pubmed.topJournals")}
                   </h3>
                 </div>
                 <div className="space-y-2.5">
                   {journals.map((j) => (
                     <div key={j.label} className="flex items-center gap-3 text-xs">
-                      <span className="w-36 truncate text-slate-600 dark:text-slate-300" title={j.label}>
+                      <span className="w-36 truncate font-medium text-slate-600 dark:text-slate-300" title={j.label}>
                         {j.label}
                       </span>
-                      <div className="flex-1 h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                      <div className="flex-1 h-2.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500"
+                          className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-500"
                           style={{ width: `${(j.count / maxJournalCount) * 100}%` }}
                         />
                       </div>
@@ -259,9 +257,9 @@ export function PubMedPanel({ t }: { t: Translate }) {
 
           {/* Articles list */}
           {articles.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-12 text-center">
+            <div className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 p-12 text-center">
               <BookOpen className="mx-auto h-10 w-10 text-slate-300 dark:text-slate-600" />
-              <h3 className="mt-3 text-base font-semibold text-slate-800 dark:text-slate-200">
+              <h3 className="mt-3 text-base font-bold text-slate-800 dark:text-slate-200">
                 {t("pubmed.noResultsTitle")}
               </h3>
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
@@ -271,7 +269,7 @@ export function PubMedPanel({ t }: { t: Translate }) {
           ) : (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
                   {t("pubmed.resultsTitle")} ({articles.length})
                 </h3>
               </div>
@@ -281,24 +279,25 @@ export function PubMedPanel({ t }: { t: Translate }) {
                 return (
                   <article
                     key={article.pmid || index}
-                    className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-5 shadow-sm transition hover:border-cyan-300 dark:hover:border-cyan-700/60"
+                    className="group relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-5 pl-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/5 hover:border-cyan-400/50 dark:hover:border-cyan-500/40"
                   >
+                    <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-cyan-400 via-sky-500 to-indigo-500 opacity-60 group-hover:opacity-100 transition-opacity" />
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0 flex-1">
                         {/* Title */}
-                        <h4 className="text-base font-semibold text-slate-900 dark:text-slate-100 leading-snug">
+                        <h4 className="text-base font-bold text-slate-900 dark:text-slate-100 leading-snug group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
                           {article.title}
                         </h4>
 
                         {/* Metadata badges */}
                         <div className="mt-2.5 flex flex-wrap items-center gap-2 text-xs">
-                          <span className="font-mono rounded bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                          <span className="font-mono rounded-lg bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
                             PMID: {article.pmid}
                           </span>
-                          <span className="rounded bg-cyan-50 dark:bg-cyan-950/40 px-2 py-0.5 text-[11px] font-medium text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-900/60">
+                          <span className="rounded-lg bg-cyan-50 dark:bg-cyan-950/50 px-2.5 py-0.5 text-[11px] font-semibold text-cyan-700 dark:text-cyan-300 border border-cyan-200/70 dark:border-cyan-900/60">
                             {article.source || t("pubmed.unknownJournal")}
                           </span>
-                          <span className="rounded bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[11px] text-slate-600 dark:text-slate-400">
+                          <span className="rounded-lg bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-[11px] font-medium text-slate-600 dark:text-slate-400">
                             {article.pubdate || t("pubmed.unknownDate")}
                           </span>
                         </div>
@@ -321,7 +320,7 @@ export function PubMedPanel({ t }: { t: Translate }) {
                             <button
                               type="button"
                               onClick={() => toggleAbstract(article.pmid)}
-                              className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:underline"
+                              className="inline-flex items-center gap-1 text-xs font-bold text-cyan-600 dark:text-cyan-400 hover:underline"
                             >
                               {isExpanded ? (
                                 <>
@@ -336,7 +335,7 @@ export function PubMedPanel({ t }: { t: Translate }) {
                               )}
                             </button>
                             {isExpanded && (
-                              <div className="mt-2.5 rounded-lg border-l-2 border-cyan-400 bg-slate-50 dark:bg-slate-800/50 p-3.5 text-xs leading-relaxed text-slate-700 dark:text-slate-300 animate-fadeIn">
+                              <div className="mt-2.5 rounded-xl border-l-2 border-cyan-400 bg-slate-50 dark:bg-slate-800/50 p-4 text-xs leading-relaxed text-slate-700 dark:text-slate-300 animate-fadeIn">
                                 {article.abstract}
                               </div>
                             )}
@@ -349,7 +348,7 @@ export function PubMedPanel({ t }: { t: Translate }) {
                             {article.mesh_terms.slice(0, 6).map((term) => (
                               <span
                                 key={term}
-                                className="rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-[10px] font-medium text-slate-600 dark:text-slate-400"
+                                className="rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-[10px] font-semibold text-slate-600 dark:text-slate-400"
                               >
                                 {term}
                               </span>
@@ -369,7 +368,7 @@ export function PubMedPanel({ t }: { t: Translate }) {
                               href={`https://doi.org/${article.doi}`}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-xs text-slate-400 hover:text-cyan-500 transition mr-2"
+                              className="text-xs font-medium text-slate-400 hover:text-cyan-500 transition mr-2"
                             >
                               DOI: {article.doi}
                             </a>
@@ -377,7 +376,7 @@ export function PubMedPanel({ t }: { t: Translate }) {
                           <a
                             href={buildBibtexUrl(article)}
                             download
-                            className="inline-flex items-center gap-1 rounded-md border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50 dark:bg-indigo-950/40 px-2.5 py-1 text-xs font-medium text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition"
+                            className="inline-flex items-center gap-1 rounded-lg border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1 text-xs font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition"
                           >
                             <Download className="h-3 w-3" />
                             {t("pubmed.exportBibtex")}
@@ -385,7 +384,7 @@ export function PubMedPanel({ t }: { t: Translate }) {
                           <a
                             href={buildRisUrl(article)}
                             download
-                            className="inline-flex items-center gap-1 rounded-md border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition"
+                            className="inline-flex items-center gap-1 rounded-lg border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition"
                           >
                             <Download className="h-3 w-3" />
                             {t("pubmed.exportRis")}
@@ -398,10 +397,10 @@ export function PubMedPanel({ t }: { t: Translate }) {
                         href={`https://pubmed.ncbi.nlm.nih.gov/${article.pmid}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+                        className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 px-3.5 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:border-cyan-400 hover:bg-gradient-to-r hover:from-cyan-500 hover:to-sky-500 hover:text-white dark:hover:text-slate-950 transition-all shadow-2xs"
                       >
                         {t("pubmed.viewOnPubmed")}
-                        <ExternalLink className="h-3 w-3" />
+                        <ExternalLink className="h-3.5 w-3.5" />
                       </a>
                     </div>
                   </article>
@@ -414,12 +413,14 @@ export function PubMedPanel({ t }: { t: Translate }) {
 
       {/* Initial Empty State */}
       {!result && !loading && (
-        <div className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 p-12 text-center">
-          <BookOpen className="mx-auto h-12 w-12 text-slate-300 dark:text-slate-700" />
-          <h3 className="mt-4 text-base font-semibold text-slate-800 dark:text-slate-200">
+        <div className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md p-12 text-center">
+          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-cyan-500/20 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
+            <BookOpen className="h-6 w-6" />
+          </div>
+          <h3 className="mt-4 text-base font-bold text-slate-800 dark:text-slate-200">
             {t("pubmed.emptyTitle")}
           </h3>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+          <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
             {t("pubmed.emptyDesc")}
           </p>
         </div>
@@ -438,12 +439,15 @@ function StatBox({
   icon: React.ComponentType<{ className?: string }>;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-4 shadow-sm">
+    <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-4 shadow-sm">
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-cyan-400 to-indigo-500" />
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{label}</span>
-        <Icon className="h-4 w-4 text-cyan-500" />
+        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{label}</span>
+        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-cyan-500/10 dark:bg-cyan-400/15 text-cyan-600 dark:text-cyan-400">
+          <Icon className="h-4 w-4" />
+        </div>
       </div>
-      <p className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+      <p className="mt-2.5 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 tabular-nums">
         {value.toLocaleString()}
       </p>
     </div>

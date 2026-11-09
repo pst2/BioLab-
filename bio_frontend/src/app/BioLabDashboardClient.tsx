@@ -85,7 +85,14 @@ export default function BioLabDashboard() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] antialiased transition-colors duration-200">
+    <div className="relative min-h-screen bg-[var(--background)] text-[var(--foreground)] antialiased transition-colors duration-200 overflow-x-hidden">
+      {/* Ambient decorative background orbs */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div className="absolute -top-32 left-1/4 h-96 w-96 rounded-full bg-cyan-500/[0.06] dark:bg-cyan-500/[0.09] blur-[100px]" />
+        <div className="absolute top-1/3 -right-32 h-96 w-96 rounded-full bg-indigo-500/[0.06] dark:bg-indigo-500/[0.09] blur-[100px]" />
+        <div className="absolute -bottom-32 left-1/3 h-80 w-80 rounded-full bg-emerald-500/[0.04] dark:bg-emerald-500/[0.07] blur-[100px]" />
+      </div>
+
       <Sidebar
         activeTab={activeTab}
         setActiveTab={handleSelectTab}
@@ -99,24 +106,27 @@ export default function BioLabDashboard() {
       />
 
       <div
-        className={`min-h-screen transition-[padding] duration-300 ease-out ${
+        className={`relative z-10 min-h-screen transition-[padding] duration-300 ease-out ${
           sidebarCollapsed ? "lg:pl-20" : "lg:pl-72"
         }`}
       >
         <header
-          className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/70 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 px-4 backdrop-blur-md md:px-8"
-          style={{ boxShadow: "0 1px 0 rgba(148,163,184,0.15)" }}
+          className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/70 dark:border-slate-800/80 bg-white/75 dark:bg-slate-950/75 px-4 backdrop-blur-xl md:px-8"
+          style={{ boxShadow: "0 4px 24px -4px rgba(15, 23, 42, 0.04)" }}
         >
           <div className="flex min-w-0 items-center gap-3">
             <button
               onClick={() => setMobileOpen(true)}
-              className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden"
+              className="rounded-xl border border-slate-200/70 dark:border-slate-800 p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden transition"
             >
               <Menu className="h-5 w-5" />
             </button>
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-cyan-500 animate-pulse" />
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-widest">
+            <div className="flex items-center gap-2.5 rounded-full border border-slate-200/80 dark:border-slate-800/90 bg-slate-50/80 dark:bg-slate-900/80 px-3.5 py-1.5 shadow-2xs">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-gradient-to-r from-cyan-500 to-indigo-500" />
+              </span>
+              <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-widest">
                 {activeTab === "dashboard"
                   ? t("tab.dashboard")
                   : activeTab === "search"
@@ -135,9 +145,20 @@ export default function BioLabDashboard() {
           <div className="flex items-center gap-3">
             <button
               onClick={checkStatus}
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="group inline-flex items-center gap-2 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 px-3.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 shadow-2xs transition-all hover:border-cyan-400/50 dark:hover:border-cyan-500/40 hover:shadow-md hover:shadow-cyan-500/10"
             >
-              <Activity className="h-3.5 w-3.5 text-cyan-500" />
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  status === "online"
+                    ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]"
+                    : status === "offline"
+                    ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"
+                    : status === "checking"
+                    ? "bg-cyan-500 animate-ping"
+                    : "bg-slate-400"
+                }`}
+              />
+              <Activity className="h-3.5 w-3.5 text-cyan-500 transition-transform group-hover:scale-110" />
               <span>{statusLabel}</span>
             </button>
           </div>

@@ -83,36 +83,42 @@ export function GeneSearchPanel(props: {
   return (
     <section className="space-y-5 animate-fadeIn">
       {/* Search bar */}
-      <div className="overflow-hidden rounded-xl border border-slate-200/70 dark:border-slate-800/80 bg-white dark:bg-slate-900 shadow-sm">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-sm">
+        <div className="h-1 w-full bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-500" />
         <div className="px-6 pt-6 pb-5">
-          <h2 className="text-xl font-semibold tracking-tight text-slate-950 dark:text-slate-100">
-            {t("search.title")}
-          </h2>
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500/15 to-indigo-500/15 text-cyan-600 dark:text-cyan-400 ring-1 ring-cyan-500/20">
+              <Search className="h-4 w-4" />
+            </div>
+            <h2 className="text-xl font-bold tracking-tight text-slate-950 dark:text-slate-100">
+              {t("search.title")}
+            </h2>
+          </div>
 
           <form onSubmit={onSubmit} className="mt-4">
-            <div className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 p-1 transition focus-within:border-slate-300 dark:focus-within:border-slate-600 focus-within:bg-white dark:focus-within:bg-slate-800 focus-within:shadow-sm">
-              <Search className="ml-3 h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500" />
+            <div className="flex items-center gap-2 rounded-xl border border-slate-200/90 dark:border-slate-700/80 bg-slate-50/90 dark:bg-slate-800/70 p-1.5 transition-all focus-within:border-cyan-400 dark:focus-within:border-cyan-500 focus-within:bg-white dark:focus-within:bg-slate-800 focus-within:ring-4 focus-within:ring-cyan-500/10">
+              <Search className="ml-3 h-4 w-4 shrink-0 text-cyan-500 dark:text-cyan-400" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="min-w-0 flex-1 bg-transparent px-2 py-2 text-sm outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
+                className="min-w-0 flex-1 bg-transparent px-2 py-2 text-sm font-medium outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 placeholder={t("search.placeholder")}
               />
               <button
                 type="button"
                 onClick={() => setShowFilters(!showFilters)}
-                className={`hidden items-center gap-1.5 rounded-md px-3 py-2 text-xs font-medium transition sm:inline-flex ${
+                className={`hidden items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold transition sm:inline-flex ${
                   showFilters
-                    ? "bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200"
-                    : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-200"
+                    ? "bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 ring-1 ring-cyan-500/30"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-700/70 hover:text-slate-900 dark:hover:text-slate-200"
                 }`}
               >
                 <SlidersHorizontal className="h-3.5 w-3.5" /> {t("search.filters")}
-                <ChevronDown className={`h-3 w-3 transition-transform ${showFilters ? "rotate-180" : ""}`} />
+                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`} />
               </button>
               <button
                 disabled={loading}
-                className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-900 dark:bg-cyan-500 px-4 py-2 text-xs font-medium text-white dark:text-slate-950 hover:bg-slate-700 dark:hover:bg-cyan-400 disabled:opacity-50 transition"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-cyan-500/20 hover:shadow-lg hover:shadow-cyan-500/30 hover:brightness-110 disabled:opacity-50 transition-all"
               >
                 {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : t("search.button")}
               </button>
@@ -122,7 +128,7 @@ export function GeneSearchPanel(props: {
 
         {/* Filters panel */}
         {showFilters && (
-          <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 px-6 py-5 animate-fadeIn">
+          <div className="border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-800/40 px-6 py-5 animate-fadeIn">
             <div className="grid gap-4 md:grid-cols-3">
               <FilterSelect
                 label={t("search.dataType")}
@@ -168,18 +174,18 @@ export function GeneSearchPanel(props: {
                 ]}
               />
               <label className="space-y-1.5 md:col-span-2">
-                <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">
+                <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">
                   {t("search.organism")}
                 </span>
                 <input
                   value={organism}
                   onChange={(e) => setOrganism(e.target.value)}
-                  className="w-full rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none focus:border-slate-400 dark:focus:border-slate-500 transition placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none focus:border-cyan-400 dark:focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15 transition placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   placeholder={t("search.organismPlaceholder")}
                 />
               </label>
             </div>
-            <label className="mt-4 flex cursor-pointer items-center gap-2.5">
+            <label className="mt-4 inline-flex cursor-pointer items-center gap-2.5">
               <div className="relative">
                 <input
                   type="checkbox"
@@ -188,17 +194,17 @@ export function GeneSearchPanel(props: {
                   className="sr-only"
                 />
                 <div
-                  className={`h-4 w-7 rounded-full transition-colors ${
-                    fallbackEnabled ? "bg-cyan-500" : "bg-slate-300 dark:bg-slate-700"
+                  className={`h-5 w-9 rounded-full transition-colors ${
+                    fallbackEnabled ? "bg-gradient-to-r from-cyan-500 to-sky-500" : "bg-slate-300 dark:bg-slate-700"
                   }`}
                 />
                 <div
-                  className={`absolute top-0.5 left-0.5 h-3 w-3 rounded-full bg-white shadow transition-transform ${
-                    fallbackEnabled ? "translate-x-3" : "translate-x-0"
+                  className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
+                    fallbackEnabled ? "translate-x-4" : "translate-x-0"
                   }`}
                 />
               </div>
-              <span className="text-xs text-slate-600 dark:text-slate-400">
+              <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
                 {t("search.fallbackFlow")}
               </span>
             </label>
@@ -210,7 +216,7 @@ export function GeneSearchPanel(props: {
       {message && !error && <Notice tone="cyan" title={t("search.backendResponse")} message={message} />}
 
       {/* Results */}
-      <div className="space-y-3 stagger-children">
+      <div className="space-y-3.5 stagger-children">
         {loading && Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)}
         {!loading && genes.length === 0 && !error && (
           <EmptyState title={t("search.emptyTitle")} message={t("search.emptyMessage")} />
@@ -234,13 +240,13 @@ function FilterSelect({
 }) {
   return (
     <label className="space-y-1.5">
-      <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">
+      <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">
         {label}
       </span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none focus:border-slate-400 dark:focus:border-slate-500 transition"
+        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 outline-none focus:border-cyan-400 dark:focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15 transition"
       >
         {options.map(([val, name]) => (
           <option key={val} value={val}>
@@ -258,9 +264,9 @@ function GeneCard({ gene, t }: { gene: GeneResult; t: Translate }) {
   const srcClass = sourceTagClass(safe(gene.source || gene.database, ""));
 
   return (
-    <article className="group relative overflow-hidden rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 shadow-sm transition-all duration-200 hover:-translate-y-px hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md animate-slideInUp">
-      <div className="absolute left-0 top-0 h-full w-[2px] bg-cyan-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
-      <div className="flex flex-col gap-4 p-5 lg:flex-row lg:items-start lg:justify-between">
+    <article className="group relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-400/50 dark:hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/5 animate-slideInUp">
+      <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-cyan-400 via-sky-500 to-indigo-500 opacity-60 transition-opacity duration-200 group-hover:opacity-100" />
+      <div className="flex flex-col gap-4 p-5 pl-6 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1.5">
             <span className={`tag-base ${dtClass}`}>{safe(gene.data_type, "gene")}</span>
@@ -269,33 +275,33 @@ function GeneCard({ gene, t }: { gene: GeneResult; t: Translate }) {
               <span className="tag-base tag-verified">{gene.source}</span>
             )}
           </div>
-          <h3 className="mt-2.5 text-lg font-semibold leading-snug tracking-tight text-slate-950 dark:text-slate-100">
+          <h3 className="mt-2.5 text-lg font-bold leading-snug tracking-tight text-slate-950 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
             {safe(gene.symbol || gene.name, `Gene ${id}`)}
           </h3>
           {gene.organism && (
-            <p className="mt-0.5 text-xs italic text-slate-400 dark:text-slate-500">{gene.organism}</p>
+            <p className="mt-0.5 text-xs italic font-medium text-cyan-700/80 dark:text-cyan-400/80">{gene.organism}</p>
           )}
-          <p className="mt-2 line-clamp-2 max-w-3xl text-sm leading-5 text-slate-500 dark:text-slate-400">
+          <p className="mt-2 line-clamp-2 max-w-3xl text-sm leading-6 text-slate-600 dark:text-slate-400">
             {safe(gene.description || gene.name, t("geneCard.noDescription"))}
           </p>
-          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1">
-            <span className="flex items-baseline gap-1.5">
-              <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">
+          <div className="mt-3.5 flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100/80 dark:bg-slate-800/80 px-2.5 py-1">
+              <span className="text-[10px] font-bold uppercase tracking-[0.06em] text-slate-400 dark:text-slate-500">
                 {t("geneCard.accession")}
               </span>
-              <span className="font-mono text-xs text-slate-600 dark:text-slate-300">{id}</span>
+              <span className="font-mono text-xs font-semibold text-slate-700 dark:text-slate-200">{id}</span>
             </span>
-            <span className="flex items-baseline gap-1.5">
-              <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100/80 dark:bg-slate-800/80 px-2.5 py-1">
+              <span className="text-[10px] font-bold uppercase tracking-[0.06em] text-slate-400 dark:text-slate-500">
                 {t("geneCard.organism")}
               </span>
-              <span className="text-xs italic text-slate-600 dark:text-slate-300">{safe(gene.organism)}</span>
+              <span className="text-xs italic font-medium text-slate-700 dark:text-slate-200">{safe(gene.organism)}</span>
             </span>
-            <span className="flex items-baseline gap-1.5">
-              <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100/80 dark:bg-slate-800/80 px-2.5 py-1">
+              <span className="text-[10px] font-bold uppercase tracking-[0.06em] text-slate-400 dark:text-slate-500">
                 {t("geneCard.external")}
               </span>
-              <span className="font-mono text-xs text-slate-600 dark:text-slate-300">
+              <span className="font-mono text-xs font-semibold text-slate-700 dark:text-slate-200">
                 {safe(gene.external_id ?? gene.gene_id ?? gene.id)}
               </span>
             </span>
@@ -304,9 +310,9 @@ function GeneCard({ gene, t }: { gene: GeneResult; t: Translate }) {
 
         <Link
           href={`/genes/${encodeURIComponent(id)}`}
-          className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 transition hover:border-slate-300 dark:hover:border-slate-600 hover:bg-white dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-100"
+          className="inline-flex shrink-0 items-center gap-2 self-start lg:self-center rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-800/90 px-4 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-200 shadow-2xs transition-all hover:border-cyan-400 dark:hover:border-cyan-500 hover:bg-gradient-to-r hover:from-cyan-500 hover:to-sky-500 hover:text-white dark:hover:text-slate-950 hover:shadow-md hover:shadow-cyan-500/20"
         >
-          {t("geneCard.viewDetail")} <ArrowRight className="h-3.5 w-3.5" />
+          {t("geneCard.viewDetail")} <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
         </Link>
       </div>
     </article>

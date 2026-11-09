@@ -172,25 +172,27 @@ export function SequenceAnalysisPanel({
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Sub-tab navigation */}
-      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+      <div className="inline-flex items-center gap-1.5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 p-1.5 shadow-2xs backdrop-blur-md">
         <button
           onClick={() => setSeqSubTab("analyze")}
-          className={`px-4 py-2 text-xs font-semibold rounded-lg transition ${
+          className={`inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl transition-all ${
             seqSubTab === "analyze"
-              ? "bg-slate-900 dark:bg-cyan-500 text-white dark:text-slate-950"
-              : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+              ? "bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 text-white shadow-md shadow-cyan-500/20"
+              : "text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200"
           }`}
         >
+          <Dna className="h-3.5 w-3.5" />
           {t("blast.subtabAnalyze")}
         </button>
         <button
           onClick={() => setSeqSubTab("blast")}
-          className={`px-4 py-2 text-xs font-semibold rounded-lg transition ${
+          className={`inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl transition-all ${
             seqSubTab === "blast"
-              ? "bg-slate-900 dark:bg-cyan-500 text-white dark:text-slate-950"
-              : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+              ? "bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 text-white shadow-md shadow-cyan-500/20"
+              : "text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200"
           }`}
         >
+          <Zap className="h-3.5 w-3.5" />
           {t("blast.subtabBlast")}
         </button>
       </div>
@@ -199,12 +201,14 @@ export function SequenceAnalysisPanel({
         <section className="grid gap-6 lg:grid-cols-12">
           <form
             onSubmit={analysis.runAnalysis}
-            className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-6 shadow-sm lg:col-span-5"
+            className="relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-6 shadow-sm lg:col-span-5"
           >
-            <p className="text-[10px] font-medium uppercase tracking-[0.1em] text-cyan-600 dark:text-cyan-400">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-500" />
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-cyan-500/10 dark:bg-cyan-400/15 border border-cyan-500/20 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-cyan-700 dark:text-cyan-300">
+              <Dna className="h-3 w-3" />
               {t("sequence.badge")}
-            </p>
-            <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-950 dark:text-slate-100">
+            </span>
+            <h2 className="mt-3 text-xl font-bold tracking-tight text-slate-950 dark:text-slate-100">
               {t("sequence.title")}
             </h2>
             <p className="mt-1.5 text-sm leading-6 text-slate-500 dark:text-slate-400">
@@ -213,22 +217,22 @@ export function SequenceAnalysisPanel({
             <textarea
               value={analysis.sequence}
               onChange={(e) => analysis.setSequence(e.target.value)}
-              className="mt-4 min-h-64 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 p-4 font-mono text-xs leading-6 text-slate-900 dark:text-slate-100 outline-none focus:border-slate-400 dark:focus:border-slate-500 focus:bg-white dark:focus:bg-slate-800 transition custom-scrollbar"
+              className="mt-4 min-h-64 w-full rounded-xl border border-slate-200/90 dark:border-slate-700/80 bg-slate-50/90 dark:bg-slate-800/70 p-4 font-mono text-xs leading-6 text-slate-900 dark:text-slate-100 outline-none focus:border-cyan-400 dark:focus:border-cyan-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-cyan-500/10 transition custom-scrollbar"
               spellCheck={false}
             />
             {analysis.error && (
-              <p className="mt-3 rounded-lg bg-red-50 dark:bg-red-950/40 p-3 text-xs text-red-600 dark:text-red-300">
+              <p className="mt-3 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 p-3 text-xs font-medium text-red-600 dark:text-red-300">
                 {analysis.error}
               </p>
             )}
             <button
               disabled={analysis.loading}
-              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 dark:bg-cyan-500 px-4 py-2.5 text-xs font-medium text-white dark:text-slate-950 hover:bg-slate-700 dark:hover:bg-cyan-400 disabled:opacity-50 transition"
+              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 px-4 py-3 text-xs font-bold text-white shadow-md shadow-cyan-500/25 hover:shadow-lg hover:shadow-cyan-500/35 hover:brightness-110 disabled:opacity-50 transition-all"
             >
               {analysis.loading ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <Zap className="h-3.5 w-3.5" />
+                <Zap className="h-4 w-4" />
               )}
               {t("sequence.button")}
             </button>
@@ -237,14 +241,14 @@ export function SequenceAnalysisPanel({
           <div className="space-y-5 lg:col-span-7">
             <MetricsPanel result={analysis.result} counts={sequenceCounts} t={t} />
             {analysis.result ? (
-              <div className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-6 shadow-sm">
+              <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-6 shadow-sm">
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                  <h3 className="text-xs font-medium uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">
+                  <h3 className="text-xs font-bold uppercase tracking-[0.1em] text-slate-600 dark:text-slate-300">
                     {t("sequence.outputs")}
                   </h3>
                   <button
                     onClick={() => copyText(analysis.result?.reverse_complement || "")}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:border-cyan-400 dark:hover:border-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400 transition"
                   >
                     <Copy className="h-3.5 w-3.5" />
                     {t("sequence.copyReverse")}
@@ -263,27 +267,29 @@ export function SequenceAnalysisPanel({
         <section className="space-y-6">
           <form
             onSubmit={blast.submitJob}
-            className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-6 shadow-sm"
+            className="relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-6 shadow-sm"
           >
-            <p className="text-[10px] font-medium uppercase tracking-[0.1em] text-cyan-600 dark:text-cyan-400">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-500" />
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-cyan-500/10 dark:bg-cyan-400/15 border border-cyan-500/20 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-cyan-700 dark:text-cyan-300">
+              <Zap className="h-3 w-3" />
               {t("blast.badge")}
-            </p>
-            <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950 dark:text-slate-100">
+            </span>
+            <h2 className="mt-2.5 text-xl font-bold tracking-tight text-slate-950 dark:text-slate-100">
               {t("blast.title")}
             </h2>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               {t("blast.desc")}
             </p>
 
-            <div className="mt-4 grid gap-4 md:grid-cols-3">
-              <label className="space-y-1">
-                <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <div className="mt-5 grid gap-4 md:grid-cols-3">
+              <label className="space-y-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   {t("blast.seqType")}
                 </span>
                 <select
                   value={blast.seqType}
                   onChange={(e) => blast.setSeqType(e.target.value as any)}
-                  className="w-full rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none"
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 outline-none focus:border-cyan-400 dark:focus:border-cyan-500 transition"
                 >
                   <option value="auto">{t("blast.seqTypeAuto")}</option>
                   <option value="dna">{t("blast.seqTypeDna")}</option>
@@ -291,14 +297,14 @@ export function SequenceAnalysisPanel({
                 </select>
               </label>
 
-              <label className="space-y-1">
-                <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              <label className="space-y-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   {t("blast.provider")}
                 </span>
                 <select
                   value={blast.provider}
                   onChange={(e) => blast.setProvider(e.target.value as any)}
-                  className="w-full rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none"
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 outline-none focus:border-cyan-400 dark:focus:border-cyan-500 transition"
                 >
                   <option value="auto">{t("blast.providerAuto")}</option>
                   <option value="ebi">{t("blast.providerEbi")}</option>
@@ -306,51 +312,51 @@ export function SequenceAnalysisPanel({
                 </select>
               </label>
 
-              <label className="space-y-1">
-                <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              <label className="space-y-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   {t("blast.databaseFilter")}
                 </span>
                 <input
                   value={blast.database}
                   onChange={(e) => blast.setDatabase(e.target.value)}
                   placeholder={t("blast.databasePlaceholder")}
-                  className="w-full rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 outline-none focus:border-cyan-400 dark:focus:border-cyan-500 placeholder:text-slate-400 dark:placeholder:text-slate-500 transition"
                 />
               </label>
             </div>
 
             {/* Advanced BLAST Parameters Collapsible */}
-            <div className="mt-3">
+            <div className="mt-3.5">
               <button
                 type="button"
                 onClick={() => setShowAdvanced((prev) => !prev)}
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:underline"
               >
-                <Sliders className="h-3 w-3" />
+                <Sliders className="h-3.5 w-3.5" />
                 <span>{showAdvanced ? t("blast.advancedHide") : t("blast.advancedShow")}</span>
-                {showAdvanced ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+                {showAdvanced ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
               </button>
 
               {showAdvanced && (
-                <div className="mt-2.5 grid grid-cols-2 sm:grid-cols-4 gap-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 p-3 text-xs">
+                <div className="mt-2.5 grid grid-cols-2 sm:grid-cols-4 gap-3 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/50 p-3.5 text-xs">
                   <label className="space-y-1">
-                    <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">{t("blast.evalueCutoff")}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t("blast.evalueCutoff")}</span>
                     <input
                       type="number"
                       step="any"
                       value={blast.evalueCutoff}
                       onChange={(e) => blast.setEvalueCutoff(e.target.value ? Number(e.target.value) : 10)}
-                      className="w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono"
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono"
                       placeholder="10"
                     />
                   </label>
 
                   <label className="space-y-1">
-                    <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">{t("blast.scoringMatrix")}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t("blast.scoringMatrix")}</span>
                     <select
                       value={blast.matrix}
                       onChange={(e) => blast.setMatrix(e.target.value)}
-                      className="w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-2 py-1.5 text-xs font-mono"
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2 py-1.5 text-xs font-mono"
                     >
                       <option value="BLOSUM62">BLOSUM62</option>
                       <option value="BLOSUM45">BLOSUM45</option>
@@ -361,23 +367,23 @@ export function SequenceAnalysisPanel({
                   </label>
 
                   <label className="space-y-1">
-                    <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">{t("blast.gapOpen")}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t("blast.gapOpen")}</span>
                     <input
                       type="number"
                       value={blast.gapOpen ?? ""}
                       onChange={(e) => blast.setGapOpen(e.target.value ? Number(e.target.value) : undefined)}
-                      className="w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono"
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono"
                       placeholder={t("common.default")}
                     />
                   </label>
 
                   <label className="space-y-1">
-                    <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">{t("blast.gapExtend")}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t("blast.gapExtend")}</span>
                     <input
                       type="number"
                       value={blast.gapExtend ?? ""}
                       onChange={(e) => blast.setGapExtend(e.target.value ? Number(e.target.value) : undefined)}
-                      className="w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono"
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono"
                       placeholder={t("common.default")}
                     />
                   </label>
@@ -390,14 +396,14 @@ export function SequenceAnalysisPanel({
                 <button
                   type="button"
                   onClick={blast.loadSampleDna}
-                  className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-1 text-[11px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+                  className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 text-[11px] font-semibold text-slate-700 dark:text-slate-300 hover:border-cyan-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition"
                 >
                   {t("blast.sampleDna")}
                 </button>
                 <button
                   type="button"
                   onClick={blast.loadSampleProtein}
-                  className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-1 text-[11px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+                  className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 text-[11px] font-semibold text-slate-700 dark:text-slate-300 hover:border-cyan-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition"
                 >
                   {t("blast.sampleProtein")}
                 </button>
@@ -408,23 +414,23 @@ export function SequenceAnalysisPanel({
               value={blast.seq}
               onChange={(e) => blast.setSeq(e.target.value)}
               placeholder={t("blast.placeholder")}
-              className="mt-3 min-h-36 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 p-4 font-mono text-xs leading-6 text-slate-900 dark:text-slate-100 outline-none focus:border-slate-400 dark:focus:border-slate-500 transition custom-scrollbar"
+              className="mt-3 min-h-36 w-full rounded-xl border border-slate-200/90 dark:border-slate-700/80 bg-slate-50/90 dark:bg-slate-800/70 p-4 font-mono text-xs leading-6 text-slate-900 dark:text-slate-100 outline-none focus:border-cyan-400 dark:focus:border-cyan-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-cyan-500/10 transition custom-scrollbar"
               spellCheck={false}
             />
 
             <div className="mt-4 flex items-center justify-between">
               <button
                 disabled={blast.loading || !blast.seq.trim()}
-                className="inline-flex items-center gap-2 rounded-lg bg-slate-900 dark:bg-cyan-500 px-5 py-2.5 text-xs font-semibold text-white dark:text-slate-950 hover:bg-slate-700 dark:hover:bg-cyan-400 disabled:opacity-50 transition"
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-cyan-500/25 hover:shadow-lg hover:shadow-cyan-500/35 hover:brightness-110 disabled:opacity-50 transition-all"
               >
-                {blast.loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />}
+                {blast.loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
                 {blast.loading ? t("blast.submitting") : t("blast.submit")}
               </button>
               {blast.status !== "idle" && (
                 <button
                   type="button"
                   onClick={blast.reset}
-                  className="text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition"
+                  className="text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition"
                 >
                   {t("blast.reset")}
                 </button>
@@ -645,52 +651,53 @@ export function SequenceAnalysisPanel({
                   </div>
                 </div>
               )}
-              <h3 className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
                 {t("blast.alignmentsFound")} ({blast.hits.length})
               </h3>
-              <div className="space-y-3">
+              <div className="space-y-3.5">
                 {blast.hits.map((hit, idx) => (
                   <div
                     key={`${hit.accession}-${idx}`}
-                    className="group rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-cyan-500/40 dark:hover:border-cyan-500/40"
+                    className="group relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-5 pl-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/5 hover:border-cyan-400/50 dark:hover:border-cyan-500/40"
                   >
+                    <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-cyan-400 via-sky-500 to-indigo-500 opacity-60 group-hover:opacity-100 transition-opacity" />
                     <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="font-mono text-xs font-bold text-cyan-600 dark:text-cyan-400">
                             {hit.accession}
                           </span>
-                          <span className="rounded bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-medium text-slate-600 dark:text-slate-400 uppercase">
+                          <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase">
                             {hit.source}
                           </span>
                         </div>
-                        <p className="mt-1 text-sm font-medium text-slate-900 dark:text-slate-100">
+                        <p className="mt-1.5 text-sm font-semibold text-slate-900 dark:text-slate-100">
                           {hit.description}
                         </p>
                       </div>
                       <div className="flex items-center gap-4 text-right text-xs shrink-0">
-                        <div>
-                          <span className="block text-[10px] uppercase text-slate-400">{t("blast.identity")}</span>
-                          <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                        <div className="rounded-lg bg-emerald-50/70 dark:bg-emerald-950/40 px-2.5 py-1 border border-emerald-200/60 dark:border-emerald-800/50">
+                          <span className="block text-[9px] font-bold uppercase text-emerald-600/80 dark:text-emerald-400/80">{t("blast.identity")}</span>
+                          <span className="font-extrabold text-emerald-700 dark:text-emerald-300">
                             {hit.identity_percent}%
                           </span>
                         </div>
-                        <div>
-                          <span className="block text-[10px] uppercase text-slate-400">{t("blast.eValue")}</span>
-                          <span className="font-mono font-medium text-slate-700 dark:text-slate-300">
+                        <div className="rounded-lg bg-slate-50 dark:bg-slate-800/70 px-2.5 py-1 border border-slate-200/60 dark:border-slate-700/60">
+                          <span className="block text-[9px] font-bold uppercase text-slate-400">{t("blast.eValue")}</span>
+                          <span className="font-mono font-bold text-slate-700 dark:text-slate-200">
                             {hit.e_value}
                           </span>
                         </div>
-                        <div>
-                          <span className="block text-[10px] uppercase text-slate-400">{t("blast.coverage")}</span>
-                          <span className="font-medium text-slate-700 dark:text-slate-300">
+                        <div className="rounded-lg bg-slate-50 dark:bg-slate-800/70 px-2.5 py-1 border border-slate-200/60 dark:border-slate-700/60">
+                          <span className="block text-[9px] font-bold uppercase text-slate-400">{t("blast.coverage")}</span>
+                          <span className="font-bold text-slate-700 dark:text-slate-200">
                             {hit.query_coverage_percent}%
                           </span>
                         </div>
                         <Link
                           href={`/genes/${encodeURIComponent(hit.accession)}?from=blast`}
                           onClick={() => seedBlastHitToCache(hit, blast.seq)}
-                          className="inline-flex items-center gap-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-cyan-500 hover:text-slate-950 dark:hover:bg-cyan-400 dark:hover:text-slate-950 transition"
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:border-cyan-400 hover:bg-gradient-to-r hover:from-cyan-500 hover:to-sky-500 hover:text-white dark:hover:text-slate-950 transition-all shadow-2xs"
                         >
                           {t("blast.details")} <ExternalLink className="h-3 w-3" />
                         </Link>
@@ -698,7 +705,7 @@ export function SequenceAnalysisPanel({
                     </div>
 
                     {/* Expand Alignment Toggle */}
-                    <div className="mt-3 flex items-center justify-between border-t border-slate-100 dark:border-slate-800/80 pt-2.5">
+                    <div className="mt-3.5 flex items-center justify-between border-t border-slate-100 dark:border-slate-800/80 pt-3">
                       <div className="flex items-center gap-3 text-[11px] text-slate-400">
                         {hit.bit_score !== undefined && hit.bit_score > 0 && (
                           <span>{t("blast.score")}: <strong className="text-slate-700 dark:text-slate-300">{hit.bit_score} bits</strong></span>
@@ -713,16 +720,16 @@ export function SequenceAnalysisPanel({
                       <button
                         type="button"
                         onClick={() => setExpandedHit(expandedHit === `${hit.accession}-${idx}` ? null : `${hit.accession}-${idx}`)}
-                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-cyan-600 dark:text-cyan-400 hover:underline"
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-cyan-600 dark:text-cyan-400 hover:underline"
                       >
                         {expandedHit === `${hit.accession}-${idx}` ? t("blast.hideAlignment") : t("blast.viewAlignment")}
-                        {expandedHit === `${hit.accession}-${idx}` ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+                        {expandedHit === `${hit.accession}-${idx}` ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
                       </button>
                     </div>
 
                     {/* Alignment Viewer Drawer */}
                     {expandedHit === `${hit.accession}-${idx}` && (
-                      <div className="mt-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-950 p-3.5 font-mono text-xs text-slate-200 overflow-x-auto custom-scrollbar animate-fadeIn">
+                      <div className="mt-3 rounded-xl border border-slate-800 bg-slate-950 p-4 font-mono text-xs text-slate-200 overflow-x-auto custom-scrollbar animate-fadeIn shadow-inner">
                         <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-[10px] text-slate-400">
                           <span>{t("blast.pairwiseHeader")}</span>
                           <span>{t("blast.coordinates")}: Query [{hit.query_from || 1}..{hit.query_to || hit.alignment_length}] | Subject [{hit.hit_from || 1}..{hit.hit_to || hit.alignment_length}]</span>
@@ -768,11 +775,11 @@ export function SequenceAnalysisPanel({
 
 function Output({ label, value, t }: { label: string; value?: string; t?: Translate }) {
   return (
-    <div className="mt-3">
-      <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">
+    <div className="mt-3.5">
+      <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">
         {label}
       </span>
-      <div className="mt-1 overflow-x-auto rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 p-3 font-mono text-xs text-slate-800 dark:text-slate-200 custom-scrollbar">
+      <div className="mt-1.5 overflow-x-auto rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-800/60 p-3.5 font-mono text-xs text-slate-800 dark:text-slate-200 custom-scrollbar">
         {value || (t ? t("common.none") : "—")}
       </div>
     </div>
@@ -793,12 +800,12 @@ function MetricsPanel({
   const offset = circumference - (Number(gc || 0) / 100) * circumference;
 
   return (
-    <div className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-6 shadow-sm">
-      <h3 className="text-xs font-medium uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">
+    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-6 shadow-sm">
+      <h3 className="text-xs font-bold uppercase tracking-[0.1em] text-slate-600 dark:text-slate-300">
         {t("sequence.metrics")}
       </h3>
       <div className="mt-5 grid gap-6 md:grid-cols-3">
-        <div className="flex flex-col items-center justify-center rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 p-4">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/60 dark:border-slate-800 bg-gradient-to-b from-slate-50/80 to-white dark:from-slate-800/50 dark:to-slate-900/50 p-5 shadow-2xs">
           <div className="relative flex h-32 w-32 items-center justify-center">
             <svg className="h-full w-full -rotate-90">
               <circle
@@ -807,8 +814,8 @@ function MetricsPanel({
                 r="56"
                 fill="transparent"
                 stroke="currentColor"
-                strokeWidth="8"
-                className="text-slate-200 dark:text-slate-700"
+                strokeWidth="9"
+                className="text-slate-200/80 dark:text-slate-800"
               />
               <circle
                 cx="64"
@@ -816,7 +823,7 @@ function MetricsPanel({
                 r="56"
                 fill="transparent"
                 stroke="url(#gcGradient)"
-                strokeWidth="8"
+                strokeWidth="9"
                 strokeDasharray={circumference}
                 strokeDashoffset={offset}
                 strokeLinecap="round"
@@ -825,15 +832,16 @@ function MetricsPanel({
               <defs>
                 <linearGradient id="gcGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                   <stop offset="0%" stopColor="#22d3ee" />
-                  <stop offset="100%" stopColor="#0891b2" />
+                  <stop offset="50%" stopColor="#0ea5e9" />
+                  <stop offset="100%" stopColor="#6366f1" />
                 </linearGradient>
               </defs>
             </svg>
             <div className="absolute text-center">
-              <span className="block text-2xl font-bold text-slate-950 dark:text-slate-100">
+              <span className="block text-2xl font-extrabold text-slate-950 dark:text-slate-100">
                 {Number(gc).toFixed(1)}%
               </span>
-              <span className="text-[9px] font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">
                 GC
               </span>
             </div>
@@ -847,14 +855,14 @@ function MetricsPanel({
             const pct = total > 0 ? ((Number(counts[base] || 0) / total) * 100).toFixed(1) : "0.0";
             return (
               <div key={base} className="bar-row">
-                <div className="mb-1.5 flex justify-between font-mono text-xs text-slate-600 dark:text-slate-300">
-                  <span className="font-semibold">{base}</span>
-                  <span className="tabular-nums text-slate-500 dark:text-slate-400">
+                <div className="mb-1.5 flex justify-between font-mono text-xs text-slate-700 dark:text-slate-200">
+                  <span className="font-bold">{base}</span>
+                  <span className="tabular-nums font-medium text-slate-500 dark:text-slate-400">
                     {counts[base] || 0}{" "}
                     <span className="text-[10px] text-slate-400 dark:text-slate-500">({pct}%)</span>
                   </span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                <div className="h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                   <div
                     className="h-full rounded-full"
                     style={{
@@ -888,23 +896,23 @@ function MetricsPanel({
 
 function MiniStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-slate-50 dark:bg-slate-800/60 p-3 ring-1 ring-slate-100 dark:ring-slate-800">
-      <p className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">
+    <div className="rounded-xl bg-slate-50/90 dark:bg-slate-800/60 p-3.5 ring-1 ring-slate-200/70 dark:ring-slate-800">
+      <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">
         {label}
       </p>
-      <p className="mt-1 text-lg font-bold text-slate-900 dark:text-slate-100">{value}</p>
+      <p className="mt-1 text-lg font-extrabold text-slate-900 dark:text-slate-100">{value}</p>
     </div>
   );
 }
 
 function EmptyState({ title, message }: { title: string; message: string }) {
   return (
-    <div className="rounded-xl border border-dashed border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 p-10 text-center">
-      <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60">
-        <Dna className="h-5 w-5 text-slate-400 dark:text-slate-500" />
+    <div className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md p-10 text-center">
+      <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl border border-cyan-500/20 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
+        <Dna className="h-5 w-5" />
       </div>
-      <h3 className="mt-4 text-sm font-semibold text-slate-700 dark:text-slate-300">{title}</h3>
-      <p className="mx-auto mt-1.5 max-w-sm text-xs leading-5 text-slate-400 dark:text-slate-500">
+      <h3 className="mt-4 text-sm font-bold text-slate-800 dark:text-slate-200">{title}</h3>
+      <p className="mx-auto mt-1.5 max-w-sm text-xs leading-5 text-slate-500 dark:text-slate-400">
         {message}
       </p>
     </div>
